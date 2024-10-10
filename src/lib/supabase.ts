@@ -21,10 +21,10 @@ export type Site = {
     url: string
     alt: string
   }[]
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>  // Changed 'any' to 'unknown'
 }
 
-export async function getSites(bounds?: [number, number, number, number]) {
+export async function getSites(bounds?: [number, number, number, number]): Promise<Site[]> {
   let query = supabase
     .from('sites')
     .select('*')
@@ -37,5 +37,6 @@ export async function getSites(bounds?: [number, number, number, number]) {
   const { data, error } = await query
   
   if (error) throw error
+  if (!data) return []
   return data as Site[]
 }
