@@ -1,0 +1,12 @@
+# Ignore build output
+.next
+
+# Ignore node_modules
+node_modules
+
+# Ignore any files in the public directory
+public
+
+# Ignore configuration files
+*.config.js
+*.config.mjs

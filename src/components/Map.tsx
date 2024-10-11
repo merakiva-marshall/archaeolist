@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { createClient } from '@supabase/supabase-js'
+import { Site } from '../types/site' 
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 
@@ -27,23 +28,16 @@ interface SiteFromDB {
     };
   };
   address: string;
-  period: string[] | null;
-  features: string[] | null;
+  period: string[] | string | null;
+  features: string[] | string | null;
+  country: string;
+  slug: string;
 }
 
-interface Site {
-  id: string;
-  name: string;
-  description: string;
-  location: [number, number];
-  address: string;
-  period: string[];
-  features: string[];
-}
-
-interface MapProps {
+export interface MapProps {
   onSiteClick: (site: Site) => void;
 }
+
 
 export default function Map({ onSiteClick }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
@@ -64,7 +58,7 @@ export default function Map({ onSiteClick }: MapProps) {
       try {
         const { data, error } = await supabase
           .from('sites')
-          .select('id, name, description, location, address, period, features')
+          .select('id, name, description, location, address, period, features, country, slug')
 
         if (error) {
           console.error('Error fetching sites:', error)
@@ -88,8 +82,10 @@ export default function Map({ onSiteClick }: MapProps) {
               description: site.description,
               location: coordinates,
               address: site.address,
-              period: Array.isArray(site.period) ? site.period : [],
-              features: Array.isArray(site.features) ? site.features : []
+              period: site.period,
+              features: site.features,
+              country: site.country,
+              slug: site.slug
             };
           });
           setSites(parsedSites)
@@ -136,7 +132,9 @@ export default function Map({ onSiteClick }: MapProps) {
               description: site.description,
               address: site.address,
               period: site.period,
-              features: site.features
+              features: site.features,
+              country: site.country,
+              slug: site.slug
             }
           }))
         }
@@ -163,7 +161,9 @@ export default function Map({ onSiteClick }: MapProps) {
             location: geometry.coordinates as [number, number],
             address: properties.address,
             period: properties.period,
-            features: properties.features
+            features: properties.features,
+            country: properties.country,
+            slug: properties.slug
           };
           onSiteClick(site);
         }
@@ -173,7 +173,7 @@ export default function Map({ onSiteClick }: MapProps) {
         if (map.current) map.current.getCanvas().style.cursor = 'pointer'
       })
 
-      map.current.on('mouseleader', 'sites', () => {
+      map.current.on('mouseleave', 'sites', () => {
         if (map.current) map.current.getCanvas().style.cursor = ''
       })
     }
