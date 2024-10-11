@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 import { Site } from '../../../../types/site'
+import Header from '../../../../components/Header'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,8 +15,6 @@ export async function generateStaticParams() {
     .from('sites')
     .select('country, slug')
   
-  console.log('Sites for static generation:', sites)
-
   return sites?.map(({ country, slug }) => ({
     country,
     slug,
@@ -35,13 +36,45 @@ export default async function Page({ params }: { params: { country: string; slug
   const site: Site = data as Site;
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">{site.name}</h1>
-      <p className="mb-4">{site.description}</p>
-      <p className="mb-2"><strong>Country:</strong> {site.country}</p>
-      <p className="mb-2"><strong>Address:</strong> {site.address}</p>
-      <p className="mb-2"><strong>Period:</strong> {Array.isArray(site.period) ? site.period.join(', ') : site.period}</p>
-      <p className="mb-2"><strong>Features:</strong> {Array.isArray(site.features) ? site.features.join(', ') : site.features}</p>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <main className="flex-grow container mx-auto px-4 py-8 max-w-3xl">
+        <Link 
+          href="/"
+          className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Map
+        </Link>
+        <article className="bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="p-6 sm:p-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{site.name}</h1>
+            <p className="text-lg text-gray-700 mb-6">{site.description}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">Details</h2>
+                <p className="mb-1"><span className="font-medium">Country:</span> {site.country}</p>
+                <p className="mb-1"><span className="font-medium">Address:</span> {site.address}</p>
+                <p className="mb-1">
+                  <span className="font-medium">Period:</span> {Array.isArray(site.period) ? site.period.join(', ') : site.period}
+                </p>
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">Features</h2>
+                <ul className="list-disc list-inside">
+                  {Array.isArray(site.features) ? (
+                    site.features.map((feature, index) => (
+                      <li key={index} className="text-gray-700">{feature}</li>
+                    ))
+                  ) : (
+                    <li className="text-gray-700">{site.features}</li>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
+      </main>
     </div>
   )
 }
