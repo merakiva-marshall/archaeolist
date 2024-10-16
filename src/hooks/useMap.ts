@@ -1,28 +1,30 @@
 // src/hooks/useMap.ts
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import { Site } from '../types/site'
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 
 export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]) => {
-    const map = useRef<mapboxgl.Map | null>(null)
+  const map = useRef<mapboxgl.Map | null>(null)
 
   useEffect(() => {
     if (!container.current) return
 
-    map.current = new mapboxgl.Map({
+    const newMap = new mapboxgl.Map({
       container: container.current,
       style: 'mapbox://styles/mschurtz/cm256dnqy00i001p34w5q474q',
       center: [15, 40],
       zoom: 4
     })
 
+    map.current = newMap
+
     return () => {
-      map.current?.remove()
+      newMap.remove()
     }
-  }, [container]) // Add container to the dependency array
+  }, [container])
 
   useEffect(() => {
     if (!map.current || sites.length === 0) return
@@ -72,45 +74,45 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
 }
 
 export const useMapEventHandlers = (map: React.MutableRefObject<mapboxgl.Map | null>, onSiteClick: (site: Site) => void) => {
-    useEffect(() => {
-      if (!map.current) return
-  
-      const handleSiteClick = (e: mapboxgl.MapMouseEvent & { features?: mapboxgl.MapboxGeoJSONFeature[] }) => {
-        if (e.features && e.features[0].properties) {
-          const properties = e.features[0].properties;
-          const site: Site = {
-            id: properties.id,
-            name: properties.name,
-            description: properties.description,
-            location: e.features[0].geometry.type === 'Point' ? e.features[0].geometry.coordinates as [number, number] : [0, 0],
-            address: properties.address,
-            period: properties.period,
-            features: properties.features,
-            country: properties.country,
-            slug: properties.slug
-          };
-          onSiteClick(site);
-        }
+  useEffect(() => {
+    if (!map.current) return
+
+    const currentMap = map.current;
+
+    const handleSiteClick = (e: mapboxgl.MapMouseEvent & { features?: mapboxgl.MapboxGeoJSONFeature[] }) => {
+      if (e.features && e.features[0].properties) {
+        const properties = e.features[0].properties;
+        const site: Site = {
+          id: properties.id,
+          name: properties.name,
+          description: properties.description,
+          location: e.features[0].geometry.type === 'Point' ? e.features[0].geometry.coordinates as [number, number] : [0, 0],
+          address: properties.address,
+          period: properties.period,
+          features: properties.features,
+          country: properties.country,
+          slug: properties.slug
+        };
+        onSiteClick(site);
       }
-  
-      const handleMouseEnter = () => {
-        if (map.current) map.current.getCanvas().style.cursor = 'pointer'
-      }
-  
-      const handleMouseLeave = () => {
-        if (map.current) map.current.getCanvas().style.cursor = ''
-      }
-  
-      map.current.on('click', 'sites', handleSiteClick)
-      map.current.on('mouseenter', 'sites', handleMouseEnter)
-      map.current.on('mouseleave', 'sites', handleMouseLeave)
-  
-      return () => {
-        if (map.current) {
-          map.current.off('click', 'sites', handleSiteClick)
-          map.current.off('mouseenter', 'sites', handleMouseEnter)
-          map.current.off('mouseleave', 'sites', handleMouseLeave)
-        }
-      }
-    }, [map, onSiteClick])
-  }
+    }
+
+    const handleMouseEnter = () => {
+      currentMap.getCanvas().style.cursor = 'pointer'
+    }
+
+    const handleMouseLeave = () => {
+      currentMap.getCanvas().style.cursor = ''
+    }
+
+    currentMap.on('click', 'sites', handleSiteClick)
+    currentMap.on('mouseenter', 'sites', handleMouseEnter)
+    currentMap.on('mouseleave', 'sites', handleMouseLeave)
+
+    return () => {
+      currentMap.off('click', 'sites', handleSiteClick)
+      currentMap.off('mouseenter', 'sites', handleMouseEnter)
+      currentMap.off('mouseleave', 'sites', handleMouseLeave)
+    }
+  }, [map, onSiteClick])
+}
