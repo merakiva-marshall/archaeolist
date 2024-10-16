@@ -1,4 +1,4 @@
-// src/components/ui/button.tsx
+// src/app/components/ui/button.tsx
 
 import * as React from "react"
 import { cn } from "@/lib/utils"

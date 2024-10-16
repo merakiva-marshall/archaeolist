@@ -1,4 +1,7 @@
+// src/app/page.tsx
+
 import dynamic from 'next/dynamic'
+import { Suspense } from 'react'
 
 const HomePage = dynamic(() => import('../components/Homepage'), {
   ssr: false,
@@ -6,5 +9,9 @@ const HomePage = dynamic(() => import('../components/Homepage'), {
 })
 
 export default function Home() {
-  return <HomePage />
+  return (
+    <Suspense fallback={<div className="w-full h-screen bg-slate-100 animate-pulse" />}>
+      <HomePage />
+    </Suspense>
+  )
 }

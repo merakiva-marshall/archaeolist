@@ -1,3 +1,5 @@
+// src/app/components/WelcomePopup.tsx
+
 'use client'
 
 import { useState } from 'react'

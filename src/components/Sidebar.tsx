@@ -1,3 +1,5 @@
+// src/app/components/Sidebar.tsx
+
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet'
 import { Button } from './ui/button'
 import { Site } from '../types/site' 

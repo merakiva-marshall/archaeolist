@@ -1,4 +1,4 @@
-// src/types/site.ts
+// src/app/types/site.ts
 
 export interface Site {
     id: string;

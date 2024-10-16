@@ -1,3 +1,5 @@
+// src/app/components/Header.tsx
+
 import { Menu, Search } from 'lucide-react'
 import {
   Sheet,
@@ -5,7 +7,11 @@ import {
   SheetTrigger,
 } from "./ui/sheet"
 
-export default function Header() {
+interface HeaderProps {
+  onSearchClick?: () => void;
+}
+
+export default function Header({ onSearchClick }: HeaderProps) {
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,9 +39,11 @@ export default function Header() {
             </a>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <Search className="h-6 w-6" />
-            </button>
+            {onSearchClick && (
+              <button className="p-2 hover:bg-gray-100 rounded-lg" onClick={onSearchClick}>
+                <Search className="h-6 w-6" />
+              </button>
+            )}
           </div>
         </div>
       </div>
