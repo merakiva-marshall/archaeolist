@@ -1,10 +1,23 @@
+// src/components/WelcomePopup.tsx
+
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 
 export default function WelcomePopup() {
-  const [isVisible, setIsVisible] = useState(true)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    if (!localStorage.getItem('hasSeenWelcome')) {
+      setIsVisible(true)
+    }
+  }, [])
+
+  const handleClose = () => {
+    setIsVisible(false)
+    localStorage.setItem('hasSeenWelcome', 'true')
+  }
 
   if (!isVisible) return null
 
@@ -13,7 +26,7 @@ export default function WelcomePopup() {
       <div className="bg-white rounded-lg shadow-xl max-w-lg w-full">
         <div className="relative p-6">
           <button 
-            onClick={() => setIsVisible(false)}
+            onClick={handleClose}
             className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-lg"
           >
             <X className="h-6 w-6" />
@@ -31,7 +44,7 @@ export default function WelcomePopup() {
               <li>🌍 Plan your visits with practical information</li>
             </ul>
             <button
-              onClick={() => setIsVisible(false)}
+              onClick={handleClose}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
             >
               Start Exploring
