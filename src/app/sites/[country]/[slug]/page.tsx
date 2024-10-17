@@ -1,9 +1,10 @@
+// src/app/sites/[country]/[slug]/page.tsx
+
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Site } from '../../../../types/site'
-import Header from '../../../../components/Header'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -36,8 +37,7 @@ export default async function Page({ params }: { params: { country: string; slug
   const site: Site = data as Site;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+    <div className="flex flex-col min-h-[calc(100vh-theme(spacing.16))] bg-gray-50">
       <main className="flex-grow container mx-auto px-4 py-8 max-w-3xl">
         <Link 
           href="/"

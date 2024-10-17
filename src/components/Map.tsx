@@ -22,5 +22,5 @@ export default function Map({ onSiteClick }: MapProps) {
 
   useMapEventHandlers(map, onSiteClick)
 
-  return <div ref={mapContainer} className="w-full h-full" />
+  return <div ref={mapContainer} className="w-full flex-1" />
 }
