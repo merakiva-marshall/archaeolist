@@ -3,7 +3,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Home } from 'lucide-react'
 import { Site } from '../../../../types/site'
 import { Metadata } from 'next'
 
@@ -63,7 +63,7 @@ export default async function Page({ params }: { params: { country: string; slug
           className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Map
+          To Map <Home className="h-4 w-4 ml-2" />
         </Link>
         <article className="bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="p-6 sm:p-8">

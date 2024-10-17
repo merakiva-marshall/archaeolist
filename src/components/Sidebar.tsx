@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet'
 import { Button } from './ui/button'
 import { Site } from '../types/site'
 import { Card, CardContent } from './ui/card'
+import { useEffect } from 'react'
 
 type SidebarFieldValue = string | string[] | [number, number] | null;
 
@@ -58,10 +59,17 @@ interface SidebarProps {
   onClose: () => void;
   site: Site | null;
   onLearnMore: (site: Site) => void;
+  onOpen: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose, site, onLearnMore }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: SidebarProps) {
   if (!site) return null;
+
+  useEffect(() => {
+    if (isOpen) {
+      onOpen();
+    }
+  }, [isOpen, onOpen]);
 
   const renderSection = (title: string, content: React.ReactNode) => (
     <div key={title} className="mb-4">
@@ -72,11 +80,16 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore }: SidebarP
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="overflow-y-auto w-full sm:max-w-md md:max-w-lg bg-opacity-50 backdrop-blur-sm">
-        <SheetHeader>
-          <SheetTitle className="text-2xl font-bold mb-4">{site.name}</SheetTitle>
+      <SheetContent 
+        className="overflow-y-auto w-full bg-white h-[70vh] 
+                   sm:w-[33vw] sm:max-w-[500px] sm:h-screen sm:top-0 sm:right-0 sm:left-auto sm:rounded-none
+                   flex flex-col"
+        side="bottom"
+      >
+        <SheetHeader className="mb-4 sm:pt-16">
+          <SheetTitle className="text-2xl font-bold">{site.name}</SheetTitle>
         </SheetHeader>
-        <Card className="mb-4">
+        <Card className="mb-4 flex-grow overflow-y-auto">
           <CardContent className="pt-6">
             {(Object.entries(sidebarFields) as [keyof Site, SidebarFieldConfig][]).map(([key, field]) => 
               renderSection(field.title, field.render(site[key]))
@@ -85,7 +98,7 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore }: SidebarP
         </Card>
         <Button 
           onClick={() => onLearnMore(site)} 
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-auto"
         >
           Learn More
         </Button>

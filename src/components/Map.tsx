@@ -1,7 +1,5 @@
 // src/components/Map.tsx
 
-'use client'
-
 import { useEffect, useRef, useState } from 'react'
 import { Site } from '../types/site'
 import { useMap, useMapEventHandlers } from '../hooks/useMap'
@@ -9,9 +7,13 @@ import { fetchSites } from '../lib/supabase'
 
 export interface MapProps {
   onSiteClick: (site: Site) => void;
+  selectedSite: Site | null;
+  isSidebarOpen: boolean;
 }
 
-export default function Map({ onSiteClick }: MapProps) {
+const SITE_ZOOM_LEVEL = 12;
+
+export default function Map({ onSiteClick, selectedSite, isSidebarOpen }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const [sites, setSites] = useState<Site[]>([])
   const map = useMap(mapContainer, sites)
@@ -21,6 +23,21 @@ export default function Map({ onSiteClick }: MapProps) {
   }, [])
 
   useMapEventHandlers(map, onSiteClick)
+
+  useEffect(() => {
+    if (map.current && selectedSite) {
+      const isMobile = window.innerWidth < 640;
+
+      map.current.easeTo({
+        center: selectedSite.location,
+        zoom: SITE_ZOOM_LEVEL,
+        padding: isMobile ? 
+          { bottom: isSidebarOpen ? window.innerHeight * 0.7 : 0 } : 
+          { right: isSidebarOpen ? window.innerWidth * 0.3 : 0 },
+        duration: 1000
+      });
+    }
+  }, [selectedSite, isSidebarOpen]);
 
   return <div ref={mapContainer} className="w-full flex-1" />
 }
