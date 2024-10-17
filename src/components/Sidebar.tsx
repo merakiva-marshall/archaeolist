@@ -72,7 +72,7 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore }: SidebarP
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="overflow-y-auto">
+      <SheetContent className="overflow-y-auto w-full sm:max-w-md md:max-w-lg bg-opacity-50 backdrop-blur-sm">
         <SheetHeader>
           <SheetTitle className="text-2xl font-bold mb-4">{site.name}</SheetTitle>
         </SheetHeader>
