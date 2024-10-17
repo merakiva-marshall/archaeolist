@@ -1,6 +1,4 @@
-// src/components/Map.tsx
-
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { Site } from '../types/site'
 import { useMap, useMapEventHandlers } from '../hooks/useMap'
 import { fetchSites } from '../lib/supabase'
@@ -24,7 +22,7 @@ export default function Map({ onSiteClick, selectedSite, isSidebarOpen }: MapPro
 
   useMapEventHandlers(map, onSiteClick)
 
-  useEffect(() => {
+  const updateMapView = useCallback(() => {
     if (map.current && selectedSite) {
       const isMobile = window.innerWidth < 640;
 
@@ -37,7 +35,11 @@ export default function Map({ onSiteClick, selectedSite, isSidebarOpen }: MapPro
         duration: 1000
       });
     }
-  }, [selectedSite, isSidebarOpen]);
+  }, [map, selectedSite, isSidebarOpen]);
+
+  useEffect(() => {
+    updateMapView();
+  }, [updateMapView]);
 
   return <div ref={mapContainer} className="w-full flex-1" />
 }

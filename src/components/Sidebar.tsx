@@ -63,13 +63,13 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: SidebarProps) {
-  if (!site) return null;
-
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && site) {
       onOpen();
     }
-  }, [isOpen, onOpen]);
+  }, [isOpen, site, onOpen]);
+
+  if (!site) return null;
 
   const renderSection = (title: string, content: React.ReactNode) => (
     <div key={title} className="mb-4">
