@@ -14,7 +14,7 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
 
     const newMap = new mapboxgl.Map({
       container: container.current,
-      style: 'mapbox://styles/mschurtz/cm256dnqy00i001p34w5q474q',
+      style: 'mapbox://styles/mschurtz/cm2dn5d2w001e01pfedqpddfu',
       center: [15, 40],
       zoom: 4
     })
