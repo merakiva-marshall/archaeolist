@@ -5,11 +5,31 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Site } from '../../../../types/site'
+import { Metadata, ResolvingMetadata } from 'next'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
+
+export async function generateMetadata(
+  { params }: { params: { country: string; slug: string } },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { data } = await supabase
+    .from('sites')
+    .select('name')
+    .eq('country', params.country)
+    .eq('slug', params.slug)
+    .single()
+
+  const siteName = data?.name || 'Archaeological Site'
+
+  return {
+    title: `${siteName} | Archaeolist`,
+    description: `Explore ${siteName}, on Archaeolist.com`,
+  }
+}
 
 export async function generateStaticParams() {
   const { data: sites } = await supabase

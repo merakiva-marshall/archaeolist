@@ -1,13 +1,15 @@
-import { GeistSans } from 'geist/font/sans'
+// src/app/layout.tsx
+
 import './globals.css'
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import { daysOne, geist, geistMono } from './fonts/fonts'
 
 export const metadata: Metadata = {
   title: 'Archaeolist',
-  description: 'Discover archaeological sites worldwide',
+  description: 'Discover archaeological sites worldwide on our interactive map. Explore ancient history and plan your next adventure with Archaeolist.',
 }
 
 export default function RootLayout({
@@ -16,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className={`h-full ${daysOne.variable} ${geist.variable} ${geistMono.variable}`}>
       <head>
         {/* Load the gtag script asynchronously */}
         <Script 
@@ -33,7 +35,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${GeistSans.className} flex flex-col min-h-screen`}>
+      <body className={`${geist.className} flex flex-col min-h-screen`}>
         <Header />
         {children}
         <Footer />
