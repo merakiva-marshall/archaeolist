@@ -31,15 +31,40 @@ export async function generateMetadata(
 }
 
 export async function generateStaticParams() {
-  const { data: sites } = await supabase
-    .from('sites')
-    .select('country, slug')
-  
-  return sites?.map(({ country, slug }) => ({
+  console.log('Starting generateStaticParams');
+  let allSites: Pick<Site, 'country' | 'slug'>[] = [];
+  let page = 0;
+  const pageSize = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from('sites')
+      .select('country, slug')
+      .range(page * pageSize, (page + 1) * pageSize - 1)
+      .order('id', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching sites for static params:', error);
+      break;
+    }
+
+    if (data) {
+      allSites = [...allSites, ...data];
+    }
+
+    hasMore = data && data.length === pageSize;
+    page++;
+  }
+
+  console.log(`Generated static params for ${allSites.length} sites`);
+
+  return allSites.map(({ country, slug }) => ({
     country,
     slug,
-  })) || []
+  }));
 }
+
 
 export default async function Page({ params }: { params: { country: string; slug: string } }) {
   const { data } = await supabase
