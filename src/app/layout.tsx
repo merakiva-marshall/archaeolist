@@ -20,12 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full ${daysOne.variable} ${geist.variable} ${geistMono.variable}`}>
       <head>
-        {/* Load the gtag script asynchronously */}
         <Script 
           src="https://www.googletagmanager.com/gtag/js?id=G-F1W4Y0LMJ0" 
           strategy="afterInteractive"
         />
-        {/* Initialize Google Analytics */}
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
@@ -35,9 +33,11 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${geist.className} flex flex-col min-h-screen`}>
+      <body className={`${geist.className} flex flex-col h-screen`}>
         <Header />
-        {children}
+        <main className="flex-1 relative overflow-hidden">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

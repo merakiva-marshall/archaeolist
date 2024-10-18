@@ -25,23 +25,33 @@ export default function Map({ onSiteClick, selectedSite, isSidebarOpen }: MapPro
   useMapEventHandlers(map, onSiteClick)
 
   const updateMapView = useCallback(() => {
-    if (map.current && selectedSite) {
+    if (map.current && selectedSite && isSidebarOpen) {
       const isMobile = window.innerWidth < 640;
 
       map.current.easeTo({
         center: selectedSite.location,
         zoom: SITE_ZOOM_LEVEL,
         padding: isMobile ? 
-          { bottom: isSidebarOpen ? window.innerHeight * 0.7 : 0 } : 
-          { right: isSidebarOpen ? window.innerWidth * 0.3 : 0 },
+          { bottom: window.innerHeight * 0.7 } : 
+          { right: window.innerWidth * 0.3 },
         duration: 1000
+      });
+    } else if (map.current && !isSidebarOpen) {
+      // Reset padding when sidebar is closed
+      map.current.easeTo({
+        padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        duration: 300
       });
     }
   }, [map, selectedSite, isSidebarOpen]);
 
   useEffect(() => {
     updateMapView();
-  }, [updateMapView]);
+  }, [updateMapView, isSidebarOpen]);
 
-  return <div ref={mapContainer} className="w-full flex-1" />
+  return (
+    <div className="absolute inset-0">
+      <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
+    </div>
+  )
 }

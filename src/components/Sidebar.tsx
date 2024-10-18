@@ -1,10 +1,11 @@
 // src/components/Sidebar.tsx
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from './ui/sheet'
+import React, { useEffect } from 'react'
 import { Button } from './ui/button'
 import { Site } from '../types/site'
 import { Card, CardContent } from './ui/card'
-import { useEffect } from 'react'
+import { X } from 'lucide-react'
+
 
 type SidebarFieldValue = string | string[] | [number, number] | null;
 
@@ -38,7 +39,6 @@ const formatList = (list: SidebarFieldValue): JSX.Element => {
   return <p className="text-gray-700">N/A</p>;
 };
 
-// Configuration object for sidebar fields
 const sidebarFields: Record<keyof Pick<Site, 'description' | 'period' | 'features'>, SidebarFieldConfig> = {
   description: {
     title: "Description",
@@ -79,16 +79,24 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
   );
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent 
-        className="overflow-y-auto w-full bg-white h-[70vh] 
-                   sm:w-[33vw] sm:max-w-[500px] sm:h-screen sm:top-0 sm:right-0 sm:left-auto sm:rounded-none
-                   flex flex-col"
-        side="bottom"
-      >
-        <SheetHeader className="mb-4 sm:pt-16">
-          <SheetTitle className="text-2xl font-bold">{site.name}</SheetTitle>
-        </SheetHeader>
+    <div 
+      className={`fixed bg-white shadow-lg 
+                  transition-transform duration-300 ease-in-out z-40
+                  ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+                  sm:w-[400px] sm:top-[5rem] sm:bottom-[5rem] sm:right-4
+                  sm:rounded-l-2xl sm:rounded-tr-2xl sm:rounded-br-2xl
+                  max-sm:w-[calc(100%-1rem)] max-sm:top-[33%] max-sm:bottom-16 max-sm:left-2 max-sm:right-2
+                  max-sm:rounded-2xl`}
+    >
+      <div className="h-full flex flex-col p-6 overflow-y-auto">
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 p-2"
+          aria-label="Close sidebar"
+        >
+          <X className="w-6 h-6" />  {/* Using the X icon with increased size */}
+        </button>
+        <h2 className="text-2xl font-bold mb-4 pr-8">{site.name}</h2>
         <Card className="mb-4 flex-grow overflow-y-auto">
           <CardContent className="pt-6">
             {(Object.entries(sidebarFields) as [keyof Site, SidebarFieldConfig][]).map(([key, field]) => 
@@ -102,7 +110,7 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
         >
           Learn More
         </Button>
-      </SheetContent>
-    </Sheet>
-  )
+      </div>
+    </div>
+  );
 }

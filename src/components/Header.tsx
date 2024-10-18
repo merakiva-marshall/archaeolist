@@ -31,7 +31,7 @@ export default function Header() {
             
             <a href="/" className="ml-6 flex items-center space-x-2"> {/* Increased left margin */}
               <span className="text-2xl font-bold text-blue-600 font-days-one tracking-wide">Archaeolist</span>
-              {/* Increased to text-3xl, added tracking-wide for slight letter spacing */}
+              {/* Increased to text-2xl, added tracking-wide for slight letter spacing */}
             </a>
           </div>
           <div className="flex items-center space-x-4">
