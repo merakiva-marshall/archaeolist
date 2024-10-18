@@ -53,43 +53,61 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
           }))
         },
         cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 20,
-        clusterProperties: {
-          'point_count': ['+', ['get', 'point_count']],
-          'points': ['collect', ['get', 'id'], ['get', 'location']]
-        }
+        clusterMaxZoom: 11,
+        clusterRadius: 6
       });
 
-      // Add a layer for clustered points
+      // Add a layer for clustered points (heatmap)
       map.current.addLayer({
         id: 'clustered-points',
         type: 'heatmap',
         source: 'sites',
         filter: ['has', 'point_count'],
         paint: {
-          // Adjust the color gradient to maintain blue hues, enhancing intensity
-          'heatmap-color': [
+          // Increase the heatmap weight based on point count
+          'heatmap-weight': [
             'interpolate',
             ['linear'],
-            ['heatmap-density'],
-            0, 'rgba(59, 130, 246, 0)',   // Lighter blue with transparency for very low density
-            0.2, 'rgba(59, 130, 246, 0.6)', // Medium blue with some transparency
-            0.4, 'rgba(59, 130, 246, 0.8)', // Slightly more opaque blue
-            1, 'rgba(37, 99, 235, 1)'      // Dark blue, fully opaque for high density
+            ['get', 'point_count'],
+            0, 0,
+            10, 1
           ],
-          // Increase intensity to make the heatmap appear more pronounced, even with few points
+          // Increase the heatmap color weight by zoom level
           'heatmap-intensity': [
             'interpolate',
             ['linear'],
             ['zoom'],
-            0, 9,    // Set a higher base intensity for all zoom levels
-            10, 2
+            0, 2,
+            12, 1
           ],
-          // Set the radius to a constant value of 6 for a tighter effect
-          'heatmap-radius': 15,
-          // Set heatmap opacity to be fully opaque
-          'heatmap-opacity': .9
+           // Color ramp for heatmap using shades of blue, with a more vibrant high intensity
+           'heatmap-color': [
+            'interpolate',
+            ['linear'],
+            ['heatmap-density'],
+            0, 'rgba(65,182,196,0)',
+            0.1, 'rgba(65,182,196,0.5)',
+            0.3, 'rgb(44,127,184)',
+            0.5, 'rgb(33,102,172)',
+            0.7, 'rgb(52,103,186)',
+            1, 'rgb(31,76,148)'
+          ],
+          // Adjust the heatmap radius by zoom level
+          'heatmap-radius': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            0, 15,
+            9, 20
+          ],
+          // Transition from heatmap to circle layer by zoom level
+          'heatmap-opacity': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            7, 1,
+            16, 0
+          ],
         }
       });
 
@@ -150,7 +168,7 @@ export const useMapEventHandlers = (map: React.MutableRefObject<mapboxgl.Map | n
 
         currentMap.easeTo({
           center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
-          zoom: zoom ?? Math.min(currentMap.getZoom() + 1, 22)
+          zoom: zoom ?? Math.min(currentMap.getZoom() + 2, 22)
         });
       });
     }

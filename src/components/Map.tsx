@@ -1,3 +1,5 @@
+// src/components/Map.tsx
+
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Site } from '../types/site'
 import { useMap, useMapEventHandlers } from '../hooks/useMap'

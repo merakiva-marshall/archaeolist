@@ -26,7 +26,7 @@ export async function generateMetadata(
 
   return {
     title: `${siteName} | Archaeolist`,
-    description: `Explore ${siteName}, on Archaeolist.`,
+    description: `Explore ${siteName}, and other archaeological sites on Archaeolist's interactive map.`,
   }
 }
 

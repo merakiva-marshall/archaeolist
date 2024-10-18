@@ -39,6 +39,7 @@ export default function WelcomePopup() {
             </p>
             <ul className="space-y-2 text-gray-600 mb-6">
               <li>🗺️ Explore sites on the interactive map</li>
+              <li>🎨 Darker blue areas contain large numbers of sites</li>
               <li>📚 Access detailed information about each location</li>
               <li>🔍 Search for specific sites or regions</li>
               <li>🌍 Plan your visits with practical information</li>
