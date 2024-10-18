@@ -31,7 +31,11 @@ export default function HomePage() {
 
   return (
     <div className="absolute inset-0">
-      <Map onSiteClick={handleSiteClick} selectedSite={selectedSite} isSidebarOpen={sidebarOpen} />
+      <Map 
+        onSiteClick={handleSiteClick} 
+        selectedSite={selectedSite} 
+        isSidebarOpen={sidebarOpen} 
+      />
       <WelcomePopup />
       <Sidebar
         isOpen={sidebarOpen}

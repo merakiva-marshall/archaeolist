@@ -82,10 +82,10 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
     <div 
       className={`fixed bg-white shadow-lg 
                   transition-transform duration-300 ease-in-out z-40
-                  ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+                  ${isOpen ? 'translate-x-0' : 'translate-x-[calc(100%+1rem)]'}
                   sm:w-[400px] sm:top-[5rem] sm:bottom-[5rem] sm:right-4
                   sm:rounded-l-2xl sm:rounded-tr-2xl sm:rounded-br-2xl
-                  max-sm:w-[calc(100%-1rem)] max-sm:top-[33%] max-sm:bottom-16 max-sm:left-2 max-sm:right-2
+                  max-sm:w-[calc(100%-1rem)] max-sm:top-[33%] max-sm:bottom-16 max-sm:left-2 max-sm:right-[-0.5rem]
                   max-sm:rounded-2xl`}
     >
       <div className="h-full flex flex-col p-6 overflow-y-auto">
@@ -94,7 +94,7 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 p-2"
           aria-label="Close sidebar"
         >
-          <X className="w-6 h-6" />  {/* Using the X icon with increased size */}
+          <X size={24} />
         </button>
         <h2 className="text-2xl font-bold mb-4 pr-8">{site.name}</h2>
         <Card className="mb-4 flex-grow overflow-y-auto">
