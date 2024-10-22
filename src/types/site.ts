@@ -9,5 +9,6 @@ export interface Site {
   period: string[] | string | null;
   features: string[] | string | null;
   country: string;
+  country_slug: string;
   slug: string;
 }

@@ -1,4 +1,4 @@
-// src/app/sites/[country]/[slug]/page.tsx
+// src/app/sites/[country_slug]/[slug]/page.tsx
 
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
@@ -13,12 +13,12 @@ const supabase = createClient(
 )
 
 export async function generateMetadata(
-  { params }: { params: { country: string; slug: string } }
+  { params }: { params: { country_slug: string; slug: string } }
 ): Promise<Metadata> {
   const { data } = await supabase
     .from('sites')
     .select('name')
-    .eq('country', params.country)
+    .eq('country_slug', params.country_slug)
     .eq('slug', params.slug)
     .single()
 
@@ -32,7 +32,7 @@ export async function generateMetadata(
 
 export async function generateStaticParams() {
   console.log('Starting generateStaticParams');
-  let allSites: Pick<Site, 'country' | 'slug'>[] = [];
+  let allSites: Pick<Site, 'country_slug' | 'slug'>[] = [];
   let page = 0;
   const pageSize = 1000;
   let hasMore = true;
@@ -40,7 +40,7 @@ export async function generateStaticParams() {
   while (hasMore) {
     const { data, error } = await supabase
       .from('sites')
-      .select('country, slug')
+      .select('country_slug, slug')
       .range(page * pageSize, (page + 1) * pageSize - 1)
       .order('id', { ascending: true });
 
@@ -59,18 +59,20 @@ export async function generateStaticParams() {
 
   console.log(`Generated static params for ${allSites.length} sites`);
 
-  return allSites.map(({ country, slug }) => ({
-    country,
+  // Filter out any sites without country_slug
+  const validSites = allSites.filter(site => site.country_slug && site.slug);
+
+  return validSites.map(({ country_slug, slug }) => ({
+    country_slug,
     slug,
   }));
 }
 
-
-export default async function Page({ params }: { params: { country: string; slug: string } }) {
+export default async function Page({ params }: { params: { country_slug: string; slug: string } }) {
   const { data } = await supabase
     .from('sites')
     .select('*')
-    .eq('country', params.country)
+    .eq('country_slug', params.country_slug)
     .eq('slug', params.slug)
     .single()
 

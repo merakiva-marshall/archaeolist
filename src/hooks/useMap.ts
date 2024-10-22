@@ -64,7 +64,6 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
         source: 'sites',
         filter: ['has', 'point_count'],
         paint: {
-          // Increase the heatmap weight based on point count
           'heatmap-weight': [
             'interpolate',
             ['linear'],
@@ -72,7 +71,6 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
             0, 0,
             10, 1
           ],
-          // Increase the heatmap color weight by zoom level
           'heatmap-intensity': [
             'interpolate',
             ['linear'],
@@ -80,8 +78,7 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
             0, 2,
             12, 1
           ],
-           // Color ramp for heatmap using shades of blue, with a more vibrant high intensity
-           'heatmap-color': [
+          'heatmap-color': [
             'interpolate',
             ['linear'],
             ['heatmap-density'],
@@ -92,7 +89,6 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
             0.7, 'rgb(52,103,186)',
             1, 'rgb(31,76,148)'
           ],
-          // Adjust the heatmap radius by zoom level
           'heatmap-radius': [
             'interpolate',
             ['linear'],
@@ -100,7 +96,6 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
             0, 15,
             9, 20
           ],
-          // Transition from heatmap to circle layer by zoom level
           'heatmap-opacity': [
             'interpolate',
             ['linear'],
@@ -186,6 +181,7 @@ export const useMapEventHandlers = (map: React.MutableRefObject<mapboxgl.Map | n
           period: properties!.period,
           features: properties!.features,
           country: properties!.country,
+          country_slug: properties!.country_slug,
           slug: properties!.slug
         };
         onSiteClick(site);

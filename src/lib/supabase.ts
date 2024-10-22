@@ -18,7 +18,7 @@ export async function fetchSites(): Promise<Site[]> {
     while (hasMore) {
       const { data, error } = await supabase
         .from('sites')
-        .select('id, name, description, location, address, period, features, country, slug')
+        .select('id, name, description, location, address, period, features, country, country_slug, slug')
         .range(page * pageSize, (page + 1) * pageSize - 1)
         .order('id', { ascending: true });
 
@@ -37,6 +37,7 @@ export async function fetchSites(): Promise<Site[]> {
           period: site.period,
           features: site.features,
           country: site.country,
+          country_slug: site.country_slug,
           slug: site.slug
         }));
 

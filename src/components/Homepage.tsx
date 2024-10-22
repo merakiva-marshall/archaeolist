@@ -26,7 +26,7 @@ export default function HomePage() {
   }
 
   const handleLearnMore = (site: Site) => {
-    router.push(`/sites/${site.country}/${site.slug}`)
+    router.push(`/sites/${site.country_slug}/${site.slug}`)
   }
 
   return (
