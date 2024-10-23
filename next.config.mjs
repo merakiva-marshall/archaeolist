@@ -4,7 +4,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['archaeolist.com'],
+    domains: ['images.archaeolist.com'],
   },
 };
 
