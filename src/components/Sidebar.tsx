@@ -5,8 +5,7 @@
 import { useEffect } from 'react'
 import Image from 'next/image'
 import { Button } from './ui/button'
-import { Site, SiteImage } from '../types/site'
-import { Card } from './ui/card'
+import { Site } from '../types/site'
 import { X } from 'lucide-react'
 
 interface SidebarProps {
