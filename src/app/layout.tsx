@@ -6,6 +6,7 @@ import Script from 'next/script'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { daysOne, geist, geistMono } from './fonts/fonts'
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 export const metadata: Metadata = {
   title: 'Archaeolist',

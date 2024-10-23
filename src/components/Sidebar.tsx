@@ -1,58 +1,13 @@
 // src/components/Sidebar.tsx
 
-import React, { useEffect } from 'react'
+'use client'
+
+import { useEffect } from 'react'
+import Image from 'next/image'
 import { Button } from './ui/button'
-import { Site } from '../types/site'
-import { Card, CardContent } from './ui/card'
+import { Site, SiteImage } from '../types/site'
+import { Card } from './ui/card'
 import { X } from 'lucide-react'
-
-
-type SidebarFieldValue = string | string[] | [number, number] | null;
-
-type SidebarFieldConfig = {
-  title: string;
-  render: (value: SidebarFieldValue) => React.ReactNode;
-};
-
-const parseJsonString = (value: SidebarFieldValue): string[] => {
-  if (typeof value === 'string') {
-    try {
-      return JSON.parse(value);
-    } catch {
-      return [value];
-    }
-  }
-  return Array.isArray(value) ? value.map(String) : [];
-};
-
-const formatList = (list: SidebarFieldValue): JSX.Element => {
-  const parsedList = parseJsonString(list);
-  if (parsedList.length > 0) {
-    return (
-      <ul className="list-disc list-inside">
-        {parsedList.map((item, index) => (
-          <li key={index} className="text-gray-700">{item}</li>
-        ))}
-      </ul>
-    );
-  }
-  return <p className="text-gray-700">N/A</p>;
-};
-
-const sidebarFields: Record<keyof Pick<Site, 'description' | 'period' | 'features'>, SidebarFieldConfig> = {
-  description: {
-    title: "Description",
-    render: (value) => <p className="text-gray-700">{value as string}</p>
-  },
-  period: {
-    title: "Period",
-    render: (value) => formatList(value)
-  },
-  features: {
-    title: "Features",
-    render: (value) => formatList(value)
-  }
-};
 
 interface SidebarProps {
   isOpen: boolean;
@@ -65,18 +20,20 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: SidebarProps) {
   useEffect(() => {
     if (isOpen && site) {
+      console.log('Site data in sidebar:', site);
+      console.log('Images:', site.images);
+      if (site.images && Array.isArray(site.images)) {
+        console.log('First image:', site.images[0]);
+      }
       onOpen();
     }
   }, [isOpen, site, onOpen]);
 
   if (!site) return null;
 
-  const renderSection = (title: string, content: React.ReactNode) => (
-    <div key={title} className="mb-4">
-      <h3 className="font-semibold text-lg mb-2">{title}</h3>
-      {content}
-    </div>
-  );
+  const firstImage = site.images && Array.isArray(site.images) && site.images.length > 0 
+    ? site.images[0] 
+    : null;
 
   return (
     <div 
@@ -88,7 +45,7 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
                   max-sm:w-[calc(100%-1rem)] max-sm:top-[33%] max-sm:bottom-16 max-sm:left-2 max-sm:right-[-0.5rem]
                   max-sm:rounded-2xl`}
     >
-      <div className="h-full flex flex-col p-6 overflow-y-auto">
+      <div className="h-full flex flex-col p-6">
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 p-2"
@@ -96,17 +53,31 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
         >
           <X size={24} />
         </button>
+
         <h2 className="text-2xl font-bold mb-4 pr-8">{site.name}</h2>
-        <Card className="mb-4 flex-grow overflow-y-auto">
-          <CardContent className="pt-6">
-            {(Object.entries(sidebarFields) as [keyof Site, SidebarFieldConfig][]).map(([key, field]) => 
-              renderSection(field.title, field.render(site[key]))
-            )}
-          </CardContent>
-        </Card>
+        
+        <div className="flex-grow overflow-y-auto px-0.5">
+          {firstImage && (
+            <div className="mb-4 w-full">
+              <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
+                <Image
+                  src={firstImage.url}
+                  alt={firstImage.filename}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 400px) 100vw, 400px"
+                  priority
+                />
+              </div>
+            </div>
+          )}
+          
+          <p className="text-gray-700">{site.description}</p>
+        </div>
+
         <Button 
           onClick={() => onLearnMore(site)} 
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-auto"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-4"
         >
           Learn More
         </Button>

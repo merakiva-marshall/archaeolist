@@ -6,11 +6,15 @@ import Link from 'next/link'
 import { ArrowLeft, Home } from 'lucide-react'
 import { Site } from '../../../../types/site'
 import { Metadata } from 'next'
+import ImageGallery from '../../../../components/ImageGallery'
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
+
+export const revalidate = 0;  // Add this at the top level of the file
 
 export async function generateMetadata(
   { params }: { params: { country_slug: string; slug: string } }
@@ -68,6 +72,7 @@ export async function generateStaticParams() {
   }));
 }
 
+
 export default async function Page({ params }: { params: { country_slug: string; slug: string } }) {
   const { data } = await supabase
     .from('sites')
@@ -83,44 +88,52 @@ export default async function Page({ params }: { params: { country_slug: string;
   const site: Site = data as Site;
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-theme(spacing.16))] bg-gray-50">
-      <main className="flex-grow container mx-auto px-4 py-8 max-w-3xl">
-        <Link 
-          href="/"
-          className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          To Map <Home className="h-4 w-4 ml-2" />
-        </Link>
-        <article className="bg-white shadow-lg rounded-lg overflow-hidden">
-          <div className="p-6 sm:p-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{site.name}</h1>
-            <p className="text-lg text-gray-700 mb-6">{site.description}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">Details</h2>
-                <p className="mb-1"><span className="font-medium">Country:</span> {site.country}</p>
-                <p className="mb-1"><span className="font-medium">Address:</span> {site.address}</p>
-                <p className="mb-1">
-                  <span className="font-medium">Period:</span> {Array.isArray(site.period) ? site.period.join(', ') : site.period}
-                </p>
+    <main className="relative min-h-[calc(100vh-4rem)] bg-gray-50"> {/* Adjust for header height */}
+      <div className="absolute inset-0 overflow-y-auto">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <Link 
+            href="/"
+            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Map <Home className="h-4 w-4 ml-2" />
+          </Link>
+          
+          <article className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+            <div className="p-6 sm:p-8">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+                {site.name}
+              </h1>
+              
+              <div className="prose max-w-none mb-8">
+                <p className="text-lg text-gray-700">{site.description}</p>
               </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">Features</h2>
-                <ul className="list-disc list-inside">
-                  {Array.isArray(site.features) ? (
-                    site.features.map((feature, index) => (
-                      <li key={index} className="text-gray-700">{feature}</li>
-                    ))
-                  ) : (
-                    <li className="text-gray-700">{site.features}</li>
-                  )}
-                </ul>
+              
+              <div className="mb-8">
+                <ImageGallery site={site} />
+              </div>
+              
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Details</h2>
+                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <dt className="font-medium text-gray-600">Country</dt>
+                      <dd className="mt-1">{site.country}</dd>
+                    </div>
+                    {site.address && (
+                      <div>
+                        <dt className="font-medium text-gray-600">Address</dt>
+                        <dd className="mt-1">{site.address}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
               </div>
             </div>
-          </div>
-        </article>
-      </main>
-    </div>
-  )
+          </article>
+        </div>
+      </div>
+    </main>
+  );
 }
