@@ -6,28 +6,7 @@ import { useState } from 'react';
 import { Timeline } from '../types/site';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { logger } from '../lib/logger';
-
-function parseDateString(dateStr: string): number {
-  if (!dateStr) return 0;
-  
-  const numberMatch = dateStr.match(/-?\d+/);
-  if (!numberMatch) return 0;
-  
-  let year = parseInt(numberMatch[0]);
-  if (dateStr.includes('BCE')) {
-    year = -year;
-  }
-  return year;
-}
-
-function formatDate(dateStr: string): string {
-  if (!dateStr) return '';
-  
-  const year = parseInt(dateStr.match(/-?\d+/)?.[0] || '0');
-  if (year === 0) return dateStr;
-  
-  return Math.abs(year) + (year < 0 ? ' BCE' : ' CE');
-}
+import { parseDateString, compareDates, type ParsedDate } from '../lib/dateUtils';
 
 interface TimelineItemProps {
   title: string;
@@ -42,15 +21,22 @@ interface TimelineItemProps {
 
 function TimelineItem({ 
   title, 
-  date = [], // Provide default empty array
-  century = [], // Provide default empty array
-  description = [], // Provide default empty array
+  date = [],
+  century = [],
+  description = [], 
   index,
   isLast,
   isExpanded,
   onToggle 
 }: TimelineItemProps) {
   const isEven = index % 2 === 0;
+
+  // Format the date display
+  const displayDate = date.length > 0 
+    ? date.join(', ')
+    : century.length > 0 
+      ? century[0]
+      : '';
 
   return (
     <div className={`
@@ -84,16 +70,13 @@ function TimelineItem({
           <div className="flex justify-between items-start">
             <div>
               <h3 className="font-medium text-gray-900">{title}</h3>
-              {date && date.length > 0 && (
+              {displayDate && (
                 <p className="text-sm text-gray-600 mt-1">
-                  {date.map(formatDate).join(', ')}
+                  {displayDate}
                 </p>
               )}
-              {(!date || date.length === 0) && century && century.length > 0 && (
-                <p className="text-sm text-gray-600 mt-1">{century[0]}</p>
-              )}
             </div>
-            {description && description.length > 0 && (
+            {description.length > 0 && (
               isExpanded ? (
                 <ChevronUp className="h-4 w-4 text-gray-500 mt-1" />
               ) : (
@@ -102,7 +85,7 @@ function TimelineItem({
             )}
           </div>
           
-          {isExpanded && description && description.length > 0 && (
+          {isExpanded && description.length > 0 && (
             <div className="mt-3 text-sm text-gray-700">
               {description.map((desc, i) => (
                 <p key={i} className="mt-1">{desc}</p>
@@ -119,11 +102,15 @@ interface SiteTimelineProps {
   timeline: Timeline;
 }
 
+interface TimelineItemWithDate extends TimelineItemProps {
+  parsedDate: ParsedDate;
+}
+
 export default function SiteTimeline({ timeline }: SiteTimelineProps) {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   
   try {
-    // Safely transform timeline entries with proper type checking
+    // Transform and sort timeline entries
     const timelineItems = Object.entries(timeline || {})
       .map(([title, data]) => {
         if (!data) {
@@ -131,19 +118,24 @@ export default function SiteTimeline({ timeline }: SiteTimelineProps) {
           return null;
         }
 
+        // Parse the primary date (from date array or century array)
+        const parsedDate = data.date && data.date.length > 0
+          ? parseDateString(data.date[0])
+          : data.century && data.century.length > 0
+            ? parseDateString(data.century[0])
+            : { type: 'unknown' as const, year: 0, original: '' };
+
         return {
           title,
           ...data,
           date: data.date || [],
           century: data.century || [],
           description: data.description || [],
-          sortDate: data.date && Array.isArray(data.date) && data.date.length > 0 
-            ? parseDateString(data.date[0])
-            : 0
+          parsedDate
         };
       })
-      .filter((item): item is NonNullable<typeof item> => item !== null)
-      .sort((a, b) => b.sortDate - a.sortDate);
+      .filter((item): item is TimelineItemWithDate => item !== null)
+      .sort((a, b) => compareDates(a.parsedDate, b.parsedDate));
 
     if (timelineItems.length === 0) {
       return null;
@@ -151,7 +143,6 @@ export default function SiteTimeline({ timeline }: SiteTimelineProps) {
 
     return (
       <div className="relative">
-        {/* Desktop-only center line with rounded ends */}
         <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-[2px] bg-blue-300 transform -translate-x-1/2 rounded-full" />
 
         <div className="space-y-0">
