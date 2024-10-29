@@ -56,20 +56,20 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
         <h2 className="text-2xl font-bold mb-4 pr-8">{site.name}</h2>
         
         <div className="flex-grow overflow-y-auto px-0.5">
-          {firstImage && (
-            <div className="mb-4 w-full">
-              <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
-                <Image
-                  src={firstImage.url}
-                  alt={firstImage.filename}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 400px) 100vw, 400px"
-                  priority
-                />
-              </div>
+        {firstImage && (
+          <div className="mb-4 w-full">
+            <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
+              <Image
+                src={firstImage.url}
+                alt={firstImage.filename}
+                fill
+                className="object-cover"
+                unoptimized
+                sizes="(max-width: 640px) 100vw, 400px"
+              />
             </div>
-          )}
+          </div>
+        )}
           
           <p className="text-gray-700">{site.description}</p>
         </div>

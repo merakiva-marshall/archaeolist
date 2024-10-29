@@ -9,16 +9,42 @@ export interface SiteImage {
   contentType: string;
 }
 
+export interface TimelineItem {
+  date: string[];
+  century: string[];
+  description: string[];
+}
+
+export interface Timeline {
+  [key: string]: TimelineItem;
+}
+
+export interface ProcessedFeatures {
+  [category: string]: string[];
+}
+
+export interface ProcessedPeriods {
+  [period: string]: string[];
+}
+
 export interface Site {
+  // Required properties
   id: string;
   name: string;
   description: string;
   location: [number, number];
-  address: string | null;
   country: string;
   country_slug: string;
   slug: string;
-  period: string;
-  features: string;
+  
+  // Optional properties
+  address?: string | null;
   images?: SiteImage[] | null;
+  wikipedia_url?: string;
+  is_unesco?: boolean;
+  short_description?: string;
+  processed_features?: ProcessedFeatures;
+  processed_periods?: ProcessedPeriods;
+  timeline?: Timeline;
+  archaeological_site_yn?: boolean;
 }

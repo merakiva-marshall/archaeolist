@@ -49,7 +49,8 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
               type: 'Point',
               coordinates: site.location
             },
-            properties: { ...site }
+            properties: { 
+              ...site }
           }))
         },
         cluster: true,
@@ -172,18 +173,29 @@ export const useMapEventHandlers = (map: React.MutableRefObject<mapboxgl.Map | n
       const features = currentMap.queryRenderedFeatures(e.point, { layers: ['unclustered-points'] });
       if (features.length > 0) {
         const properties = features[0].properties;
+        if (!properties) return;
+
+        // Create a site object with required properties
         const site: Site = {
-          id: properties!.id,
-          name: properties!.name,
-          description: properties!.description,
+          id: properties.id,
+          name: properties.name,
+          description: properties.description,
           location: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
-          address: properties!.address,
-          period: properties!.period,
-          features: properties!.features,
-          country: properties!.country,
-          country_slug: properties!.country_slug,
-          slug: properties!.slug
+          country: properties.country,
+          country_slug: properties.country_slug,
+          slug: properties.slug,
+          // Optional properties can be included if they exist
+          address: properties.address,
+          images: properties.images,
+          wikipedia_url: properties.wikipedia_url,
+          is_unesco: properties.is_unesco,
+          short_description: properties.short_description,
+          processed_features: properties.processed_features,
+          processed_periods: properties.processed_periods,
+          timeline: properties.timeline,
+          archaeological_site_yn: properties.archaeological_site_yn
         };
+
         onSiteClick(site);
 
         currentMap.flyTo({

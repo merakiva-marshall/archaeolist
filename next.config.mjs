@@ -4,7 +4,15 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['images.archaeolist.com'],
+    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.archaeolist.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 };
 

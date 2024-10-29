@@ -3,39 +3,39 @@
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Home } from 'lucide-react'
+import { ArrowLeft, Home, ExternalLink } from 'lucide-react'
 import { Site } from '../../../../types/site'
 import { Metadata } from 'next'
 import ImageGallery from '../../../../components/ImageGallery'
-
+import SiteFeatures from '../../../../components/SiteFeatures'
+import SitePeriods from '../../../../components/SitePeriods'
+import SiteTimeline from '../../../../components/SiteTimeline'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export const revalidate = 0;  // Add this at the top level of the file
+export const revalidate = 0;
 
 export async function generateMetadata(
   { params }: { params: { country_slug: string; slug: string } }
 ): Promise<Metadata> {
   const { data } = await supabase
     .from('sites')
-    .select('name')
+    .select('name, short_description')
     .eq('country_slug', params.country_slug)
     .eq('slug', params.slug)
     .single()
 
-  const siteName = data?.name || 'Archaeological Site'
-
   return {
-    title: `${siteName} | Archaeolist`,
-    description: `Explore ${siteName}, and other archaeological sites on Archaeolist's interactive map.`,
+    title: data ? `${data.name} | Archaeolist` : 'Archaeological Site | Archaeolist',
+    description: data?.short_description || 'Explore archaeological sites on Archaeolist\'s interactive map.',
   }
 }
 
 export async function generateStaticParams() {
-  console.log('Starting generateStaticParams');
   let allSites: Pick<Site, 'country_slug' | 'slug'>[] = [];
   let page = 0;
   const pageSize = 1000;
@@ -48,30 +48,19 @@ export async function generateStaticParams() {
       .range(page * pageSize, (page + 1) * pageSize - 1)
       .order('id', { ascending: true });
 
-    if (error) {
-      console.error('Error fetching sites for static params:', error);
-      break;
-    }
-
-    if (data) {
-      allSites = [...allSites, ...data];
-    }
-
+    if (error) break;
+    if (data) allSites = [...allSites, ...data];
     hasMore = data && data.length === pageSize;
     page++;
   }
 
-  console.log(`Generated static params for ${allSites.length} sites`);
-
-  // Filter out any sites without country_slug
-  const validSites = allSites.filter(site => site.country_slug && site.slug);
-
-  return validSites.map(({ country_slug, slug }) => ({
-    country_slug,
-    slug,
-  }));
+  return allSites
+    .filter(site => site.country_slug && site.slug)
+    .map(({ country_slug, slug }) => ({
+      country_slug,
+      slug,
+    }));
 }
-
 
 export default async function Page({ params }: { params: { country_slug: string; slug: string } }) {
   const { data } = await supabase
@@ -87,10 +76,15 @@ export default async function Page({ params }: { params: { country_slug: string;
 
   const site: Site = data as Site;
 
+  // Ensure we have valid objects even if the properties are undefined
+  const timeline = site.timeline || {};
+  const processedFeatures = site.processed_features || {};
+  const processedPeriods = site.processed_periods || {};
+
   return (
-    <main className="relative min-h-[calc(100vh-4rem)] bg-gray-50"> {/* Adjust for header height */}
+    <main className="relative min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="absolute inset-0 overflow-y-auto">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="container mx-auto px-4 py-8 pb-16 max-w-4xl">
           <Link 
             href="/"
             className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
@@ -99,35 +93,112 @@ export default async function Page({ params }: { params: { country_slug: string;
             Back to Map <Home className="h-4 w-4 ml-2" />
           </Link>
           
-          <article className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
-            <div className="p-6 sm:p-8">
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-                {site.name}
-              </h1>
-              
-              <div className="prose max-w-none mb-8">
-                <p className="text-lg text-gray-700">{site.description}</p>
-              </div>
-              
-              <div className="mb-8">
-                <ImageGallery site={site} />
-              </div>
-              
-              <div className="grid grid-cols-1 gap-6">
-                <div>
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">Details</h2>
-                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <dt className="font-medium text-gray-600">Country</dt>
-                      <dd className="mt-1">{site.country}</dd>
+          <article className="space-y-8">
+            {/* Header Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-3xl sm:text-4xl">{site.name}</CardTitle>
+                {site.short_description && (
+                  <p className="text-lg text-gray-600 mt-4 leading-relaxed">{site.short_description}</p>
+                )}
+              </CardHeader>
+            </Card>
+
+            {/* Mobile Periods */}
+            <div className="lg:hidden">
+              <SitePeriods periods={processedPeriods} />
+            </div>
+
+            <div className="flex gap-8">
+              <div className="flex-1 space-y-8">
+                {/* Description Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-2xl">About</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose max-w-none">
+                      <p className="text-gray-700">{site.description}</p>
                     </div>
-                    {site.address && (
+                  </CardContent>
+                </Card>
+
+                {/* Image Gallery */}
+                {site.images && site.images.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-2xl">Gallery</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ImageGallery site={site} />
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Features Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-2xl">Site Features</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <SiteFeatures 
+                      features={processedFeatures}
+                      siteId={site.id}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Timeline Section */}
+                {Object.keys(timeline).length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-2xl">Site Timeline</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <SiteTimeline timeline={timeline} />
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Details Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-2xl">Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <dt className="font-medium text-gray-600">Address</dt>
-                        <dd className="mt-1">{site.address}</dd>
+                        <dt className="font-medium text-gray-600">Country</dt>
+                        <dd className="mt-1">{site.country}</dd>
                       </div>
-                    )}
-                  </dl>
+                      {site.wikipedia_url && (
+                        <div>
+                          <dt className="font-medium text-gray-600">Source</dt>
+                          <dd className="mt-1">
+                            <a 
+                              href={site.wikipedia_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+                            >
+                              Wikipedia
+                              <ExternalLink className="h-4 w-4 ml-1" />
+                            </a>
+                          </dd>
+                        </div>
+                      )}
+                    </dl>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Desktop Periods */}
+              <div className="hidden lg:block w-48">
+                <div className="sticky top-8">
+                  <SitePeriods 
+                    periods={processedPeriods}
+                    isFloating={true}
+                  />
                 </div>
               </div>
             </div>

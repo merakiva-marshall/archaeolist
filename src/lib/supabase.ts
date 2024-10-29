@@ -1,7 +1,7 @@
 // src/lib/supabase.ts
 
 import { createClient } from '@supabase/supabase-js'
-import { Site, SiteImage } from '../types/site'
+import { Site, SiteImage, Timeline } from '../types/site'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,12 +14,17 @@ interface RawSite {
   description: string;
   location: { coordinates: [number, number] };
   address: string | null;
-  period: string;
-  features: string;
   country: string;
   country_slug: string;
   slug: string;
   images: SiteImage[] | null;
+  wikipedia_url?: string;
+  is_unesco?: boolean;
+  short_description?: string;
+  processed_features?: { [key: string]: string[] };
+  processed_periods?: { [key: string]: string[] };
+  timeline?: Timeline;
+  archaeological_site_yn?: boolean;
 }
 
 export async function fetchSites(): Promise<Site[]> {
@@ -34,7 +39,7 @@ export async function fetchSites(): Promise<Site[]> {
       
       const { data, error } = await supabase
         .from('sites')
-        .select('*, images')
+        .select('*')
         .range(page * pageSize, (page + 1) * pageSize - 1)
         .order('id', { ascending: true });
 
@@ -44,9 +49,6 @@ export async function fetchSites(): Promise<Site[]> {
       }
 
       if (data) {
-        // Log raw data for debugging
-        console.log('Raw data example:', data[0]);
-
         const formattedSites = data.map((site: RawSite) => {
           const formattedSite: Site = {
             id: site.id,
@@ -54,16 +56,18 @@ export async function fetchSites(): Promise<Site[]> {
             description: site.description,
             location: site.location.coordinates,
             address: site.address,
-            period: site.period,
-            features: site.features,
             country: site.country,
             country_slug: site.country_slug,
             slug: site.slug,
-            images: Array.isArray(site.images) ? site.images : (site.images ? JSON.parse(site.images as unknown as string) : null)
+            images: Array.isArray(site.images) ? site.images : (site.images ? JSON.parse(site.images as unknown as string) : null),
+            wikipedia_url: site.wikipedia_url,
+            is_unesco: site.is_unesco,
+            short_description: site.short_description,
+            processed_features: site.processed_features,
+            processed_periods: site.processed_periods,
+            timeline: site.timeline,
+            archaeological_site_yn: site.archaeological_site_yn
           };
-
-          // Log formatted site for debugging
-          console.log(`Formatted site ${formattedSite.name} images:`, formattedSite.images);
           
           return formattedSite;
         });
