@@ -13,6 +13,35 @@ export const metadata: Metadata = {
   description: 'Discover archaeological sites worldwide on our interactive map. Explore ancient history and plan your next adventure with Archaeolist.',
 }
 
+function OrganizationSchema() {
+  const orgSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': 'https://archaeolist.com',
+    name: 'Archaeolist',
+    url: 'https://archaeolist.com',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://archaeolist.com/logo.png',
+      width: 100,  // Update with your logo's dimensions
+      height: 100,
+    },
+    description: 'Discover archaeological sites worldwide on our interactive map. Explore ancient history and plan your next adventure with Archaeolist.',
+    sameAs: [
+      'https://merakivatravel.com',
+      'https://instagram.com/merakiva.travel'
+    ]
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+    />
+  )
+}
+
+
 export default function RootLayout({
   children,
 }: {
@@ -21,6 +50,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full ${daysOne.variable} ${geist.variable} ${geistMono.variable}`}>
       <head>
+      <OrganizationSchema />
+      <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="https://images.archaeolist.com/archaeolist_map_preview.png" />
         <Script 
           src="https://www.googletagmanager.com/gtag/js?id=G-F1W4Y0LMJ0" 
           strategy="afterInteractive"

@@ -10,7 +10,9 @@ import ImageGallery from '../../../../components/ImageGallery'
 import SiteFeatures from '../../../../components/SiteFeatures'
 import SitePeriods from '../../../../components/SitePeriods'
 import SiteTimeline from '../../../../components/SiteTimeline'
+import StructuredData from '../../../../components/StructuredData'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card'
+import { generateBaseMetadata } from '../../../../lib/metadata'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,15 +26,21 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { data } = await supabase
     .from('sites')
-    .select('name, short_description')
+    .select('name, short_description, images')
     .eq('country_slug', params.country_slug)
     .eq('slug', params.slug)
     .single()
 
-  return {
-    title: data ? `${data.name} | Archaeolist` : 'Archaeological Site | Archaeolist',
-    description: data?.short_description || 'Explore archaeological sites on Archaeolist\'s interactive map.',
-  }
+  if (!data) return generateBaseMetadata()
+
+  const mainImage = data.images?.[0]?.url
+
+  return generateBaseMetadata({
+    title: data.name,
+    description: data.short_description,
+    path: `/sites/${params.country_slug}/${params.slug}`,
+    image: mainImage
+  })
 }
 
 export async function generateStaticParams() {
@@ -82,7 +90,9 @@ export default async function Page({ params }: { params: { country_slug: string;
   const processedPeriods = site.processed_periods || {};
 
   return (
-    <main className="relative min-h-[calc(100vh-4rem)] bg-gray-50">
+    <>
+      <StructuredData site={site} />
+      <main className="relative min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="absolute inset-0 overflow-y-auto">
         <div className="container mx-auto px-4 py-8 pb-16 max-w-4xl">
           <Link 
@@ -205,6 +215,7 @@ export default async function Page({ params }: { params: { country_slug: string;
           </article>
         </div>
       </div>
-    </main>
+      </main>
+    </>
   );
 }
