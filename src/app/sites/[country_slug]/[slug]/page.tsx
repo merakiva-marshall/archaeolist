@@ -13,6 +13,8 @@ import SiteTimeline from '../../../../components/SiteTimeline'
 import StructuredData from '../../../../components/StructuredData'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card'
 import { generateBaseMetadata } from '../../../../lib/metadata'
+import ErrorBoundary from '../../../../components/ErrorBoundary'
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -91,6 +93,7 @@ export default async function Page({ params }: { params: { country_slug: string;
 
   return (
     <>
+    <ErrorBoundary>
       <StructuredData site={site} />
       <main className="relative min-h-[calc(100vh-4rem)] bg-gray-50">
       <div className="absolute inset-0 overflow-y-auto">
@@ -216,6 +219,7 @@ export default async function Page({ params }: { params: { country_slug: string;
         </div>
       </div>
       </main>
+      </ErrorBoundary>
     </>
   );
 }

@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { Timeline } from '../types/site';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { logger } from '../lib/logger';
 
 function parseDateString(dateStr: string): number {
   if (!dateStr) return 0;
@@ -20,6 +21,8 @@ function parseDateString(dateStr: string): number {
 }
 
 function formatDate(dateStr: string): string {
+  if (!dateStr) return '';
+  
   const year = parseInt(dateStr.match(/-?\d+/)?.[0] || '0');
   if (year === 0) return dateStr;
   
@@ -39,9 +42,9 @@ interface TimelineItemProps {
 
 function TimelineItem({ 
   title, 
-  date, 
-  century, 
-  description, 
+  date = [], // Provide default empty array
+  century = [], // Provide default empty array
+  description = [], // Provide default empty array
   index,
   isLast,
   isExpanded,
@@ -81,16 +84,16 @@ function TimelineItem({
           <div className="flex justify-between items-start">
             <div>
               <h3 className="font-medium text-gray-900">{title}</h3>
-              {date.length > 0 && (
+              {date && date.length > 0 && (
                 <p className="text-sm text-gray-600 mt-1">
                   {date.map(formatDate).join(', ')}
                 </p>
               )}
-              {!date.length && century.length > 0 && (
+              {(!date || date.length === 0) && century && century.length > 0 && (
                 <p className="text-sm text-gray-600 mt-1">{century[0]}</p>
               )}
             </div>
-            {description.length > 0 && (
+            {description && description.length > 0 && (
               isExpanded ? (
                 <ChevronUp className="h-4 w-4 text-gray-500 mt-1" />
               ) : (
@@ -99,7 +102,7 @@ function TimelineItem({
             )}
           </div>
           
-          {isExpanded && description.length > 0 && (
+          {isExpanded && description && description.length > 0 && (
             <div className="mt-3 text-sm text-gray-700">
               {description.map((desc, i) => (
                 <p key={i} className="mt-1">{desc}</p>
@@ -119,33 +122,57 @@ interface SiteTimelineProps {
 export default function SiteTimeline({ timeline }: SiteTimelineProps) {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   
-  const timelineItems = Object.entries(timeline)
-    .map(([title, data]) => ({
-      title,
-      ...data,
-      sortDate: data.date.length > 0 
-        ? parseDateString(data.date[0])
-        : 0
-    }))
-    .sort((a, b) => b.sortDate - a.sortDate);
+  try {
+    // Safely transform timeline entries with proper type checking
+    const timelineItems = Object.entries(timeline || {})
+      .map(([title, data]) => {
+        if (!data) {
+          logger.warn(`Invalid timeline data for title: ${title}`);
+          return null;
+        }
 
-  return (
-    <div className="relative">
-      {/* Desktop-only center line with rounded ends */}
-      <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-[2px] bg-blue-300 transform -translate-x-1/2 rounded-full" />
+        return {
+          title,
+          ...data,
+          date: data.date || [],
+          century: data.century || [],
+          description: data.description || [],
+          sortDate: data.date && Array.isArray(data.date) && data.date.length > 0 
+            ? parseDateString(data.date[0])
+            : 0
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+      .sort((a, b) => b.sortDate - a.sortDate);
 
-      <div className="space-y-0">
-        {timelineItems.map((item, index) => (
-          <TimelineItem
-            key={item.title}
-            {...item}
-            index={index}
-            isLast={index === timelineItems.length - 1}
-            isExpanded={expandedItem === item.title}
-            onToggle={() => setExpandedItem(expandedItem === item.title ? null : item.title)}
-          />
-        ))}
+    if (timelineItems.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="relative">
+        {/* Desktop-only center line with rounded ends */}
+        <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-[2px] bg-blue-300 transform -translate-x-1/2 rounded-full" />
+
+        <div className="space-y-0">
+          {timelineItems.map((item, index) => (
+            <TimelineItem
+              key={item.title}
+              {...item}
+              index={index}
+              isLast={index === timelineItems.length - 1}
+              isExpanded={expandedItem === item.title}
+              onToggle={() => setExpandedItem(expandedItem === item.title ? null : item.title)}
+            />
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    logger.error(error as Error, {
+      component: 'SiteTimeline',
+      timeline: JSON.stringify(timeline)
+    });
+    return null;
+  }
 }

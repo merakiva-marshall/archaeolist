@@ -8,7 +8,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-interface RawSite {
+
+export interface RawSite {
   id: string;
   name: string;
   description: string;
@@ -25,6 +26,7 @@ interface RawSite {
   processed_periods?: { [key: string]: string[] };
   timeline?: Timeline;
   archaeological_site_yn?: boolean;
+  updated_at: string; // Add this line
 }
 
 export async function fetchSites(): Promise<Site[]> {
