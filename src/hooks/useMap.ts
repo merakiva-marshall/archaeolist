@@ -3,6 +3,11 @@
 import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import { Site } from '../types/site'
+import { 
+  siteSourceConfig,
+  layerOrder,
+  getLayerConfig 
+} from '../lib/mapLayers'
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 
@@ -33,14 +38,19 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
       if (!map.current) return;
       
       // Remove existing layers and source if they exist
-      ['clustered-points', 'unclustered-points'].forEach(layer => {
-        if (map.current!.getLayer(layer)) map.current!.removeLayer(layer);
+      layerOrder.forEach(layerId => {
+        if (map.current!.getLayer(layerId)) {
+          map.current!.removeLayer(layerId);
+        }
       });
-      if (map.current.getSource('sites')) map.current.removeSource('sites');
+      
+      if (map.current.getSource('sites')) {
+        map.current.removeSource('sites');
+      }
 
-      // Add new source with clustering enabled
+      // Add source with clustering enabled
       map.current.addSource('sites', {
-        type: 'geojson',
+        ...siteSourceConfig,
         data: {
           type: 'FeatureCollection',
           features: sites.map(site => ({
@@ -49,81 +59,14 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
               type: 'Point',
               coordinates: site.location
             },
-            properties: { 
-              ...site }
+            properties: { ...site }
           }))
-        },
-        cluster: true,
-        clusterMaxZoom: 11,
-        clusterRadius: 6
-      });
-
-      // Add a layer for clustered points (heatmap)
-      map.current.addLayer({
-        id: 'clustered-points',
-        type: 'heatmap',
-        source: 'sites',
-        filter: ['has', 'point_count'],
-        paint: {
-          'heatmap-weight': [
-            'interpolate',
-            ['linear'],
-            ['get', 'point_count'],
-            0, 0,
-            10, 1
-          ],
-          'heatmap-intensity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            0, 2,
-            12, 1
-          ],
-          'heatmap-color': [
-            'interpolate',
-            ['linear'],
-            ['heatmap-density'],
-            0, 'rgba(65,182,196,0)',
-            0.1, 'rgba(65,182,196,0.5)',
-            0.3, 'rgb(44,127,184)',
-            0.5, 'rgb(33,102,172)',
-            0.7, 'rgb(52,103,186)',
-            1, 'rgb(31,76,148)'
-          ],
-          'heatmap-radius': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            0, 15,
-            9, 20
-          ],
-          'heatmap-opacity': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            7, 1,
-            16, 0
-          ],
         }
       });
 
-      // Add a layer for unclustered points
-      map.current.addLayer({
-        id: 'unclustered-points',
-        type: 'symbol',
-        source: 'sites',
-        filter: ['!', ['has', 'point_count']],
-        layout: {
-          'icon-image': 'archaeological-site',
-          'icon-size': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            0, 0.3,
-            22, 1
-          ],
-          'icon-allow-overlap': true
-        }
+      // Add layers in correct order
+      layerOrder.forEach(layerId => {
+        map.current!.addLayer(getLayerConfig(layerId));
       });
     }
 
@@ -148,14 +91,19 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
   return map
 }
 
-export const useMapEventHandlers = (map: React.MutableRefObject<mapboxgl.Map | null>, onSiteClick: (site: Site) => void) => {
+export const useMapEventHandlers = (
+  map: React.MutableRefObject<mapboxgl.Map | null>, 
+  onSiteClick: (site: Site) => void
+) => {
   useEffect(() => {
     if (!map.current) return
 
     const currentMap = map.current;
 
     const handleClusterClick = (e: mapboxgl.MapMouseEvent) => {
-      const features = currentMap.queryRenderedFeatures(e.point, { layers: ['clustered-points'] });
+      const features = currentMap.queryRenderedFeatures(e.point, { 
+        layers: [layerOrder[0]] // clustered-points
+      });
       const clusterId = features[0].properties?.cluster_id;
       const source = currentMap.getSource('sites') as mapboxgl.GeoJSONSource;
       
@@ -170,12 +118,13 @@ export const useMapEventHandlers = (map: React.MutableRefObject<mapboxgl.Map | n
     }
 
     const handlePointClick = (e: mapboxgl.MapMouseEvent) => {
-      const features = currentMap.queryRenderedFeatures(e.point, { layers: ['unclustered-points'] });
+      const features = currentMap.queryRenderedFeatures(e.point, { 
+        layers: [layerOrder[1]] // unclustered-points
+      });
       if (features.length > 0) {
         const properties = features[0].properties;
         if (!properties) return;
 
-        // Create a site object with required properties
         const site: Site = {
           id: properties.id,
           name: properties.name,
@@ -184,7 +133,6 @@ export const useMapEventHandlers = (map: React.MutableRefObject<mapboxgl.Map | n
           country: properties.country,
           country_slug: properties.country_slug,
           slug: properties.slug,
-          // Optional properties can be included if they exist
           address: properties.address,
           images: properties.images,
           wikipedia_url: properties.wikipedia_url,
@@ -214,20 +162,20 @@ export const useMapEventHandlers = (map: React.MutableRefObject<mapboxgl.Map | n
       currentMap.getCanvas().style.cursor = ''
     }
 
-    currentMap.on('click', 'clustered-points', handleClusterClick);
-    currentMap.on('click', 'unclustered-points', handlePointClick);
-    currentMap.on('mouseenter', 'clustered-points', handleMouseEnter);
-    currentMap.on('mouseenter', 'unclustered-points', handleMouseEnter);
-    currentMap.on('mouseleave', 'clustered-points', handleMouseLeave);
-    currentMap.on('mouseleave', 'unclustered-points', handleMouseLeave);
+    currentMap.on('click', layerOrder[0], handleClusterClick);
+    currentMap.on('click', layerOrder[1], handlePointClick);
+    currentMap.on('mouseenter', layerOrder[0], handleMouseEnter);
+    currentMap.on('mouseenter', layerOrder[1], handleMouseEnter);
+    currentMap.on('mouseleave', layerOrder[0], handleMouseLeave);
+    currentMap.on('mouseleave', layerOrder[1], handleMouseLeave);
 
     return () => {
-      currentMap.off('click', 'clustered-points', handleClusterClick);
-      currentMap.off('click', 'unclustered-points', handlePointClick);
-      currentMap.off('mouseenter', 'clustered-points', handleMouseEnter);
-      currentMap.off('mouseenter', 'unclustered-points', handleMouseEnter);
-      currentMap.off('mouseleave', 'clustered-points', handleMouseLeave);
-      currentMap.off('mouseleave', 'unclustered-points', handleMouseLeave);
+      currentMap.off('click', layerOrder[0], handleClusterClick);
+      currentMap.off('click', layerOrder[1], handlePointClick);
+      currentMap.off('mouseenter', layerOrder[0], handleMouseEnter);
+      currentMap.off('mouseenter', layerOrder[1], handleMouseEnter);
+      currentMap.off('mouseleave', layerOrder[0], handleMouseLeave);
+      currentMap.off('mouseleave', layerOrder[1], handleMouseLeave);
     }
   }, [map, onSiteClick])
 }
