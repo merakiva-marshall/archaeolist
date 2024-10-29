@@ -1,5 +1,8 @@
 // src/components/Header.tsx
 
+'use client'
+
+import { useState } from 'react'
 import { Menu, Search } from 'lucide-react'
 import {
   Sheet,
@@ -7,8 +10,11 @@ import {
   SheetTrigger,
 } from "./ui/sheet"
 import RecentSites from './RecentSites'
+import SearchDialog from './SearchDialog'
 
 export default function Header() {
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,16 +40,26 @@ export default function Header() {
             </Sheet>
             
             <a href="/" className="ml-6 flex items-center space-x-2">
-              <span className="text-2xl font-bold text-blue-600 font-days-one tracking-wide">Archaeolist</span>
+              <span className="text-2xl font-bold text-blue-600 font-days-one tracking-wide">
+                Archaeolist
+              </span>
             </a>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
+            <button 
+              className="p-2 hover:bg-gray-100 rounded-lg"
+              onClick={() => setIsSearchOpen(true)}
+            >
               <Search className="h-6 w-6" />
             </button>
           </div>
         </div>
       </div>
+
+      <SearchDialog 
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
     </header>
   )
 }
