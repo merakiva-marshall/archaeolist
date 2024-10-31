@@ -6,9 +6,24 @@ const siteConfig = {
   name: 'Archaeolist',
   description: 'Discover archaeological sites worldwide on our interactive map. Explore ancient history and plan your next adventure with Archaeolist.',
   url: 'https://archaeolist.com',
-  ogImage: 'https://images.archaeolist.com/archaeolist_map_preview.png', 
+  ogImage: 'https://images.archaeolist.com/archaeolist_map_preview.png',
   logoImage: 'https://archaeolist.com/logo.png',
-  twitter: '@merakivatravel' // Replace with your Twitter handle
+  twitter: '@merakivatravel'
+}
+
+interface OpenGraphExtensions {
+  type?: string;
+  locale?: string;
+  [key: string]: string | undefined;
+}
+
+interface MetadataProps {
+  title?: string;
+  description?: string;
+  path?: string;
+  image?: string;
+  additionalOpenGraph?: OpenGraphExtensions;
+  keywords?: string;
 }
 
 export function generateBaseMetadata({
@@ -16,14 +31,11 @@ export function generateBaseMetadata({
   description,
   path = '',
   image,
-}: {
-  title?: string;
-  description?: string;
-  path?: string;
-  image?: string;
-} = {}): Metadata {
+  additionalOpenGraph = {},
+  keywords
+}: MetadataProps = {}): Metadata {
   const finalTitle = title 
-    ? `${title} | ${siteConfig.name}`
+    ? `${title}`
     : siteConfig.name;
   
   const finalDescription = description || siteConfig.description;
@@ -33,34 +45,20 @@ export function generateBaseMetadata({
   return {
     title: finalTitle,
     description: finalDescription,
+    keywords,
     metadataBase: new URL(siteConfig.url),
-    icons: {
-      icon: '/favicon.ico',
-      apple: '/apple-touch-icon.png',
-    },
     openGraph: {
-      type: 'website',
-      siteName: siteConfig.name,
       title: finalTitle,
       description: finalDescription,
       url,
+      siteName: siteConfig.name,
       images: [{
         url: ogImage,
         width: 1200,
         height: 630,
         alt: finalTitle,
       }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      site: siteConfig.twitter,
-      creator: siteConfig.twitter,
-      title: finalTitle,
-      description: finalDescription,
-      images: [ogImage],
-    },
-    alternates: {
-      canonical: url,
-    },
-  }
+      ...additionalOpenGraph
+    }
+  };
 }

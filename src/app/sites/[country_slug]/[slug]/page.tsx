@@ -3,7 +3,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Home, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Home, ExternalLink, MapPin } from 'lucide-react'
 import { Site } from '../../../../types/site'
 import { Metadata } from 'next'
 import ImageGallery from '../../../../components/ImageGallery'
@@ -79,11 +79,11 @@ export async function generateStaticParams() {
       .eq('country_slug', params.country_slug)
       .eq('slug', params.slug)
       .single()
-  
+
     if (!data) {
       notFound()
     }
-  
+
     const site: Site = data as Site;
     const timeline = site.timeline || {};
     const processedFeatures = site.processed_features || {};
@@ -108,18 +108,27 @@ export async function generateStaticParams() {
                   {/* Header Section with H1 */}
                   <Card>
                     <CardHeader>
+                      <Link 
+                        href={`/sites/${site.country_slug}`}
+                        className="group inline-flex items-center space-x-2 text-sm text-gray-600 hover:text-blue-600 mb-4"
+                      >
+                        <MapPin className="h-4 w-4" />
+                        <span className="font-medium">{site.country}</span>
+                      </Link>
                       <h1 className="text-3xl sm:text-4xl font-bold">{site.name}</h1>
                       {site.short_description && (
-                        <p className="text-lg text-gray-600 mt-4 leading-relaxed">{site.short_description}</p>
+                        <p className="text-lg text-gray-600 mt-4 leading-relaxed">
+                          {site.short_description}
+                        </p>
                       )}
                     </CardHeader>
                   </Card>
-  
+    
                   {/* Mobile Periods */}
                   <div className="lg:hidden">
                     <SitePeriods periods={processedPeriods} headingLevel="h2" />
                   </div>
-  
+    
                   <div className="flex gap-8">
                     <div className="flex-1 space-y-8">
                       {/* Description Section */}
@@ -133,7 +142,7 @@ export async function generateStaticParams() {
                           </div>
                         </CardContent>
                       </Card>
-  
+    
                       {/* Image Gallery */}
                       {site.images && site.images.length > 0 && (
                         <Card>
@@ -145,7 +154,7 @@ export async function generateStaticParams() {
                           </CardContent>
                         </Card>
                       )}
-  
+    
                       {/* Features Section */}
                       <Card>
                         <CardHeader>
@@ -158,7 +167,7 @@ export async function generateStaticParams() {
                           />
                         </CardContent>
                       </Card>
-  
+    
                       {/* Timeline Section */}
                       {Object.keys(timeline).length > 0 && (
                         <Card>
@@ -170,7 +179,7 @@ export async function generateStaticParams() {
                           </CardContent>
                         </Card>
                       )}
-  
+    
                       {/* Details Section */}
                       <Card>
                         <CardHeader>
@@ -202,7 +211,7 @@ export async function generateStaticParams() {
                         </CardContent>
                       </Card>
                     </div>
-  
+    
                     {/* Desktop Periods */}
                     <div className="hidden lg:block w-48">
                       <div className="sticky top-8">
