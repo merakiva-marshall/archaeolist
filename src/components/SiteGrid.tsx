@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { Button } from './ui/button'
 import { Loader2 } from 'lucide-react'
@@ -27,7 +27,7 @@ export default function SiteGrid({ countrySlug, initialSites }: SiteGridProps) {
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
 
-  async function loadSites(offset: number) {
+  const loadSites = useCallback(async (offset: number) => {
     try {
       if (offset === 0) setLoading(true)
       else setLoadingMore(true)
@@ -52,13 +52,13 @@ export default function SiteGrid({ countrySlug, initialSites }: SiteGridProps) {
       setLoading(false)
       setLoadingMore(false)
     }
-  }
+  }, [countrySlug])
 
   useEffect(() => {
     if (!initialSites) {
       loadSites(0)
     }
-  }, [initialSites])
+  }, [initialSites, loadSites])
 
   if (loading) {
     return (

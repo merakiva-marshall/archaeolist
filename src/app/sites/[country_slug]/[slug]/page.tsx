@@ -14,6 +14,7 @@ import StructuredData from '../../../../components/StructuredData'
 import { Card, CardContent, CardHeader } from '../../../../components/ui/card'
 import { generateBaseMetadata } from '../../../../lib/metadata'
 import ErrorBoundary from '../../../../components/ErrorBoundary'
+import VisitSection from '../../../../components/VistSection'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -142,7 +143,6 @@ export async function generateStaticParams() {
                           </div>
                         </CardContent>
                       </Card>
-    
                       {/* Image Gallery */}
                       {site.images && site.images.length > 0 && (
                         <Card>
@@ -156,6 +156,7 @@ export async function generateStaticParams() {
                       )}
     
                       {/* Features Section */}
+                      {processedFeatures && Object.keys(processedFeatures).length > 0 && (
                       <Card>
                         <CardHeader>
                           <h2 className="text-2xl font-semibold">Site Features</h2>
@@ -167,7 +168,16 @@ export async function generateStaticParams() {
                           />
                         </CardContent>
                       </Card>
-    
+                    )}
+                      {/* Visit Section*/}
+                      <VisitSection 
+                        siteName={site.name}
+                        slug={site.slug}
+                        country={site.country}
+                        country_slug={site.country_slug}
+                        hasTours={false}
+                        hasDirections={false}
+                      />
                       {/* Timeline Section */}
                       {Object.keys(timeline).length > 0 && (
                         <Card>
