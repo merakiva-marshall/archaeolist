@@ -6,6 +6,7 @@ import { Metadata } from 'next'
 import { Database } from '../../../types/supabase'
 import { generateBaseMetadata } from '../../../lib/metadata'
 import SiteGrid from '../../../components/SiteGrid'
+import { Site } from '../../../types/site'
 import StructuredData from '../../../components/StructuredData'
 import ErrorBoundary from '../../../components/ErrorBoundary'
 import { Card, CardContent } from '../../../components/ui/card'
@@ -14,16 +15,18 @@ import Link from 'next/link'
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export const revalidate = 0;
+export const revalidate = 86400;
 
 interface CountryInfo {
   country: string;
+  country_slug: string;
   site_count: number;
   earliest_site?: string;
   unesco_count: number;
+  sites: Site[]; // add this
 }
 
 interface PageParams {
@@ -35,15 +38,17 @@ interface PageParams {
 async function getCountryInfo(country_slug: string): Promise<CountryInfo | null> {
   const { data: sites, error } = await supabase
     .from('sites')
-    .select('country, is_unesco, processed_periods')
+    .select('*')
     .eq('country_slug', country_slug);
 
   if (error || !sites.length) return null;
 
   return {
     country: sites[0].country,
+    country_slug: sites[0].country_slug, // Add this
     site_count: sites.length,
     unesco_count: sites.filter(site => site.is_unesco).length,
+    sites
   };
 }
 
@@ -78,17 +83,22 @@ export async function generateMetadata(
     });
   }
 
-export async function generateStaticParams() {
-  const { data: countries } = await supabase
-    .from('sites')
-    .select('country_slug')
-    .eq('country_slug', 'country_slug')
-    .limit(1);
-
-  return (countries || []).map(({ country_slug }) => ({
-    country_slug,
-  }));
-}
+  interface CountrySlugRow {
+    country_slug: string;
+  }
+  export async function generateStaticParams() {
+    const { data } = await supabase
+      .from('sites')
+      .select<'country_slug', CountrySlugRow>('country_slug');
+  
+    const uniqueSlugs = Array.from(
+      new Set(data?.map(row => row.country_slug))
+    );
+  
+    return uniqueSlugs.map((slug: string) => ({
+      country_slug: slug
+    }));
+  }
 
 export default async function CountryPage({ params }: PageParams) {
     const countryInfo = await getCountryInfo(params.country_slug);
@@ -172,7 +182,10 @@ export default async function CountryPage({ params }: PageParams) {
               </div>
   
               {/* Sites Grid */}
-              <SiteGrid countrySlug={params.country_slug} />
+              <SiteGrid 
+                  countrySlug={params.country_slug} 
+                  initialSites={countryInfo.sites}  // Add this prop
+                />
               </div>
         </div>
       </main>
