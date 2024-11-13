@@ -11,6 +11,28 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 export const metadata: Metadata = {
   title: 'Archaeolist',
   description: 'Discover archaeological sites worldwide on our interactive map. Explore ancient history and plan your next adventure with Archaeolist.',
+  metadataBase: new URL('https://archaeolist.com'),
+  openGraph: {
+    title: 'Archaeolist',
+    description: 'Discover archaeological sites worldwide on our interactive map. Explore ancient history and plan your next adventure with Archaeolist.',
+    url: 'https://archaeolist.com',
+    siteName: 'Archaeolist',
+    images: [{
+      url: 'https://images.archaeolist.com/archaeolist_map_preview.png',
+      width: 1200,
+      height: 630,
+      alt: 'Archaeolist - Interactive Archaeological Sites Map'
+    }],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Archaeolist',
+    description: 'Discover archaeological sites worldwide on our interactive map. Explore ancient history and plan your next adventure with Archaeolist.',
+    creator: '@merakivatravel',
+    images: ['https://images.archaeolist.com/archaeolist_map_preview.png'],
+  }
 }
 
 function OrganizationSchema() {
