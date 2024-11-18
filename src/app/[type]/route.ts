@@ -14,7 +14,6 @@ interface SitemapSite {
   updated_at: string | null
 }
 
-// Helper function to format date for sitemap
 function formatDate(date: string | Date): string {
   if (date instanceof Date) {
     return date.toISOString()
@@ -22,7 +21,6 @@ function formatDate(date: string | Date): string {
   return new Date(date).toISOString()
 }
 
-// Helper function to generate XML
 function generateSitemapXml(sitemap: MetadataRoute.Sitemap): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -39,7 +37,6 @@ function generateSitemapXml(sitemap: MetadataRoute.Sitemap): string {
     </urlset>`
 }
 
-// Helper function to generate sitemap index XML
 function generateSitemapIndexXml(sitemaps: { url: string; lastModified: Date }[]): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
     <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -59,12 +56,9 @@ export async function GET(
   { params }: { params: { type: string } }
 ): Promise<Response> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://archaeolist.com'
-  
-  // Clean up the type parameter to handle various formats
   const type = params.type.replace(/\.xml$/, '').toLowerCase()
 
   try {
-    // Handle sitemap index - handle both root sitemap.xml and index
     if (type === 'sitemap' || type === 'index') {
       const sitemapIndex = [
         {
@@ -89,9 +83,7 @@ export async function GET(
       })
     }
 
-    // Handle other sitemaps with simplified matching
     if (['sitemap-static', 'sitemap-sites', 'sitemap-countries'].includes(type)) {
-      // Strip 'sitemap-' prefix for our internal handling
       const sitemapType = type.replace('sitemap-', '')
       
       if (sitemapType === 'static') {
@@ -131,18 +123,16 @@ export async function GET(
             .range(page * pageSize, (page + 1) * pageSize - 1)
             .order('id', { ascending: true })
   
-          if (error) {
-            throw new Error(error.message)
+          if (error || !data) {
+            return new Response('Error generating sitemap', { status: 500 })
           }
   
-          if (data) {
-            allSites = [...allSites, ...data.filter(site => 
-              site.country_slug && 
-              site.slug
-            )]
-          }
-  
-          hasMore = data && data.length === pageSize
+          allSites = [...allSites, ...data.filter(site => 
+            site.country_slug && 
+            site.slug
+          )]
+          
+          hasMore = data.length === pageSize
           page++
         }
   
@@ -166,8 +156,8 @@ export async function GET(
           .from('sites')
           .select('country_slug, updated_at')
   
-        if (error) {
-          throw new Error(error.message)
+        if (error || !countryCounts) {
+          return new Response('Error generating sitemap', { status: 500 })
         }
   
         const countryStats = countryCounts.reduce((acc, site) => {
@@ -204,9 +194,8 @@ export async function GET(
       }
     }
 
-    // Handle invalid sitemap type
     return new Response('Not found', { status: 404 })
-  } catch (error) {
+  } catch {
     return new Response('Error generating sitemap', { status: 500 })
   }
 }
