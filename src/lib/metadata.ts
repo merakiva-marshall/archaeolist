@@ -24,6 +24,7 @@ interface MetadataProps {
   image?: string;
   additionalOpenGraph?: OpenGraphExtensions;
   keywords?: string;
+  canonicalUrl?: string; // Add this
 }
 
 export function generateBaseMetadata({
@@ -32,7 +33,8 @@ export function generateBaseMetadata({
   path = '',
   image,
   additionalOpenGraph = {},
-  keywords
+  keywords,
+  canonicalUrl
 }: MetadataProps = {}): Metadata {
   const finalTitle = title 
     ? `${title}`
@@ -47,10 +49,13 @@ export function generateBaseMetadata({
     description: finalDescription,
     keywords,
     metadataBase: new URL(siteConfig.url),
+    alternates: {
+      canonical: canonicalUrl || url, // Add canonical URL support
+    },
     openGraph: {
       title: finalTitle,
       description: finalDescription,
-      url,
+      url: canonicalUrl || url, // Use canonical URL in OpenGraph if available
       siteName: siteConfig.name,
       images: [{
         url: ogImage,
