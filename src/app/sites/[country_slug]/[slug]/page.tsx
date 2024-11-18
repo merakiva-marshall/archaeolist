@@ -37,12 +37,14 @@ export async function generateMetadata(
 
   const mainImage = data.images?.[0]?.url
   const title = `${data.name} | ${data.country} | ${process.env.NEXT_PUBLIC_SITE_NAME || 'Archaeolist'}`
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/sites/${params.country_slug}/${params.slug}`
 
   return generateBaseMetadata({
     title,
     description: `${data.short_description || ''} Explore ${data.name} on the map and discover thousands of archaeological sites.`.trim(),
     path: `/sites/${params.country_slug}/${params.slug}`,
-    image: mainImage
+    image: mainImage,
+    canonicalUrl // Add this to the parameters
   })
 }
 
