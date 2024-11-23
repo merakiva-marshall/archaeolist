@@ -1,15 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 
 export default function IndexNowTest() {
   const [urls, setUrls] = useState('');
+  const [origin, setOrigin] = useState('');
   const [status, setStatus] = useState<{
     loading: boolean;
     message?: string;
     error?: boolean;
   }>({ loading: false });
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +24,7 @@ export default function IndexNowTest() {
       const urlList = urls.split('\n').map(url => url.trim()).filter(Boolean);
 
       // Validate URLs
-      const siteHostname = new URL(window.location.origin).hostname;
+      const siteHostname = new URL(origin).hostname;
       const invalidUrls = urlList.filter(url => {
         try {
           const urlHostname = new URL(url).hostname;
@@ -65,6 +70,10 @@ export default function IndexNowTest() {
     }
   };
 
+  if (!origin) {
+    return null; // Or loading state
+  }
+
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">IndexNow Test Tool</h1>
@@ -78,7 +87,7 @@ export default function IndexNowTest() {
             value={urls}
             onChange={(e) => setUrls(e.target.value)}
             className="w-full h-40 p-3 border rounded-md"
-            placeholder={`${window.location.origin}/sites/greece/acropolis\n${window.location.origin}/sites/egypt/giza`}
+            placeholder={`${origin}/sites/greece/acropolis\n${origin}/sites/egypt/giza`}
           />
         </div>
         
@@ -118,7 +127,7 @@ export default function IndexNowTest() {
         <ol className="list-decimal pl-4 space-y-2">
           <li>Submit a few test URLs using the form above</li>
           <li>Check the browser console for detailed API responses</li>
-          <li>Verify your key file at: <code className="bg-gray-100 px-2 py-1 rounded">{window.location.origin}/{'{INDEXNOW_KEY}'}.txt</code></li>
+          <li>Verify your key file at: <code className="bg-gray-100 px-2 py-1 rounded">{origin}/{'{INDEXNOW_KEY}'}.txt</code></li>
           <li>Check Bing Webmaster Tools submissions page after a few minutes</li>
         </ol>
       </div>
