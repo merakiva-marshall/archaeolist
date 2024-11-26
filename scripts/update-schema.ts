@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import type { GeoJSON } from 'geojson';
 
 // Load environment variables from .env.local file
 dotenv.config({ path: path.join(process.cwd(), '.env.local') });
@@ -401,6 +402,7 @@ function sqlTypeToTypeScript(sqlType: string): string {
   
   const type = sqlType.toLowerCase();
   const typeMap: Record<string, string> = {
+    // Numeric types
     'integer': 'number',
     'bigint': 'number',
     'smallint': 'number',
@@ -408,43 +410,81 @@ function sqlTypeToTypeScript(sqlType: string): string {
     'numeric': 'number',
     'real': 'number',
     'double precision': 'number',
-    'boolean': 'boolean',
+    'double': 'number',
+    'precision': 'number',
+    
+    // String types
     'character varying': 'string',
+    'varying': 'string',
     'varchar': 'string',
     'character': 'string',
     'char': 'string',
     'text': 'string',
-    'json': 'any',
-    'jsonb': 'any',
+    'cstring': 'string',
+    'uuid': 'string',
+    
+    // Boolean type
+    'boolean': 'boolean',
+    
+    // Binary types
+    'bytea': 'Uint8Array',
+    
+    // Array types (from database)
+    'text[]': 'string[]',
+    'varchar[]': 'string[]',
+    'integer[]': 'number[]',
+    'bigint[]': 'number[]',
+    'double precision[]': 'number[]',
+    
+    // JSON types
+    'json': 'Record<string, any>',
+    'jsonb': 'Record<string, any>',
+    
+    // Date/Time types
     'timestamp': 'string',
     'timestamp with time zone': 'string',
     'timestamp without time zone': 'string',
     'date': 'string',
     'time': 'string',
     'interval': 'string',
-    'uuid': 'string',
-    'bytea': 'Uint8Array',
-    'point': 'any',
-    'line': 'any',
-    'lseg': 'any',
-    'box': 'any',
-    'path': 'any',
-    'polygon': 'any',
-    'circle': 'any',
-    'cidr': 'string',
-    'inet': 'string',
-    'macaddr': 'string',
-    'bit': 'string',
-    'bit varying': 'string',
-    'money': 'string',
-    'xml': 'string',
-    'void': 'void'
+    
+    // PostGIS and Geometric types
+    'postgis geometry': 'GeoJSON.Geometry',
+    'geometry': 'GeoJSON.Geometry',
+    'geography': 'GeoJSON.Geometry',
+    'point': 'GeoJSON.Point',
+    'line': 'GeoJSON.LineString',
+    'path': 'GeoJSON.LineString',
+    'polygon': 'GeoJSON.Polygon',
+    'box': 'GeoJSON.BBox',
+    'box2d': 'GeoJSON.BBox',
+    'box3d': 'GeoJSON.BBox',
+    'box2df': 'GeoJSON.BBox',
+    
+    // PostgreSQL internal types
+    'internal': 'any',
+    'trigger': 'any',
+    'language_handler': 'any',
+    'void': 'void',
+    'without': 'any',
+    'xid': 'number',
+    'oid': 'number',
+    'regclass': 'string',
+    'gidx': 'any',
+    'spheroid': 'any',
+    'unknown': 'any',
+    'default': 'any'
   };
 
-  // Handle arrays
+  // Handle arrays that aren't explicitly mapped
   if (type.endsWith('[]')) {
     const baseType = type.slice(0, -2);
     return `${sqlTypeToTypeScript(baseType)}[]`;
+  }
+
+  // Handle table types (common in PostgreSQL functions)
+  if (type.startsWith('table(')) {
+    return 'Record<string, any>';
   }
 
   // Handle custom types (enums, etc)
