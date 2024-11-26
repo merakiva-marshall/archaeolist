@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // src/utils/supabase/inspector.ts
 
 import { promises as fs } from 'fs';

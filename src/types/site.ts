@@ -27,6 +27,11 @@ export interface ProcessedPeriods {
   [period: string]: string[];
 }
 
+export interface FAQ {
+  question: string;
+  answer: string;
+}
+
 export interface Site {
   // Required properties
   id: string;
@@ -47,4 +52,5 @@ export interface Site {
   processed_periods?: ProcessedPeriods;
   timeline?: Timeline;
   archaeological_site_yn?: boolean;
+  faqs?: FAQ[];
 }

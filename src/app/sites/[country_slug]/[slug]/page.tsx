@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader } from '../../../../components/ui/card'
 import { generateBaseMetadata } from '../../../../lib/metadata'
 import ErrorBoundary from '../../../../components/ErrorBoundary'
 import VisitSection from '../../../../components/VistSection'
+import SiteFAQ from '../../../../components/SiteFAQ'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -76,18 +77,34 @@ export async function generateStaticParams() {
 }
 
   export default async function Page({ params }: { params: { country_slug: string; slug: string } }) {
-    const { data } = await supabase
+    console.log('Fetching site data for:', params.country_slug, params.slug);
+    const { data, error } = await supabase
       .from('sites')
       .select('*')
       .eq('country_slug', params.country_slug)
       .eq('slug', params.slug)
       .single()
 
+    if (error) {
+      console.error('Supabase error:', error);
+    }
+
     if (!data) {
+      console.log('No data found');
       notFound()
     }
 
+    console.log('Raw site data:', data);
     const site: Site = data as Site;
+    // Extract FAQs from site data
+    const faqsArray = site.faqs || [];
+    console.log('Parsed site:', {
+      name: site.name,
+      faqs: faqsArray,
+      hasArrayFaqs: Array.isArray(faqsArray),
+      faqsLength: faqsArray.length
+    });
+
     const timeline = site.timeline || {};
     const processedFeatures = site.processed_features || {};
     const processedPeriods = site.processed_periods || {};
@@ -191,7 +208,12 @@ export async function generateStaticParams() {
                           </CardContent>
                         </Card>
                       )}
-    
+
+                      {/* FAQ Section */}
+                      {faqsArray && faqsArray.length > 0 && (
+                        <SiteFAQ faqs={faqsArray} />
+                      )}
+
                       {/* Details Section */}
                       <Card>
                         <CardHeader>
