@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from './ui/card';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
 
 interface FAQProps {
   faqs: FAQ[];
@@ -141,17 +142,11 @@ export default function SiteFAQ({ faqs }: FAQProps) {
                     className="overflow-hidden"
                   >
                     <div className="p-4 pt-0 prose max-w-none">
-                      {faq.answer.split('\\n').map((paragraph, i) => (
-                        <motion.p 
-                          key={i}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.1 }}
-                          className="text-muted-foreground leading-relaxed mb-3 last:mb-0"
-                        >
-                          {paragraph}
-                        </motion.p>
-                      ))}
+                      <ReactMarkdown 
+                        className="text-muted-foreground [&>p]:mb-6 [&>p]:leading-relaxed [&>h1]:mb-6 [&>h2]:mb-4 [&>h3]:mb-4 [&>ul]:mb-6 [&>ol]:mb-6 [&>ul]:space-y-2 [&>ol]:space-y-2"
+                      >
+                        {faq.answer}
+                      </ReactMarkdown>
                     </div>
                   </motion.div>
                 )}
