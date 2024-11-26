@@ -70,6 +70,10 @@ export default function SiteFAQ({ faqs }: FAQProps) {
     }
   };
 
+  const processAnswer = (answer: string) => {
+    return answer.replace(/\\n/g, '\n');
+  };
+
   return (
     <Card className="overflow-hidden bg-white/50 backdrop-blur-sm shadow-sm border border-border">
       <CardHeader className="space-y-1 pb-8">
@@ -145,7 +149,7 @@ export default function SiteFAQ({ faqs }: FAQProps) {
                       <ReactMarkdown 
                         className="text-muted-foreground [&>p]:mb-6 [&>p]:leading-relaxed [&>h1]:mb-6 [&>h2]:mb-4 [&>h3]:mb-4 [&>ul]:mb-6 [&>ol]:mb-6 [&>ul]:space-y-2 [&>ol]:space-y-2"
                       >
-                        {faq.answer}
+                        {processAnswer(faq.answer)}
                       </ReactMarkdown>
                     </div>
                   </motion.div>
