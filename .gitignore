@@ -35,5 +35,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# schema documentation
+/docs/schema/
+
 #env.local
 .env.local
