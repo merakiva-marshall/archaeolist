@@ -5,6 +5,7 @@ import { Timeline } from '@/types/site';
 import { ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { parseDateString, type ParsedDate } from '@/lib/dateUtils';
 
 interface TimelineItemProps {
   title: string;
@@ -119,7 +120,7 @@ function TimelineItem({
 }
 
 interface TimelineItemWithDate {
-  parsedDate: Date;
+  parsedDate: ParsedDate;
   item: {
     title: string;
     date: string[];
@@ -143,9 +144,11 @@ export default function SiteTimeline({ timeline }: TimelineProps) {
   const timelineItems = Object.entries(timeline)
     .map(([title, item]) => {
       const dates = Array.isArray(item.date) ? item.date : [];
-      const firstDate = dates[0] || '';
+      const centuries = Array.isArray(item.century) ? item.century : [];
+      // Use the first available date or century for sorting
+      const dateStr = dates[0] || centuries[0] || '';
       return {
-        parsedDate: new Date(firstDate),
+        parsedDate: parseDateString(dateStr),
         item: { 
           title,
           date: item.date,
@@ -154,7 +157,7 @@ export default function SiteTimeline({ timeline }: TimelineProps) {
         }
       } as TimelineItemWithDate;
     })
-    .sort((a, b) => a.parsedDate.getTime() - b.parsedDate.getTime())
+    .sort((a, b) => a.parsedDate.year - b.parsedDate.year)
     .map(({ item }) => item);
 
   return (
