@@ -32,9 +32,9 @@ function TimelineItem({
   const isEven = index % 2 === 0;
 
   // Format the date display
-  const displayDate = date.length > 0 
+  const displayDate = Array.isArray(date) && date.length > 0 
     ? date.join(', ')
-    : century.length > 0 
+    : Array.isArray(century) && century.length > 0 
       ? century[0]
       : '';
 
