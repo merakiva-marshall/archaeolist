@@ -9,4 +9,7 @@ public
 
 # Ignore configuration files
 *.config.js
-*.config.mjs
+
+# Ignore development scripts and generated files
+src/utils/supabase/inspector.ts
+src/lib/supabase/schema/**/*
