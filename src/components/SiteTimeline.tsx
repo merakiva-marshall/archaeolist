@@ -1,12 +1,10 @@
-// src/components/SiteTimeline.tsx
-
 'use client';
 
 import { useState } from 'react';
-import { Timeline } from '../types/site';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { logger } from '../lib/logger';
-import { parseDateString, compareDates, type ParsedDate } from '../lib/dateUtils';
+import { Timeline } from '@/types/site';
+import { ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface TimelineItemProps {
   title: string;
@@ -39,131 +37,148 @@ function TimelineItem({
       : '';
 
   return (
-    <div className={`
-      flex w-full relative
-      ${isEven ? 'md:justify-start' : 'md:justify-end'}
-    `}>
-      {/* Mobile timeline line container */}
+    <div className={cn(
+      "flex w-full relative",
+      isEven ? 'md:justify-start' : 'md:justify-end'
+    )}>
+      {/* Mobile timeline line */}
       <div className="md:hidden absolute w-0.5 z-0 top-0 bottom-0" style={{ left: '15%' }}>
         {!isLast && <div className="absolute left-0 top-8 w-0.5 h-full bg-blue-300" />}
       </div>
 
-      <div className={`
-        relative bg-white rounded-lg shadow-sm border mb-6 md:mb-4
-        transition-all duration-200 hover:shadow-md cursor-pointer
-        md:w-[calc(50%-1rem)] w-[calc(100%-2rem)]
-        mx-4 md:mx-0
-        z-10
-        ${isExpanded ? 'shadow-md' : ''}
-      `}
-        onClick={onToggle}
-      >
-        {/* Desktop-only horizontal connector line */}
-        <div className={`
-          absolute top-8 w-4 h-[1px] bg-blue-300
-          transform -translate-y-1/2
-          ${isEven ? '-right-4' : '-left-4'}
-          hidden md:block
-        `} />
-        
-        <div className="p-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-medium text-gray-900">{title}</h3>
-              {displayDate && (
-                <p className="text-sm text-gray-600 mt-1">
-                  {displayDate}
-                </p>
-              )}
-            </div>
-            {description.length > 0 && (
-              isExpanded ? (
-                <ChevronUp className="h-4 w-4 text-gray-500 mt-1" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-gray-500 mt-1" />
-              )
-            )}
-          </div>
-          
-          {isExpanded && description.length > 0 && (
-            <div className="mt-3 text-sm text-gray-700">
-              {description.map((desc, i) => (
-                <p key={i} className="mt-1">{desc}</p>
-              ))}
-            </div>
+      <div className={cn(
+        "relative z-10 w-[85%] md:w-[45%] group bg-background",
+        "transition-all duration-200"
+      )}>
+        {/* Desktop horizontal connector line */}
+        <div className={cn(
+          "absolute top-8 w-4 h-[1px] bg-blue-300 transform -translate-y-1/2",
+          isEven ? '-right-4' : '-left-4',
+          "hidden md:block"
+        )} />
+
+        <motion.div
+          initial={{ opacity: 0, x: isEven ? -20 : 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className={cn(
+            "rounded-lg border p-3",
+            "transition-all duration-200",
+            "hover:shadow-md hover:border-accent"
           )}
-        </div>
+        >
+          <button
+            onClick={onToggle}
+            className="w-full flex justify-between items-start text-left"
+          >
+            <div>
+              <h3 className="font-medium text-sm text-primary">{title}</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {displayDate}
+              </p>
+            </div>
+            <motion.div
+              animate={{ rotate: isExpanded ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              className={cn(
+                "rounded-full p-1 transition-colors duration-200",
+                isExpanded ? "bg-secondary" : "bg-secondary/50",
+                "hover:bg-secondary"
+              )}
+            >
+              <ChevronDown className={cn(
+                "h-4 w-4 transition-colors duration-200",
+                isExpanded ? "text-primary" : "text-muted-foreground"
+              )} />
+            </motion.div>
+          </button>
+
+          {isExpanded && description.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-2 text-xs text-muted-foreground"
+            >
+              {description.map((paragraph, i) => (
+                <motion.p 
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="mb-3 last:mb-0"
+                >
+                  {paragraph}
+                </motion.p>
+              ))}
+            </motion.div>
+          )}
+        </motion.div>
       </div>
     </div>
   );
 }
 
-interface SiteTimelineProps {
+interface TimelineItemWithDate {
+  parsedDate: Date;
+  item: {
+    title: string;
+    date: string[];
+    century: string[];
+    description: string[];
+  };
+}
+
+interface TimelineProps {
   timeline: Timeline;
 }
 
-interface TimelineItemWithDate extends TimelineItemProps {
-  parsedDate: ParsedDate;
-}
+export default function SiteTimeline({ timeline }: TimelineProps) {
+  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
 
-export default function SiteTimeline({ timeline }: SiteTimelineProps) {
-  const [expandedItem, setExpandedItem] = useState<string | null>(null);
-  
-  try {
-    // Transform and sort timeline entries
-    const timelineItems = Object.entries(timeline || {})
-      .map(([title, data]) => {
-        if (!data) {
-          logger.warn(`Invalid timeline data for title: ${title}`);
-          return null;
-        }
+  if (!timeline || Object.keys(timeline).length === 0) {
+    return null;
+  }
 
-        // Parse the primary date (from date array or century array)
-        const parsedDate = data.date && data.date.length > 0
-          ? parseDateString(data.date[0])
-          : data.century && data.century.length > 0
-            ? parseDateString(data.century[0])
-            : { type: 'unknown' as const, year: 0, original: '' };
-
-        return {
+  // Sort periods chronologically and process timeline items
+  const timelineItems = Object.entries(timeline)
+    .map(([title, item]) => {
+      const dates = Array.isArray(item.date) ? item.date : [];
+      const firstDate = dates[0] || '';
+      return {
+        parsedDate: new Date(firstDate),
+        item: { 
           title,
-          ...data,
-          date: data.date || [],
-          century: data.century || [],
-          description: data.description || [],
-          parsedDate
-        };
-      })
-      .filter((item): item is TimelineItemWithDate => item !== null)
-      .sort((a, b) => compareDates(a.parsedDate, b.parsedDate));
+          date: item.date,
+          century: item.century,
+          description: item.description
+        }
+      } as TimelineItemWithDate;
+    })
+    .sort((a, b) => a.parsedDate.getTime() - b.parsedDate.getTime())
+    .map(({ item }) => item);
 
-    if (timelineItems.length === 0) {
-      return null;
-    }
-
-    return (
+  return (
+    <div className="relative">
       <div className="relative">
-        <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-[2px] bg-blue-300 transform -translate-x-1/2 rounded-full" />
+        {/* Desktop center line */}
+        <div className="hidden md:block absolute left-1/2 top-0 bottom-4 w-[2px] bg-blue-300 transform -translate-x-1/2 rounded-full" />
 
-        <div className="space-y-0">
+        <div className="relative space-y-12">
           {timelineItems.map((item, index) => (
             <TimelineItem
               key={item.title}
-              {...item}
+              title={item.title}
+              date={item.date}
+              century={item.century}
+              description={item.description}
               index={index}
               isLast={index === timelineItems.length - 1}
-              isExpanded={expandedItem === item.title}
-              onToggle={() => setExpandedItem(expandedItem === item.title ? null : item.title)}
+              isExpanded={selectedPeriod === item.title}
+              onToggle={() => setSelectedPeriod(selectedPeriod === item.title ? null : item.title)}
             />
           ))}
         </div>
       </div>
-    );
-  } catch (error) {
-    logger.error(error as Error, {
-      component: 'SiteTimeline',
-      timeline: JSON.stringify(timeline)
-    });
-    return null;
-  }
+    </div>
+  );
 }

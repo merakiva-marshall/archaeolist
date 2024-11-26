@@ -11,7 +11,7 @@ import SiteFeatures from '../../../../components/SiteFeatures'
 import SitePeriods from '../../../../components/SitePeriods'
 import SiteTimeline from '../../../../components/SiteTimeline'
 import StructuredData from '../../../../components/StructuredData'
-import { Card, CardContent, CardHeader } from '../../../../components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../../components/ui/card'
 import { generateBaseMetadata } from '../../../../lib/metadata'
 import ErrorBoundary from '../../../../components/ErrorBoundary'
 import VisitSection from '../../../../components/VistSection'
@@ -79,8 +79,29 @@ export async function generateStaticParams() {
   export default async function Page({ params }: { params: { country_slug: string; slug: string } }) {
     console.log('Fetching site data for:', params.country_slug, params.slug);
     const { data, error } = await supabase
-      .from('sites')
-      .select('*')
+      .from('sites_with_ref_count')
+      .select(`
+        id,
+        name,
+        description,
+        location,
+        country,
+        country_slug,
+        slug,
+        address,
+        images,
+        wikipedia_url,
+        is_unesco,
+        short_description,
+        processed_features,
+        processed_periods,
+        timeline,
+        archaeological_site_yn,
+        faqs,
+        features,
+        period,
+        metadata
+      `)
       .eq('country_slug', params.country_slug)
       .eq('slug', params.slug)
       .single()
@@ -96,14 +117,10 @@ export async function generateStaticParams() {
 
     console.log('Raw site data:', data);
     const site: Site = data as Site;
-    // Extract FAQs from site data
-    const faqsArray = site.faqs || [];
-    console.log('Parsed site:', {
-      name: site.name,
-      faqs: faqsArray,
-      hasArrayFaqs: Array.isArray(faqsArray),
-      faqsLength: faqsArray.length
-    });
+    console.log('Site object:', site);
+    console.log('Raw FAQs:', site.faqs);
+    const faqs = site.faqs?.faqs || [];
+    console.log('Processed FAQs:', faqs);
 
     const timeline = site.timeline || {};
     const processedFeatures = site.processed_features || {};
@@ -162,46 +179,45 @@ export async function generateStaticParams() {
                           </div>
                         </CardContent>
                       </Card>
+
                       {/* Image Gallery */}
                       {site.images && site.images.length > 0 && (
                         <Card>
                           <CardHeader>
                             <h2 className="text-2xl font-semibold">Gallery</h2>
+                            <p className="text-sm text-muted-foreground">
+                              Explore photographs of ancient structures, artifacts, and archaeological excavations at {site.name}
+                            </p>
                           </CardHeader>
                           <CardContent>
                             <ImageGallery site={site} />
                           </CardContent>
                         </Card>
                       )}
-    
+
                       {/* Features Section */}
                       {processedFeatures && Object.keys(processedFeatures).length > 0 && (
-                      <Card>
-                        <CardHeader>
-                          <h2 className="text-2xl font-semibold">Site Features</h2>
-                        </CardHeader>
-                        <CardContent>
-                          <SiteFeatures 
-                            features={processedFeatures}
-                            siteId={site.id}
-                          />
-                        </CardContent>
-                      </Card>
-                    )}
-                      {/* Visit Section*/}
-                      <VisitSection 
-                        siteName={site.name}
-                        slug={site.slug}
-                        country={site.country}
-                        country_slug={site.country_slug}
-                        hasTours={false}
-                        hasDirections={false}
-                      />
-                      {/* Timeline Section */}
-                      {Object.keys(timeline).length > 0 && (
                         <Card>
                           <CardHeader>
-                            <h2 className="text-2xl font-semibold">Site Timeline</h2>
+                            <CardTitle>Archaeological Features</CardTitle>
+                            <CardDescription>
+                              Explore the unique architectural and cultural elements found at this historical site
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <SiteFeatures features={processedFeatures} siteId={site.id} />
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {/* Timeline Section */}
+                      {timeline && Object.keys(timeline).length > 0 && (
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>Historical Timeline</CardTitle>
+                            <CardDescription>
+                              Journey through time and discover key events in this site&apos;s archaeological history
+                            </CardDescription>
                           </CardHeader>
                           <CardContent>
                             <SiteTimeline timeline={timeline} />
@@ -210,9 +226,25 @@ export async function generateStaticParams() {
                       )}
 
                       {/* FAQ Section */}
-                      {faqsArray && faqsArray.length > 0 && (
-                        <SiteFAQ faqs={faqsArray} />
-                      )}
+                      {(() => {
+                        console.log('Rendering FAQ section, faqs:', faqs);
+                        console.log('faqs type:', typeof faqs);
+                        console.log('faqs is array:', Array.isArray(faqs));
+                        console.log('faqs length:', faqs?.length);
+                        return faqs && Array.isArray(faqs) && faqs.length > 0 && (
+                          <SiteFAQ faqs={faqs} />
+                        );
+                      })()}
+
+                      {/* Visit Section */}
+                      <VisitSection 
+                        siteName={site.name}
+                        slug={site.slug}
+                        country={site.country}
+                        country_slug={site.country_slug}
+                        hasTours={false}
+                        hasDirections={false}
+                      />
 
                       {/* Details Section */}
                       <Card>
