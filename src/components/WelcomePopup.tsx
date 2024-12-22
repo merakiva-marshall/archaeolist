@@ -43,16 +43,6 @@ export default function WelcomePopup() {
           <li>🌍 Get practical visiting information for each site</li>
         </ul>
       </div>
-      <div>
-        <h2 className="text-xl font-semibold mb-3">Featured Categories</h2>
-        <ul className="space-y-2 text-gray-600">
-          <li>⭐ UNESCO World Heritage Sites</li>
-          <li>🏛️ Ancient Roman Ruins</li>
-          <li>🗿 Prehistoric Monuments</li>
-          <li>🏰 Medieval Castles</li>
-          <li>🏺 Ancient Cities</li>
-        </ul>
-      </div>
     </div>
   )
 
