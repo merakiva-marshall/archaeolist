@@ -72,11 +72,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full ${daysOne.variable} ${geist.variable} ${geistMono.variable}`}>
       <head>
-      <OrganizationSchema />
-      <link rel="icon" href="/favicon.ico" sizes="any" />
+        <OrganizationSchema />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="https://images.archaeolist.com/archaeolist_map_preview.png" />
-        <Script 
-          src="https://www.googletagmanager.com/gtag/js?id=G-F1W4Y0LMJ0" 
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-F1W4Y0LMJ0"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -88,9 +88,9 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${geist.className} flex flex-col h-screen`}>
+      <body className={`${geist.className} flex flex-col min-h-screen`}>
         <Header />
-        <main className="flex-1 relative overflow-hidden">
+        <main className="flex-1 relative">
           {children}
         </main>
         <Footer />

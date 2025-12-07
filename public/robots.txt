@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /_next/image
+
 Sitemap: https://archaeolist.com/sitemap.xml
+Sitemap: https://archaeolist.com/sitemap-sites.xml
+Sitemap: https://archaeolist.com/sitemap-countries.xml
+Sitemap: https://archaeolist.com/sitemap-static.xml

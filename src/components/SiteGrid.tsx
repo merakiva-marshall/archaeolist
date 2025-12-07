@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react'
 import { Site } from '../types/site'
 import SiteCard from './SiteCard'
 
-const PAGE_SIZE = 12
+const PAGE_SIZE = 50
 
 interface SiteGridProps {
   countrySlug?: string;
@@ -16,14 +16,19 @@ interface SiteGridProps {
 }
 
 export default function SiteGrid({ initialSites }: SiteGridProps) {
-  const [displayedSites, setDisplayedSites] = useState<Site[]>([])
+  const [displayedSites, setDisplayedSites] = useState<Site[]>(
+    initialSites ? initialSites.slice(0, PAGE_SIZE) : []
+  )
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (initialSites) {
-      setDisplayedSites(initialSites.slice(0, PAGE_SIZE))
-      setLoading(false)
+      // Only reset if initialSites changes significantly or we need to sync,
+      // but usually for a static list page this is fine.
+      // Keeping this sync logic but ensuring it doesn't cause hydration mismatch
+      // is tricky. For static pages, simpler is better.
+      // We'll trust the initial state for the first render.
     }
   }, [initialSites])
 
@@ -36,7 +41,7 @@ export default function SiteGrid({ initialSites }: SiteGridProps) {
     setLoading(true)
     const nextPage = currentPage + 1
     const newSites = initialSites.slice(0, nextPage * PAGE_SIZE)
-    
+
     setDisplayedSites(newSites)
     setCurrentPage(nextPage)
     setLoading(false)

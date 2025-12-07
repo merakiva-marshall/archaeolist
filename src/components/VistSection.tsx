@@ -9,16 +9,19 @@ import { Button } from './ui/button';
 import Image from 'next/image';
 
 interface VisitSectionProps {
-    siteName: string;
-    slug: string;
-    country: string;
-    country_slug: string;
-    hasTours?: boolean;
-    hasDirections?: boolean;
-  }
+  siteName: string;
+  slug: string;
+  country: string;
+  country_slug: string;
+  hasTours?: boolean;
+  hasDirections?: boolean;
+}
 
 const isAllowedCountry = async (): Promise<boolean> => {
   try {
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      return true;
+    }
     const response = await fetch('https://ipapi.co/json/');
     const data = await response.json();
     return ['US', 'CA'].includes(data.country_code);
@@ -28,10 +31,10 @@ const isAllowedCountry = async (): Promise<boolean> => {
   }
 };
 
-export default function VisitSection({ 
+export default function VisitSection({
   siteName,
-  slug, 
-  country, 
+  slug,
+  country,
   country_slug,
   hasTours = false,
   hasDirections = false
@@ -67,21 +70,21 @@ export default function VisitSection({
                       Specialized in archaeological travel, we create custom journeys that bring ancient history to life.
                     </p>
                     <p className="text-gray-700">
-                        Let us help you plan your visit to {siteName} and {country} with expert guidance, insider tips, and a deep understanding of the site&apos;s historical significance.
+                      Let us help you plan your visit to {siteName} and {country} with expert guidance, insider tips, and a deep understanding of the site&apos;s historical significance.
                     </p>
                   </div>
                 </div>
-                <Button 
-                className="w-full bg-[#006D77] hover:bg-[#005c64]"
-                onClick={() => {
-                window.open(
-                    `https://merakivatravel.com/travel-consultation?site=${encodeURIComponent(slug)}&country=${encodeURIComponent(country_slug)}`,
-                    '_blank'
-                );
-                }}
-            >
-                Get Free Consultation
-            </Button>
+                <Button
+                  className="w-full bg-[#006D77] hover:bg-[#005c64]"
+                  onClick={() => {
+                    window.open(
+                      `https://merakivatravel.com/travel-consultation?site=${encodeURIComponent(slug)}&country=${encodeURIComponent(country_slug)}`,
+                      '_blank'
+                    );
+                  }}
+                >
+                  Get Free Consultation
+                </Button>
               </div>
             </div>
           )}
