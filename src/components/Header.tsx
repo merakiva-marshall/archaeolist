@@ -16,7 +16,7 @@ export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -38,7 +38,7 @@ export default function Header() {
                 </div>
               </SheetContent>
             </Sheet>
-            
+
             <a href="/" className="ml-6 flex items-center space-x-2">
               <span className="text-2xl font-bold text-blue-600 font-days-one tracking-wide">
                 Archaeolist
@@ -46,7 +46,7 @@ export default function Header() {
             </a>
           </div>
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               className="p-2 hover:bg-gray-100 rounded-lg"
               onClick={() => setIsSearchOpen(true)}
             >
@@ -56,7 +56,7 @@ export default function Header() {
         </div>
       </div>
 
-      <SearchDialog 
+      <SearchDialog
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
       />

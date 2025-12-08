@@ -53,10 +53,16 @@ export default function ViatorTours({ tours }: { tours: ViatorTour[] }) {
                             <div className="mt-auto pt-3 border-t border-gray-100">
                                 <div className="flex flex-col gap-3">
                                     <div className="flex flex-col">
-                                        <span className="text-xs text-gray-500 font-medium">From</span>
-                                        <span className="font-bold text-lg text-green-700">
-                                            {new Intl.NumberFormat('en-US', { style: 'currency', currency: tour.currency || 'USD' }).format(tour.price || 0)}
-                                        </span>
+                                        {tour.price && tour.price > 0 ? (
+                                            <>
+                                                <span className="text-xs text-gray-500 font-medium">From</span>
+                                                <span className="font-bold text-lg text-green-700">
+                                                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: tour.currency || 'USD' }).format(tour.price)}
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <span className="font-bold text-lg text-green-700">View Price</span>
+                                        )}
                                     </div>
 
                                     <a href={tour.url || '#'} target="_blank" rel="noopener noreferrer" className="w-full">

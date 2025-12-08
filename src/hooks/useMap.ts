@@ -3,10 +3,10 @@
 import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import { Site } from '../types/site'
-import { 
+import {
   siteSourceConfig,
   layerOrder,
-  getLayerConfig 
+  getLayerConfig
 } from '../lib/mapLayers'
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
@@ -16,6 +16,12 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
 
   useEffect(() => {
     if (!container.current) return
+
+    // Cleanup existing map if it exists
+    if (map.current) {
+      map.current.remove();
+      map.current = null;
+    }
 
     const newMap = new mapboxgl.Map({
       container: container.current,
@@ -28,6 +34,7 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
 
     return () => {
       newMap.remove()
+      map.current = null
     }
   }, [container])
 
@@ -36,14 +43,14 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
 
     const addSourceAndLayers = () => {
       if (!map.current) return;
-      
+
       // Remove existing layers and source if they exist
       layerOrder.forEach(layerId => {
         if (map.current!.getLayer(layerId)) {
           map.current!.removeLayer(layerId);
         }
       });
-      
+
       if (map.current.getSource('sites')) {
         map.current.removeSource('sites');
       }
@@ -77,22 +84,24 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
     }
 
     // Add custom icon
-    map.current.loadImage(
-      'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
-      (error, image) => {
-        if (error) throw error;
-        if (image && map.current) {
-          map.current.addImage('archaeological-site', image);
+    if (!map.current.hasImage('archaeological-site')) {
+      map.current.loadImage(
+        'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+        (error, image) => {
+          if (error) throw error;
+          if (image && map.current && !map.current.hasImage('archaeological-site')) {
+            map.current.addImage('archaeological-site', image);
+          }
         }
-      }
-    );
+      );
+    }
   }, [sites])
 
   return map
 }
 
 export const useMapEventHandlers = (
-  map: React.MutableRefObject<mapboxgl.Map | null>, 
+  map: React.MutableRefObject<mapboxgl.Map | null>,
   onSiteClick: (site: Site) => void
 ) => {
   useEffect(() => {
@@ -101,12 +110,12 @@ export const useMapEventHandlers = (
     const currentMap = map.current;
 
     const handleClusterClick = (e: mapboxgl.MapMouseEvent) => {
-      const features = currentMap.queryRenderedFeatures(e.point, { 
+      const features = currentMap.queryRenderedFeatures(e.point, {
         layers: [layerOrder[0]] // clustered-points
       });
       const clusterId = features[0].properties?.cluster_id;
       const source = currentMap.getSource('sites') as mapboxgl.GeoJSONSource;
-      
+
       source.getClusterExpansionZoom(clusterId, (err, zoom) => {
         if (err) return;
 
@@ -118,7 +127,7 @@ export const useMapEventHandlers = (
     }
 
     const handlePointClick = (e: mapboxgl.MapMouseEvent) => {
-      const features = currentMap.queryRenderedFeatures(e.point, { 
+      const features = currentMap.queryRenderedFeatures(e.point, {
         layers: [layerOrder[1]] // unclustered-points
       });
       if (features.length > 0) {

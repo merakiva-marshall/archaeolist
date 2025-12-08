@@ -26,6 +26,7 @@ const supabase = createClient(
 
 
 export const revalidate = 86400; // Revalidate every 24 hours
+// export const dynamic = 'force-dynamic';
 
 
 export async function generateMetadata(
@@ -129,17 +130,73 @@ export default async function Page({ params }: { params: { country_slug: string;
     .limit(60); // Retrieve a pool of candidates
 
   // Fetch Viator Tours
-  const { data: toursData } = await supabase
+  const { data: toursData, error: toursError } = await supabase
     .from('viator_tours')
     .select('*')
     .eq('site_id', data.id)
-    .eq('site_id', data.id)
-    .gte('review_count', 2) // Minimum 2 reviews
-    .order('rating', { ascending: false })
-    .order('review_count', { ascending: false }) // Secondary sort
-    .limit(6);
+    .order('review_count', { ascending: false }) // Fetch most popular first
+    .limit(100); // Fetch a larger pool for client-side sorting
 
-  const tours: ViatorTour[] = toursData as ViatorTour[] || [];
+  const toursDataTyped = (toursData as ViatorTour[]) || [];
+
+  // 1. Bayesian Score (Quality)
+  const m = 10; // Threshold
+  const C = 4.5; // Mean
+  const calculateBayesianScore = (rating: number, reviewCount: number) => {
+    // If no reviews, return C (4.5) but with low confidence implicit in the math if reviewCount was 0? 
+    // Actually the formula handles 0: (0 + m*C) / (0 + m) = C = 4.5
+    return (reviewCount * rating + m * C) / (reviewCount + m);
+  };
+
+  // 2. Generate Search Keywords (Relevance)
+  const stopWords = ['the', 'a', 'an', 'of', 'in', 'at', 'archaeological', 'site', 'ruins', 'park', 'great', 'complex'];
+  const siteKeywords = data.name.toLowerCase().split(' ')
+    .filter((word: string) => !stopWords.includes(word) && word.length > 2);
+
+  // 3. Process & Filter Tours
+  const processedTours = toursDataTyped
+    .filter(t => {
+      // Price Filter - Remove strictly 0 or negative prices. Allow null (treat as 'on request' or unknown)
+      if (t.price !== null && t.price !== undefined && t.price <= 0) return false;
+
+      // Relevance Filter
+      const titleLower = t.title.toLowerCase();
+      // Only strict match if we have keywords, otherwise safe-allow (shouldn't happen for valid sites)
+      if (siteKeywords.length > 0) {
+        const hasKeyword = siteKeywords.some((k: string) => titleLower.includes(k));
+        if (!hasKeyword) return false;
+      }
+
+      return true;
+    })
+    .map(t => {
+      const bayesian = calculateBayesianScore(t.rating || 0, t.review_count || 0);
+      // Price Penalty: -1 point for every $1000
+      // If price is null, no penalty
+      const penalty = (t.price || 0) / 1000;
+      const finalScore = bayesian - penalty;
+
+      return { ...t, finalScore, bayesian };
+    });
+
+  // 4. Sort by Final Score (Descending)
+  processedTours.sort((a, b) => b.finalScore - a.finalScore);
+
+  // 5. Slice Top 6
+  const tours: ViatorTour[] = processedTours.slice(0, 6);
+
+  // Debug logs
+  console.log(`Site: ${data.name} | Keywords: ${siteKeywords.join(', ')}`);
+  console.log('Top 3 Tours:', tours.slice(0, 3).map(t => ({
+    title: t.title.substring(0, 30) + '...',
+    rating: t.rating,
+    reviews: t.review_count,
+    price: t.price,
+    bayesian: (t as any).bayesian.toFixed(3),
+    final: (t as any).finalScore.toFixed(3)
+  })));
+
+
 
   let relatedSites = relatedSitesData || [];
 
