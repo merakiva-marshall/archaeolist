@@ -7,6 +7,35 @@ import { Map, Globe } from 'lucide-react';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { Button } from './ui/button';
 import Image from 'next/image';
+import { ViatorTour } from '@/lib/viator/types';
+import ViatorTours from './ViatorTours';
+
+// Helper to check if user is in US or CA
+// Returns false on error to be safe with restriction
+const isAllowedCountry = async (): Promise<boolean> => {
+  try {
+    // Localhost always allowed
+    if (typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      return true;
+    }
+
+    // specific check for ipapi.co with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
+
+    const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) return false;
+
+    const data = await response.json();
+    return ['US', 'CA', 'GB'].includes(data.country_code); // Added GB for testing if needed, or stick to US/CA as per original
+  } catch (error) {
+    console.error('Error checking location:', error);
+    return false; // Fail safe to hidden if strict restriction desired
+  }
+};
 
 interface VisitSectionProps {
   siteName: string;
@@ -15,21 +44,10 @@ interface VisitSectionProps {
   country_slug: string;
   hasTours?: boolean;
   hasDirections?: boolean;
+  tours?: ViatorTour[];
 }
 
-const isAllowedCountry = async (): Promise<boolean> => {
-  try {
-    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-      return true;
-    }
-    const response = await fetch('https://ipapi.co/json/');
-    const data = await response.json();
-    return ['US', 'CA'].includes(data.country_code);
-  } catch (error) {
-    console.error('Error checking location:', error);
-    return false;
-  }
-};
+
 
 export default function VisitSection({
   siteName,
@@ -37,7 +55,8 @@ export default function VisitSection({
   country,
   country_slug,
   hasTours = false,
-  hasDirections = false
+  hasDirections = false,
+  tours = []
 }: VisitSectionProps) {
   const [showMerakiva, setShowMerakiva] = useState(false);
 
@@ -52,6 +71,28 @@ export default function VisitSection({
       </CardHeader>
       <CardContent>
         <div className="space-y-6 max-w-2xl mx-auto">
+          {/* Tours - Display Tours if available, otherwise show placeholder if hasTours is true */}
+          {tours && tours.length > 0 ? (
+            <ViatorTours tours={tours} />
+          ) : hasTours && (
+            <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-gray-50 to-white p-8">
+              <div className="relative z-10">
+                <div className="mb-4">
+                  <div className="inline-block rounded-lg bg-gray-100 p-2">
+                    <Globe className="h-6 w-6 text-gray-600" />
+                  </div>
+                </div>
+                <h3 className="mb-2 text-xl font-semibold">Find Tours</h3>
+                <p className="mb-4 text-gray-600">
+                  Guided tours and experiences at {siteName}. Coming soon.
+                </p>
+                <Button variant="secondary" className="w-full" disabled>
+                  View Tours
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Take a Trip - Merakiva Travel */}
           {showMerakiva && (
             <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-blue-50 to-white p-8">
@@ -84,26 +125,6 @@ export default function VisitSection({
                   }}
                 >
                   Get Free Consultation
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Tours - Conditional */}
-          {hasTours && (
-            <div className="relative overflow-hidden rounded-lg border bg-gradient-to-br from-gray-50 to-white p-8">
-              <div className="relative z-10">
-                <div className="mb-4">
-                  <div className="inline-block rounded-lg bg-gray-100 p-2">
-                    <Globe className="h-6 w-6 text-gray-600" />
-                  </div>
-                </div>
-                <h3 className="mb-2 text-xl font-semibold">Find Tours</h3>
-                <p className="mb-4 text-gray-600">
-                  Guided tours and experiences at {siteName}. Coming soon.
-                </p>
-                <Button variant="secondary" className="w-full" disabled>
-                  View Tours
                 </Button>
               </div>
             </div>

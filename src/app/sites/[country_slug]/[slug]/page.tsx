@@ -17,6 +17,7 @@ import ErrorBoundary from '../../../../components/ErrorBoundary'
 import VisitSection from '../../../../components/VistSection'
 import SiteFAQ from '../../../../components/SiteFAQ'
 import RelatedSites from '../../../../components/RelatedSites'
+import { ViatorTour } from '@/lib/viator/types';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -126,6 +127,19 @@ export default async function Page({ params }: { params: { country_slug: string;
     .eq('country_slug', params.country_slug)
     .neq('slug', params.slug)
     .limit(60); // Retrieve a pool of candidates
+
+  // Fetch Viator Tours
+  const { data: toursData } = await supabase
+    .from('viator_tours')
+    .select('*')
+    .eq('site_id', data.id)
+    .eq('site_id', data.id)
+    .gte('review_count', 2) // Minimum 2 reviews
+    .order('rating', { ascending: false })
+    .order('review_count', { ascending: false }) // Secondary sort
+    .limit(6);
+
+  const tours: ViatorTour[] = toursData as ViatorTour[] || [];
 
   let relatedSites = relatedSitesData || [];
 
@@ -280,8 +294,9 @@ export default async function Page({ params }: { params: { country_slug: string;
                     slug={site.slug}
                     country={site.country}
                     country_slug={site.country_slug}
-                    hasTours={false}
+                    hasTours={tours.length > 0}
                     hasDirections={false}
+                    tours={tours}
                   />
 
                   {/* Details Section */}
