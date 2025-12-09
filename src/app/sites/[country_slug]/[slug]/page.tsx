@@ -18,6 +18,12 @@ import VisitSection from '../../../../components/VistSection'
 import SiteFAQ from '../../../../components/SiteFAQ'
 import RelatedSites from '../../../../components/RelatedSites'
 import { ViatorTour } from '@/lib/viator/types';
+import dynamic from 'next/dynamic'
+
+const SingleSiteMap = dynamic(() => import('../../../../components/SingleSiteMap'), {
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-gray-100 animate-pulse rounded-xl" />
+})
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -130,7 +136,7 @@ export default async function Page({ params }: { params: { country_slug: string;
     .limit(60); // Retrieve a pool of candidates
 
   // Fetch Viator Tours
-  const { data: toursData, error: toursError } = await supabase
+  const { data: toursData } = await supabase
     .from('viator_tours')
     .select('*')
     .eq('site_id', data.id)
@@ -138,6 +144,7 @@ export default async function Page({ params }: { params: { country_slug: string;
     .limit(100); // Fetch a larger pool for client-side sorting
 
   const toursDataTyped = (toursData as ViatorTour[]) || [];
+
 
   // 1. Bayesian Score (Quality)
   const m = 10; // Threshold
@@ -192,8 +199,10 @@ export default async function Page({ params }: { params: { country_slug: string;
     rating: t.rating,
     reviews: t.review_count,
     price: t.price,
-    bayesian: (t as any).bayesian.toFixed(3),
-    final: (t as any).finalScore.toFixed(3)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    bayesian: ((t as any).bayesian as number).toFixed(3),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    final: ((t as any).finalScore as number).toFixed(3)
   })));
 
 
@@ -225,9 +234,12 @@ export default async function Page({ params }: { params: { country_slug: string;
     relatedSites = scoredSites.slice(0, 6);
   }
 
-  console.log('Raw site data:', data);
-  const site: Site = data as Site;
-  console.log('Site object:', site);
+  const site: Site = {
+    ...data,
+    // Handle PostGIS location object (GeoJSON) -> [lng, lat]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    location: (data.location as any)?.coordinates || data.location,
+  } as Site;
   console.log('Raw FAQs:', site.faqs);
   const faqs = site.faqs?.faqs || [];
   console.log('Processed FAQs:', faqs);
@@ -271,8 +283,14 @@ export default async function Page({ params }: { params: { country_slug: string;
               </Card>
 
               {/* Mobile Periods */}
-              <div className="lg:hidden">
+              <div className="lg:hidden space-y-8">
                 <SitePeriods periods={processedPeriods} headingLevel="h2" />
+                <div className="my-8">
+                  <h2 className="text-2xl font-semibold mb-4 px-2">Location</h2>
+                  <div className="px-2"> {/* Extra padding for scroll safety */}
+                    <SingleSiteMap site={site} className="h-64 w-full" />
+                  </div>
+                </div>
               </div>
 
               <div className="flex gap-8">
@@ -395,13 +413,17 @@ export default async function Page({ params }: { params: { country_slug: string;
                 </div>
 
                 {/* Desktop Periods */}
-                <div className="hidden lg:block w-48">
-                  <div className="sticky top-8">
+                <div className="hidden lg:block w-72">
+                  <div className="sticky top-24">
                     <SitePeriods
                       periods={processedPeriods}
                       isFloating={true}
                       headingLevel="h2"
                     />
+                    <div className="mt-8">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-3">Location</h3>
+                      <SingleSiteMap site={site} className="h-64 w-full" />
+                    </div>
                   </div>
                 </div>
               </div>
