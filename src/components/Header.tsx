@@ -9,7 +9,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from "./ui/sheet"
-import RecentSites from './RecentSites'
 import SearchDialog from './SearchDialog'
 
 export default function Header() {
@@ -33,9 +32,13 @@ export default function Header() {
                     <li><a href="/about" className="hover:text-blue-600">About</a></li>
                   </ul>
                 </nav>
-                <div className="mt-4 border-t border-gray-100">
-                  <RecentSites />
-                </div>
+                <div className="mt-4 border-t border-gray-100 mb-4" />
+                <nav>
+                  <ul className="space-y-4 px-4">
+                    <li><a href="/sites" className="hover:text-blue-600">All Sites</a></li>
+                    <li><a href="/sites/unesco" className="hover:text-blue-600">UNESCO Sites</a></li>
+                  </ul>
+                </nav>
               </SheetContent>
             </Sheet>
 

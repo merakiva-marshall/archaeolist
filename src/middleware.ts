@@ -3,6 +3,13 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
+    // Canonicalize Domain: Redirect www to non-www
+    if (request.nextUrl.hostname.startsWith('www.') || request.headers.get('host')?.startsWith('www.')) {
+        const newUrl = new URL(request.url);
+        newUrl.hostname = 'archaeolist.com';
+        return NextResponse.redirect(newUrl, { status: 301 });
+    }
+
     let response = NextResponse.next({
         request: {
             headers: request.headers,

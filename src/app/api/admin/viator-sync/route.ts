@@ -16,9 +16,12 @@ export async function POST(request: Request) {
         // const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 10;
 
         const body = await request.json().catch(() => ({}));
-        const { siteIds, searchQuery } = body;
+        const { siteIds, searchQuery, limit } = body;
 
-        const results = await syncSites(siteIds, searchQuery);
+        // Use limit from body, or default to 5 if not provided (syncSites handles default too)
+        const batchSize = limit ? parseInt(limit) : 5;
+
+        const results = await syncSites(siteIds, searchQuery, batchSize);
 
         return NextResponse.json({
             success: true,

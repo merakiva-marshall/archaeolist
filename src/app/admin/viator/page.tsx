@@ -24,7 +24,7 @@ export default function ViatorSyncPage() {
         try {
             const res = await fetch('/api/admin/viator-sync', {
                 method: 'POST',
-                body: JSON.stringify({ limit: 5 })
+                body: JSON.stringify({ limit: 10 })
             });
             const json = await res.json();
 
@@ -72,7 +72,7 @@ export default function ViatorSyncPage() {
                         disabled={syncing}
                         className="rounded bg-sky-600 px-4 py-3 font-bold text-white hover:bg-sky-700 disabled:opacity-50"
                     >
-                        {syncing ? "Syncing..." : "Sync Batch (5)"}
+                        {syncing ? "Syncing..." : "Sync Batch (10)"}
                     </button>
                     <button
                         onClick={() => handleSync(true)}

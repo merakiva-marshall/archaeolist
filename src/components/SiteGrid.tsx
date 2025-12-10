@@ -13,9 +13,10 @@ const PAGE_SIZE = 50
 interface SiteGridProps {
   countrySlug?: string;
   initialSites?: Site[];
+  showCountryContext?: boolean;
 }
 
-export default function SiteGrid({ initialSites }: SiteGridProps) {
+export default function SiteGrid({ initialSites, showCountryContext }: SiteGridProps) {
   const [displayedSites, setDisplayedSites] = useState<Site[]>(
     initialSites ? initialSites.slice(0, PAGE_SIZE) : []
   )
@@ -29,6 +30,8 @@ export default function SiteGrid({ initialSites }: SiteGridProps) {
       // Keeping this sync logic but ensuring it doesn't cause hydration mismatch
       // is tricky. For static pages, simpler is better.
       // We'll trust the initial state for the first render.
+      setDisplayedSites(initialSites.slice(0, PAGE_SIZE));
+      setCurrentPage(1);
     }
   }, [initialSites])
 
@@ -61,7 +64,7 @@ export default function SiteGrid({ initialSites }: SiteGridProps) {
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayedSites.map((site) => (
-          <SiteCard key={site.id} site={site} />
+          <SiteCard key={site.id} site={site} showCountryContext={showCountryContext} />
         ))}
       </div>
 

@@ -5,12 +5,14 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader } from './ui/card'
 import { Site } from '../types/site'
 import SitePlaceholder from './SitePlaceholder'
+import { MapPin } from 'lucide-react'
 
 interface SiteCardProps {
   site: Site;
+  showCountryContext?: boolean;
 }
 
-export default function SiteCard({ site }: SiteCardProps) {
+export default function SiteCard({ site, showCountryContext }: SiteCardProps) {
   return (
     <Link
       href={`/sites/${site.country_slug}/${site.slug}`}
@@ -33,6 +35,12 @@ export default function SiteCard({ site }: SiteCardProps) {
           )}
         </div>
         <CardHeader>
+          {showCountryContext && site.country && (
+            <div className="flex items-center space-x-1 text-sm text-blue-600 mb-2 font-medium">
+              <MapPin className="h-3 w-3" />
+              <span>{site.country}</span>
+            </div>
+          )}
           <h2 className="text-xl font-semibold group-hover:text-blue-600 transition-colors">
             {site.name}
           </h2>

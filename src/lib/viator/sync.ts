@@ -51,7 +51,7 @@ export async function findNearestDestination(lat: number, lng: number, destinati
 }
 
 // Logic to sync specific sites
-export async function syncSites(siteIds: string[] | null, searchQuery: string | null) {
+export async function syncSites(siteIds: string[] | null, searchQuery: string | null, limit: number = 5) {
     const supabase = getSupabase();
     const apiKey = process.env.VIATOR_API_KEY;
     if (!apiKey) throw new Error("VIATOR_API_KEY is missing");
@@ -68,11 +68,8 @@ export async function syncSites(siteIds: string[] | null, searchQuery: string | 
     } else {
         // Fetch sites that haven't been synced locally OR were synced more than 24 hours ago
         // Default sort: Oldest sync first (nulls first)
-
-        // Supabase doesn't support complex OR logic with nulls easily in one chain without raw SQL or RPC
-        // So we stick to simple ordering: Nulls first, then oldest dates.
         // This naturally prioritizes "never synced" and "oldest synced".
-        query = query.order('last_viator_sync', { ascending: true, nullsFirst: true }).limit(5);
+        query = query.order('last_viator_sync', { ascending: true, nullsFirst: true }).limit(limit);
     }
 
     const { data: sites, error } = await query;

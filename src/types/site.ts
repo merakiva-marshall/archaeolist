@@ -45,7 +45,7 @@ export interface Site {
   country: string;
   country_slug: string;
   slug: string;
-  
+
   // Optional properties
   address?: string | null;
   images?: SiteImage[] | null;
@@ -54,7 +54,11 @@ export interface Site {
   short_description?: string;
   processed_features?: ProcessedFeatures;
   processed_periods?: ProcessedPeriods;
+  period?: string[];
+  features?: string[] | null;
   timeline?: Timeline;
   archaeological_site_yn?: boolean;
   faqs?: FAQData;
+  created_at?: string;
+  updated_at?: string;
 }

@@ -37,16 +37,16 @@ function PeriodMarker({ period, isPresent, isMobile = false }: TimelinePeriodMar
         <div className="w-5 flex justify-center flex-shrink-0">
           <div className={`
             rounded-full transition-all duration-200
-            ${isPresent 
-              ? 'w-2.5 h-2.5 bg-blue-600' 
+            ${isPresent
+              ? 'w-2.5 h-2.5 bg-[#0077D4]'
               : 'w-1.5 h-1.5 bg-gray-200'
             }
           `} />
         </div>
         <span className={`
           transition-all duration-200 min-w-0 flex-1
-          ${isPresent 
-            ? 'text-sm font-semibold text-gray-900' 
+          ${isPresent
+            ? 'text-sm font-semibold text-gray-900'
             : 'text-sm text-gray-400'
           }
         `}>
@@ -62,16 +62,16 @@ function PeriodMarker({ period, isPresent, isMobile = false }: TimelinePeriodMar
         <div className={`
           transition-all duration-200
           rounded-md
-          ${isPresent 
-            ? 'w-4 h-4 bg-blue-600' 
+          ${isPresent
+            ? 'w-4 h-4 bg-[#0077D4]'
             : 'w-3.5 h-3.5 border-2 border-gray-200 bg-white'
           }
         `} />
       </div>
       <span className={`
         transition-all duration-200 whitespace-nowrap
-        ${isPresent 
-          ? 'text-base font-medium text-gray-900' 
+        ${isPresent
+          ? 'text-base font-medium text-gray-900'
           : 'text-sm text-gray-400'
         }
       `}>
@@ -87,7 +87,7 @@ interface SitePeriodsProps {
   headingLevel?: 'h2' | 'h3';
 }
 
-export default function SitePeriods({ 
+export default function SitePeriods({
   periods = {},
   isFloating = false,
   headingLevel = 'h2'
@@ -171,7 +171,7 @@ export default function SitePeriods({
 
       {/* Tooltip */}
       {tooltip && (
-        <div 
+        <div
           className="fixed z-50 bg-white px-3 py-2 rounded-lg shadow-lg border text-sm whitespace-nowrap"
           style={{
             left: `${tooltip.x + 10}px`,

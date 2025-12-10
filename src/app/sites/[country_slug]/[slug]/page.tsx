@@ -3,7 +3,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Home, ExternalLink, MapPin } from 'lucide-react'
+import { ExternalLink, MapPin } from 'lucide-react'
 import { Site } from '../../../../types/site'
 import { Metadata } from 'next'
 import ImageGallery from '../../../../components/ImageGallery'
@@ -254,31 +254,40 @@ export default async function Page({ params }: { params: { country_slug: string;
         <StructuredData site={site} />
         <main className="min-h-[calc(100vh-4rem)] bg-gray-50">
           <div className="container mx-auto px-4 py-8 pb-16 max-w-4xl">
-            <Link
-              href="/"
-              className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Map <Home className="h-4 w-4 ml-2" />
-            </Link>
 
             <article className="space-y-8">
               {/* Header Section with H1 */}
-              <Card>
-                <CardHeader>
-                  <Link
-                    href={`/sites/${site.country_slug}`}
-                    className="group inline-flex items-center space-x-2 text-sm text-gray-600 hover:text-blue-600 mb-4"
-                  >
-                    <MapPin className="h-4 w-4" />
-                    <span className="font-medium">{site.country}</span>
-                  </Link>
-                  <h1 className="text-3xl sm:text-4xl font-bold">{site.name}</h1>
-                  {site.short_description && (
-                    <p className="text-lg text-gray-600 mt-4 leading-relaxed">
-                      {site.short_description}
-                    </p>
-                  )}
+              <Card className="relative overflow-hidden">
+                {/* Unified UNESCO Top Bar */}
+                {site.is_unesco && (
+                  <div className="w-full bg-[#0077D4] flex items-center justify-end pr-4 py-1.5">
+                    <Link href="/sites/unesco" className="inline-block transition-opacity hover:opacity-90">
+                      <img
+                        src="https://www.unesco.org/themes/custom/bunesco8/assets/images/logo/logo.svg"
+                        alt="UNESCO World Heritage Site"
+                        className="h-[20px] md:h-[30px] w-auto brightness-0 invert"
+                      />
+                      <span className="sr-only">UNESCO World Heritage Site</span>
+                    </Link>
+                  </div>
+                )}
+
+                <CardHeader className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="flex-1">
+                    <Link
+                      href={`/sites/${site.country_slug}`}
+                      className="group inline-flex items-center space-x-2 text-lg font-bold text-blue-600 underline-offset-4 hover:underline mb-4"
+                    >
+                      <MapPin className="h-5 w-5" />
+                      <span>{site.country}</span>
+                    </Link>
+                    <h1 className="text-3xl sm:text-4xl font-bold">{site.name}</h1>
+                    {site.short_description && (
+                      <p className="text-lg text-gray-600 mt-4 leading-relaxed">
+                        {site.short_description}
+                      </p>
+                    )}
+                  </div>
                 </CardHeader>
               </Card>
 
@@ -286,7 +295,7 @@ export default async function Page({ params }: { params: { country_slug: string;
               <div className="lg:hidden space-y-8">
                 <SitePeriods periods={processedPeriods} headingLevel="h2" />
                 <div className="my-8">
-                  <h2 className="text-2xl font-semibold mb-4 px-2">Location</h2>
+                  <h2 className="text-2xl font-bold mb-4 px-2">Location</h2>
                   <div className="px-2"> {/* Extra padding for scroll safety */}
                     <SingleSiteMap site={site} className="h-64 w-full" />
                   </div>
