@@ -74,8 +74,14 @@ export async function generateMetadata(): Promise<Metadata> {
     });
 }
 
+import { Suspense } from 'react';
+
 export default async function AllSitesPage() {
     const sites = await getAllSites();
 
-    return <AllSitesClient initialSites={sites} />;
+    return (
+        <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading sites...</div>}>
+            <AllSitesClient initialSites={sites} />
+        </Suspense>
+    );
 }

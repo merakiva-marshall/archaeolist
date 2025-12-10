@@ -77,16 +77,20 @@ export async function generateMetadata(): Promise<Metadata> {
     });
 }
 
+import { Suspense } from 'react';
+
 export default async function UnescoPage() {
     const sites = await getUnescoSites();
 
     return (
-        <UnescoSitesClient
-            initialSites={sites}
-            content={{
-                title: "UNESCO World Heritage Sites",
-                description: "Preserving Our Shared Heritage"
-            }}
-        />
+        <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading UNESCO sites...</div>}>
+            <UnescoSitesClient
+                initialSites={sites}
+                content={{
+                    title: "UNESCO World Heritage Sites",
+                    description: "Preserving Our Shared Heritage"
+                }}
+            />
+        </Suspense>
     );
 }
