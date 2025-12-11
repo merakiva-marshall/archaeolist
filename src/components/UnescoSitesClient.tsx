@@ -164,7 +164,7 @@ export default function UnescoSitesClient({ initialSites }: UnescoSitesClientPro
 
                         {/* Left Column: Info */}
                         <div className="lg:col-span-4 space-y-8">
-                            <div className="hidden lg:block lg:col-span-1 sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                            <div className="lg:col-span-1 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
 
                                 {/* Info Card */}
                                 <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
