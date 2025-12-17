@@ -27,7 +27,8 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
       container: container.current,
       style: 'mapbox://styles/mschurtz/cm2dn5d2w001e01pfedqpddfu',
       center: [20, 40],
-      zoom: 5
+      zoom: 5,
+      cooperativeGestures: true
     })
 
     map.current = newMap

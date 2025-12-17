@@ -57,6 +57,7 @@ export interface Site {
   period?: string[];
   features?: string[] | null;
   timeline?: Timeline;
+  featured?: boolean;
   archaeological_site_yn?: boolean;
   faqs?: FAQData;
   created_at?: string;

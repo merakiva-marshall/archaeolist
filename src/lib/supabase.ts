@@ -25,7 +25,8 @@ export interface RawSite {
   processed_periods?: { [key: string]: string[] };
   timeline?: Timeline;
   archaeological_site_yn?: boolean;
-  updated_at: string; // Add this line
+  featured?: boolean;
+  updated_at: string;
 }
 
 export async function fetchSites(): Promise<Site[]> {
@@ -37,7 +38,7 @@ export async function fetchSites(): Promise<Site[]> {
 
     while (hasMore) {
       console.log('Fetching page:', page);
-      
+
       const { data, error } = await supabase
         .from('sites')
         .select('*')
@@ -67,9 +68,10 @@ export async function fetchSites(): Promise<Site[]> {
             processed_features: site.processed_features,
             processed_periods: site.processed_periods,
             timeline: site.timeline,
-            archaeological_site_yn: site.archaeological_site_yn
+            archaeological_site_yn: site.archaeological_site_yn,
+            featured: site.featured
           };
-          
+
           return formattedSite;
         });
 

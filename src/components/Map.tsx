@@ -1,6 +1,6 @@
 // src/components/Map.tsx
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, forwardRef, useImperativeHandle } from 'react'
 import { Site } from '../types/site'
 import { useMap, useMapEventHandlers } from '../hooks/useMap'
 import { fetchSites } from '../lib/supabase'
@@ -11,12 +11,28 @@ export interface MapProps {
   isSidebarOpen: boolean;
 }
 
+export interface MapRef {
+  flyToSite: (site: Site) => void;
+}
+
 const SITE_ZOOM_LEVEL = 12;
 
-export default function Map({ onSiteClick, selectedSite, isSidebarOpen }: MapProps) {
+const Map = forwardRef<MapRef, MapProps>(({ onSiteClick, selectedSite, isSidebarOpen }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const [sites, setSites] = useState<Site[]>([])
   const map = useMap(mapContainer, sites)
+
+  useImperativeHandle(ref, () => ({
+    flyToSite: (site: Site) => {
+      if (map.current) {
+        map.current.flyTo({
+          center: site.location,
+          zoom: SITE_ZOOM_LEVEL,
+          essential: true
+        });
+      }
+    }
+  }));
 
   useEffect(() => {
     fetchSites().then(setSites)
@@ -31,8 +47,8 @@ export default function Map({ onSiteClick, selectedSite, isSidebarOpen }: MapPro
       map.current.easeTo({
         center: selectedSite.location,
         zoom: SITE_ZOOM_LEVEL,
-        padding: isMobile ? 
-          { bottom: window.innerHeight * 0.7 } : 
+        padding: isMobile ?
+          { bottom: window.innerHeight * 0.7 } :
           { right: window.innerWidth * 0.3 },
         duration: 1000
       });
@@ -54,4 +70,8 @@ export default function Map({ onSiteClick, selectedSite, isSidebarOpen }: MapPro
       <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
     </div>
   )
-}
+});
+
+Map.displayName = 'Map';
+
+export default Map;
