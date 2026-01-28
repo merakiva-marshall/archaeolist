@@ -1,65 +1,10 @@
-import { createClient } from '@supabase/supabase-js'
+import { Suspense } from 'react';
 import { Metadata } from 'next'
-import { Database } from '../../types/supabase'
-import { Site } from '../../types/site'
 import { generateBaseMetadata } from '../../lib/metadata'
 import AllSitesClient from '../../components/AllSitesClient'
+import { getSites, getSiteMetadata, ITEMS_PER_PAGE } from '../../lib/sites'
 
-export const revalidate = 86400; // Cache for 24 hours
-
-const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
-async function getAllSites(): Promise<Site[]> {
-    let allSites: Site[] = [];
-    let page = 0;
-    const pageSize = 1000;
-
-    while (true) {
-        const { data, error } = await supabase
-            .from('sites')
-            .select(`
-          id,
-          name,
-          slug,
-          country,
-          country_slug,
-          short_description,
-          images,
-          is_unesco,
-          created_at,
-          updated_at,
-          description,
-          timeline,
-          period,
-          features,
-          processed_features,
-          processed_periods
-        `)
-            .range(page * pageSize, (page + 1) * pageSize - 1);
-
-        if (error) {
-            console.error('Error fetching sites:', error);
-            break;
-        }
-
-        if (!data || data.length === 0) {
-            break;
-        }
-
-        allSites = [...allSites, ...(data as unknown as Site[])];
-
-        if (data.length < pageSize) {
-            break;
-        }
-
-        page++;
-    }
-
-    return allSites;
-}
+export const revalidate = 3600; // Cache for 1 hour (as per quick fix recommendation)
 
 export async function generateMetadata(): Promise<Metadata> {
     return generateBaseMetadata({
@@ -74,14 +19,44 @@ export async function generateMetadata(): Promise<Metadata> {
     });
 }
 
-import { Suspense } from 'react';
+interface PageProps {
+    searchParams: { [key: string]: string | string[] | undefined };
+}
 
-export default async function AllSitesPage() {
-    const sites = await getAllSites();
+export default async function AllSitesPage({ searchParams }: PageProps) {
+    // Parse params
+    const page = typeof searchParams.page === 'string' ? parseInt(searchParams.page) : 1;
+    const countries = typeof searchParams.countries === 'string' ? searchParams.countries.split(',') : [];
+    const periods = typeof searchParams.periods === 'string' ? searchParams.periods.split(',') : [];
+    const features = typeof searchParams.features === 'string' ? searchParams.features.split(',') : [];
+    const unesco = searchParams.unesco === 'true';
+    const sort = typeof searchParams.sort === 'string'
+        ? (searchParams.sort as 'featured' | 'recent' | 'updated_desc' | 'updated_asc')
+        : 'featured';
+
+    // Fetch data
+    const [sitesResult, metadata] = await Promise.all([
+        getSites({
+            page,
+            limit: ITEMS_PER_PAGE,
+            countries,
+            periods,
+            features,
+            unesco,
+            sort
+        }),
+        getSiteMetadata()
+    ]);
 
     return (
         <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading sites...</div>}>
-            <AllSitesClient initialSites={sites} />
+            <AllSitesClient
+                initialSites={sitesResult.sites}
+                totalCount={sitesResult.count}
+                metadata={metadata}
+                currentPage={page}
+                itemsPerPage={ITEMS_PER_PAGE}
+            />
         </Suspense>
     );
 }

@@ -2,11 +2,12 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { Button } from './ui/button'
-import { Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Site } from '../types/site'
 import SiteCard from './SiteCard'
+import { useSearchParams } from 'next/navigation'
 
 const PAGE_SIZE = 50
 
@@ -14,41 +15,17 @@ interface SiteGridProps {
   countrySlug?: string;
   initialSites?: Site[];
   showCountryContext?: boolean;
+  /**
+   * If true, disables client-side pagination (slicing) and internal pagination controls.
+   * Use this when the parent component or server is already handling pagination.
+   */
+  manualPagination?: boolean;
 }
 
-export default function SiteGrid({ initialSites, showCountryContext }: SiteGridProps) {
-  const [displayedSites, setDisplayedSites] = useState<Site[]>(
-    initialSites ? initialSites.slice(0, PAGE_SIZE) : []
-  )
-  const [currentPage, setCurrentPage] = useState(1)
-  const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (initialSites) {
-      // Only reset if initialSites changes significantly or we need to sync,
-      // but usually for a static list page this is fine.
-      // Keeping this sync logic but ensuring it doesn't cause hydration mismatch
-      // is tricky. For static pages, simpler is better.
-      // We'll trust the initial state for the first render.
-      setDisplayedSites(initialSites.slice(0, PAGE_SIZE));
-      setCurrentPage(1);
-    }
-  }, [initialSites])
-
-  // Calculate if there are more sites to show
-  const hasMore = initialSites ? currentPage * PAGE_SIZE < initialSites.length : false
-
-  const loadMore = () => {
-    if (!initialSites) return
-
-    setLoading(true)
-    const nextPage = currentPage + 1
-    const newSites = initialSites.slice(0, nextPage * PAGE_SIZE)
-
-    setDisplayedSites(newSites)
-    setCurrentPage(nextPage)
-    setLoading(false)
-  }
+export default function SiteGrid({ initialSites, showCountryContext, manualPagination = false }: SiteGridProps) {
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+  const currentPage = pageParam ? parseInt(pageParam) : 1;
 
   if (!initialSites) {
     return (
@@ -60,6 +37,36 @@ export default function SiteGrid({ initialSites, showCountryContext }: SiteGridP
     )
   }
 
+  // If manualPagination is true, we just show everything passed to us
+  if (manualPagination) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {initialSites.map((site) => (
+          <SiteCard key={site.id} site={site} showCountryContext={showCountryContext} />
+        ))}
+      </div>
+    );
+  }
+
+  // --- Client-Side Pagination Logic (Legacy/Country Page) ---
+
+  const totalItems = initialSites.length;
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+  const safeCurrentPage = Math.max(1, Math.min(currentPage, totalPages));
+
+  const startIndex = (safeCurrentPage - 1) * PAGE_SIZE;
+  const displayedSites = initialSites.slice(startIndex, startIndex + PAGE_SIZE);
+
+  const getPageLink = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    if (page === 1) {
+      params.delete('page');
+    } else {
+      params.set('page', page.toString());
+    }
+    return `?${params.toString()}`;
+  };
+
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -68,22 +75,53 @@ export default function SiteGrid({ initialSites, showCountryContext }: SiteGridP
         ))}
       </div>
 
-      {hasMore && (
-        <div className="mt-8 flex justify-center">
-          <Button
-            onClick={loadMore}
-            disabled={loading}
-            className="min-w-[200px] bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-400"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading more sites...
-              </>
-            ) : (
-              'Load More Sites'
-            )}
-          </Button>
+      {totalPages > 1 && (
+        <div className="mt-12 flex justify-center items-center gap-2">
+          {/* Previous Button */}
+          {safeCurrentPage > 1 ? (
+            <Link
+              href={getPageLink(safeCurrentPage - 1)}
+              scroll={true}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              aria-label="Previous Page"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Link>
+          ) : (
+            <Button
+              variant="outline"
+              disabled
+              className="h-10 w-10 p-0"
+              aria-label="Previous Page"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          )}
+
+          <div className="flex items-center gap-1 mx-2 text-sm font-medium">
+            PageResult {safeCurrentPage} of {totalPages}
+          </div>
+
+          {/* Next Button */}
+          {safeCurrentPage < totalPages ? (
+            <Link
+              href={getPageLink(safeCurrentPage + 1)}
+              scroll={true}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              aria-label="Next Page"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Link>
+          ) : (
+            <Button
+              variant="outline"
+              disabled
+              className="h-10 w-10 p-0"
+              aria-label="Next Page"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       )}
     </div>

@@ -75,17 +75,12 @@ export default function RootLayout({
         <OrganizationSchema />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="https://images.archaeolist.com/archaeolist_map_preview.png" />
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-F1W4Y0LMJ0"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){window.dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-F1W4Y0LMJ0');
-          `}
+        <Script id="google-tag-manager" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-NDXB6JDJ');`}
         </Script>
       </head>
       <body className={`${geist.className} flex flex-col min-h-screen`}>

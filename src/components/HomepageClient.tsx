@@ -1,4 +1,4 @@
-// src/components/Homepage.tsx
+// src/components/HomepageClient.tsx
 
 'use client'
 
@@ -8,10 +8,6 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import WelcomePopup from './WelcomePopup'
 import Sidebar from './Sidebar'
-import FeaturedSites from './FeaturedSites'
-import PopularCountries from './PopularCountries'
-import MissionSection from './MissionSection'
-import AboutProject from './AboutProject'
 
 import { Site } from '../types/site'
 
@@ -28,7 +24,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-export default function HomePage() {
+export default function HomepageClient() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [selectedSite, setSelectedSite] = useState<Site | null>(null)
   const router = useRouter()
@@ -68,19 +64,8 @@ export default function HomePage() {
     router.push(`/sites/${site.country_slug}/${site.slug}`)
   }
 
-  // Not used anymore as we link directly
-  /* 
-  const handleFeaturedClick = (site: Site) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => {
-        // mapRef.current?.flyToSite(site); 
-        handleSiteClick(site); 
-    }, 500);
-  }
-  */
-
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       {/* Header Section */}
       <div className="bg-white border-b border-gray-100 pt-8 pb-4 px-4 sm:px-6 lg:px-8 text-center sm:text-left">
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 tracking-wide font-days-one text-center mx-auto">
@@ -114,14 +99,6 @@ export default function HomePage() {
           onOpen={() => { }}
         />
       </div>
-
-      <FeaturedSites />
-
-      <PopularCountries />
-
-      <MissionSection />
-
-      <AboutProject />
 
       {/* Global Components */}
       <WelcomePopup />

@@ -1,10 +1,8 @@
 
-import { useEffect, useState } from 'react'
 import { Site } from '../types/site'
-import { fetchSites } from '../lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
-
-
+import Image from 'next/image'
 
 // Helper to truncate text
 const truncateText = (text: string, maxLength: number) => {
@@ -12,55 +10,45 @@ const truncateText = (text: string, maxLength: number) => {
     return text.substr(0, maxLength) + '...';
 }
 
-export default function FeaturedSites() {
-    const [featuredSites, setFeaturedSites] = useState<Site[]>([])
-    const [loading, setLoading] = useState(true)
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
-    useEffect(() => {
-        async function loadFeatured() {
-            try {
-                // Fetch all fields to be safe, assuming 'featured' is in the schema now
-                // We fetch everything (*) so if 'featured' exists it will be returned
-                const sites = await fetchSites();
+export default async function FeaturedSites() {
+    let featuredSites: Site[] = [];
 
-                // Explicitly check for true. If the column is missing/undefined, this will be falsy.
-                // We use type assertion or optional chaining safely if Typescript complains about 'featured'
-                // being purely optional, but we added it to the type so it should be fine.
-                const featured = sites.filter(s => s.featured === true);
+    try {
+        const { data } = await supabase
+            .from('sites')
+            .select('*, images')
+            .eq('featured', true)
+            .limit(5);
 
-                console.log(`Found ${featured.length} featured sites in database.`);
+        if (data && data.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            featuredSites = data.map((site: any) => ({
+                ...site,
+                location: site.location?.coordinates || site.location
+            }));
+        } else {
+            // Fallback: fetch 4 random UNESCO sites.
+            const { data: fallbackData } = await supabase
+                .from('sites')
+                .select('*, images')
+                .eq('is_unesco', true)
+                .limit(4);
 
-                if (featured.length > 0) {
-                    setFeaturedSites(featured.slice(0, 5));
-                } else {
-                    console.log("No featured sites found, falling back to defaults.");
-                    // Fallback names
-                    const fallbackNames = ['Great Wall of China', 'Petra', 'Machu Picchu', 'Giza Pyramids'];
-                    const fallbacks = sites.filter(s => fallbackNames.some(name => s.name.includes(name))).slice(0, 4);
-                    setFeaturedSites(fallbacks.length > 0 ? fallbacks : sites.slice(0, 4));
-                }
-            } catch (err) {
-                console.error("Error loading featured sites:", err);
-            } finally {
-                setLoading(false);
+            if (fallbackData) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                featuredSites = fallbackData.map((site: any) => ({
+                    ...site,
+                    location: site.location?.coordinates || site.location
+                }));
             }
         }
-        loadFeatured();
-    }, [])
-
-    if (loading) {
-        return (
-            <section className="py-12 bg-white relative z-10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Sites</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[...Array(4)].map((_, i) => (
-                            <div key={i} className="h-64 bg-gray-100 rounded-lg animate-pulse" />
-                        ))}
-                    </div>
-                </div>
-            </section>
-        )
+    } catch (err) {
+        console.error("Error loading featured sites:", err);
     }
 
     if (featuredSites.length === 0) return null;
@@ -70,7 +58,7 @@ export default function FeaturedSites() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Sites</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {featuredSites.map((site) => (
+                    {featuredSites.slice(0, 4).map((site) => (
                         <Link
                             key={site.id}
                             href={`/sites/${site.country_slug}/${site.slug}`}
@@ -79,10 +67,13 @@ export default function FeaturedSites() {
                             {/* Image */}
                             <div className="relative h-48 overflow-hidden bg-gray-100 flex-shrink-0">
                                 {site.images && site.images.length > 0 ? (
-                                    <img
+                                    <Image
                                         src={site.images[0].url}
                                         alt={site.name}
-                                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                        fill
+                                        className="object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                        unoptimized
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -101,7 +92,7 @@ export default function FeaturedSites() {
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors line-clamp-1">{site.name}</h3>
                                 <p className="text-gray-600 text-sm mb-4 flex-1">
-                                    {truncateText(site.description || site.short_description || "", 300)}
+                                    {truncateText(site.description || site.short_description || "", 150)}
                                 </p>
                                 <div className="mt-auto pt-2">
                                     <span className="text-sm font-medium text-blue-600 group-hover:text-blue-800 transition-colors">

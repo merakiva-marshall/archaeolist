@@ -3,6 +3,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
+import Link from 'next/link'
+import { Suspense } from 'react'
 import { Database } from '../../../types/supabase'
 import { generateBaseMetadata } from '../../../lib/metadata'
 import SiteGrid from '../../../components/SiteGrid'
@@ -11,7 +13,6 @@ import StructuredData from '../../../components/StructuredData'
 import ErrorBoundary from '../../../components/ErrorBoundary'
 import { Card, CardContent } from '../../../components/ui/card'
 import { Building2, MapPin, Award } from 'lucide-react'
-import Link from 'next/link'
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -62,8 +63,7 @@ export async function generateMetadata(
 
   return generateBaseMetadata({
     title: `${countryInfo.country} Archaeological Sites | Archaeolist`,
-    description: `Explore ${countryInfo.site_count} archaeological sites and ruins in ${countryInfo.country
-      }, including ${countryInfo.unesco_count} UNESCO World Heritage sites. Discover ancient history, plan your visits, and find detailed information about historical landmarks and archaeological treasures.`,
+    description: `Explore ${countryInfo.site_count} archaeological sites and ruins in ${countryInfo.country}, including ${countryInfo.unesco_count} UNESCO World Heritage sites. Discover ancient history, plan your visits, and find detailed information about historical landmarks and archaeological treasures.`,
     path: `/sites/${params.country_slug}`,
     keywords: [
       `${countryInfo.country} archaeological sites`,
@@ -183,10 +183,12 @@ export default async function CountryPage({ params }: PageParams) {
               </div>
 
               {/* Sites Grid */}
-              <SiteGrid
-                countrySlug={params.country_slug}
-                initialSites={countryInfo.sites}  // Add this prop
-              />
+              <Suspense fallback={<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{[...Array(6)].map((_, i) => <div key={i} className="h-64 bg-gray-100 rounded-lg animate-pulse" />)}</div>}>
+                <SiteGrid
+                  countrySlug={params.country_slug}
+                  initialSites={countryInfo.sites}
+                />
+              </Suspense>
             </div>
           </div>
         </main>

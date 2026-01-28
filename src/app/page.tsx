@@ -1,12 +1,19 @@
 // src/app/page.tsx
 
-import dynamic from 'next/dynamic'
-
-const HomePage = dynamic(() => import('../components/Homepage'), {
-  ssr: false,
-  loading: () => <div className="w-full h-screen bg-slate-100 animate-pulse" />
-})
+import HomepageClient from '../components/HomepageClient'
+import FeaturedSites from '../components/FeaturedSites'
+import PopularCountries from '../components/PopularCountries'
+import MissionSection from '../components/MissionSection'
+import AboutProject from '../components/AboutProject'
 
 export default function Home() {
-  return <HomePage />
+  return (
+    <main className="min-h-screen bg-white">
+      <HomepageClient />
+      <FeaturedSites />
+      <PopularCountries />
+      <MissionSection />
+      <AboutProject />
+    </main>
+  )
 }

@@ -34,8 +34,8 @@ export default function SiteFAQ({ faqs }: FAQProps) {
 
   const itemVariants = {
     hidden: { opacity: 0, x: -20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       x: 0,
       transition: { duration: 0.3 }
     }
@@ -43,7 +43,7 @@ export default function SiteFAQ({ faqs }: FAQProps) {
 
   const contentVariants = {
     hidden: { height: 0, opacity: 0 },
-    visible: { 
+    visible: {
       height: "auto",
       opacity: 1,
       transition: {
@@ -77,14 +77,14 @@ export default function SiteFAQ({ faqs }: FAQProps) {
   return (
     <Card className="overflow-hidden bg-white/50 backdrop-blur-sm shadow-sm border border-border">
       <CardHeader className="space-y-1 pb-8">
-        <motion.h2 
+        <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-2xl font-bold text-primary"
+          className="text-2xl font-bold text-gray-900"
         >
           Frequently Asked Questions
         </motion.h2>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.7 }}
           className="text-sm text-muted-foreground"
@@ -93,7 +93,7 @@ export default function SiteFAQ({ faqs }: FAQProps) {
         </motion.p>
       </CardHeader>
       <CardContent>
-        <motion.div 
+        <motion.div
           className="space-y-3"
           variants={containerVariants}
           initial="hidden"
@@ -146,7 +146,7 @@ export default function SiteFAQ({ faqs }: FAQProps) {
                     className="overflow-hidden"
                   >
                     <div className="p-4 pt-0 prose max-w-none">
-                      <ReactMarkdown 
+                      <ReactMarkdown
                         className="text-muted-foreground [&>p]:mb-6 [&>p]:leading-relaxed [&>h1]:mb-6 [&>h2]:mb-4 [&>h3]:mb-4 [&>ul]:mb-6 [&>ol]:mb-6 [&>ul]:space-y-2 [&>ol]:space-y-2"
                       >
                         {processAnswer(faq.answer)}

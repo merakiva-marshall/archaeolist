@@ -115,14 +115,14 @@ export default async function Page({ params }: { params: { country_slug: string;
       `)
     .eq('country_slug', params.country_slug)
     .eq('slug', params.slug)
-    .single()
+    .maybeSingle()
 
   if (error) {
     console.error('Supabase error:', error);
   }
 
   if (!data) {
-    console.log('No data found');
+    console.log(`No data found for site: ${params.country_slug}/${params.slug}`);
     notFound()
   }
 
@@ -293,7 +293,7 @@ export default async function Page({ params }: { params: { country_slug: string;
 
               {/* Mobile Periods */}
               <div className="lg:hidden space-y-8">
-                <SitePeriods periods={processedPeriods} headingLevel="h2" />
+                <SitePeriods periods={processedPeriods} headingLevel="h2" variant="mobile" />
                 <div className="my-8">
                   <h2 className="text-2xl font-bold mb-4 px-2">Location</h2>
                   <div className="px-2"> {/* Extra padding for scroll safety */}
@@ -428,6 +428,7 @@ export default async function Page({ params }: { params: { country_slug: string;
                       periods={processedPeriods}
                       isFloating={true}
                       headingLevel="h2"
+                      variant="desktop"
                     />
                     <div className="mt-8">
                       <h3 className="text-sm font-semibold text-gray-900 mb-3">Location</h3>

@@ -46,7 +46,7 @@ function PeriodMarker({ period, isPresent, isMobile = false }: TimelinePeriodMar
         <span className={`
           transition-all duration-200 min-w-0 flex-1
           ${isPresent
-            ? 'text-sm font-semibold text-gray-900'
+            ? 'text-sm font-semibold text-black'
             : 'text-sm text-gray-400'
           }
         `}>
@@ -71,7 +71,7 @@ function PeriodMarker({ period, isPresent, isMobile = false }: TimelinePeriodMar
       <span className={`
         transition-all duration-200 whitespace-nowrap
         ${isPresent
-          ? 'text-base font-medium text-gray-900'
+          ? 'text-base font-medium text-black'
           : 'text-sm text-gray-400'
         }
       `}>
@@ -85,12 +85,14 @@ interface SitePeriodsProps {
   periods?: ProcessedPeriods;
   isFloating?: boolean;
   headingLevel?: 'h2' | 'h3';
+  variant?: 'mobile' | 'desktop';
 }
 
 export default function SitePeriods({
   periods = {},
   isFloating = false,
-  headingLevel = 'h2'
+  headingLevel = 'h2',
+  variant = 'desktop'
 }: SitePeriodsProps) {
   const [tooltip, setTooltip] = useState<{
     text: string;
@@ -100,10 +102,8 @@ export default function SitePeriods({
 
   const HeadingTag = headingLevel;
 
-
-  return (
-    <div>
-      {/* Mobile view */}
+  if (variant === 'mobile') {
+    return (
       <div className="lg:hidden">
         <div className="rounded-lg border p-4">
           <HeadingTag className="text-2xl font-bold mb-4">Time Periods</HeadingTag>
@@ -135,38 +135,39 @@ export default function SitePeriods({
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Desktop view */}
-      <div className="hidden lg:block">
-        <HeadingTag className={`
-          font-bold mb-6 transition-all duration-300
-          ${isFloating ? 'text-lg' : 'text-2xl'}
-        `}>
-          Time Periods
-        </HeadingTag>
-        <div className="space-y-1">
-          {Object.keys(PERIOD_DEFINITIONS).map((period) => (
-            <div
-              key={period}
-              onMouseEnter={(e) => {
-                if (period in periods) {
-                  setTooltip({
-                    text: `${period}: ${PERIOD_DEFINITIONS[period as keyof typeof PERIOD_DEFINITIONS]}`,
-                    x: e.clientX,
-                    y: e.clientY
-                  });
-                }
-              }}
-              onMouseLeave={() => setTooltip(null)}
-            >
-              <h3 className="sr-only">{period}</h3>
-              <PeriodMarker
-                period={period}
-                isPresent={period in periods}
-              />
-            </div>
-          ))}
-        </div>
+  return (
+    <div className="hidden lg:block">
+      <HeadingTag className={`
+        font-bold mb-6 transition-all duration-300
+        ${isFloating ? 'text-lg' : 'text-2xl'}
+      `}>
+        Time Periods
+      </HeadingTag>
+      <div className="space-y-1">
+        {Object.keys(PERIOD_DEFINITIONS).map((period) => (
+          <div
+            key={period}
+            onMouseEnter={(e) => {
+              if (period in periods) {
+                setTooltip({
+                  text: `${period}: ${PERIOD_DEFINITIONS[period as keyof typeof PERIOD_DEFINITIONS]}`,
+                  x: e.clientX,
+                  y: e.clientY
+                });
+              }
+            }}
+            onMouseLeave={() => setTooltip(null)}
+          >
+            <h3 className="sr-only">{period}</h3>
+            <PeriodMarker
+              period={period}
+              isPresent={period in periods}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Tooltip */}

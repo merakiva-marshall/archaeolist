@@ -39,4 +39,4 @@ next-env.d.ts
 /docs/schema/
 
 #env.local
-.env.local
+.env.localbuild.log

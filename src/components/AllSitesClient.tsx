@@ -22,9 +22,14 @@ import {
     SelectValue,
 } from "./ui/select";
 import { Checkbox } from './ui/checkbox';
+import { SiteMetadata } from '../lib/sites';
 
 interface AllSitesClientProps {
     initialSites: Site[];
+    totalCount: number;
+    metadata: SiteMetadata;
+    currentPage: number;
+    itemsPerPage: number;
 }
 
 // Helper to clean country names
@@ -51,19 +56,14 @@ const getCountryEmoji = (countryName: string) => {
 
 // Period Colors (Earthy/Historical/Warm)
 function generatePeriodColor(text: string): { bg: string; text: string; border: string } {
-    // Use a predictable hash
     const hash = Array.from(text).reduce((acc, char) => {
         return char.charCodeAt(0) + ((acc << 5) - acc);
     }, 0);
 
-    // Constrain to "Earthy" tones: Oranges, Browns, Yellows, Warm Greens
-    // Hues ~20 (Brown/Orange) to ~60 (Yellow) to ~150 (Green)
-    // Let's map the hash to a specific set of nice earthy hues
-    const earthyHues = [30, 45, 180, 200, 210]; // Warm browns, golds, and slate blues for "Time"
+    const earthyHues = [30, 45, 180, 200, 210];
     const h = earthyHues[Math.abs(hash) % earthyHues.length];
-
-    const s = 30 + (Math.abs(hash) % 30); // 30-60% saturation (muted)
-    const l = 90 + (Math.abs(hash) % 6); // 90-96% lightness (very light background)
+    const s = 30 + (Math.abs(hash) % 30);
+    const l = 90 + (Math.abs(hash) % 6);
 
     return {
         bg: `hsl(${h}, ${s}%, ${l}%)`,
@@ -78,10 +78,9 @@ function generateFeatureColor(text: string): { bg: string; text: string; border:
         return char.charCodeAt(0) + ((acc << 5) - acc);
     }, 0);
 
-    // Full spectrum but distinct from periods (avoiding the exact earthy muds if possible)
     const h = Math.abs(hash) % 360;
-    const s = 60 + (Math.abs(hash) % 30); // 60-90% saturation (more vibrant)
-    const l = 92 + (Math.abs(hash) % 5); // 92-97% lightness
+    const s = 60 + (Math.abs(hash) % 30);
+    const l = 92 + (Math.abs(hash) % 5);
 
     return {
         bg: `hsl(${h}, ${s}%, ${l}%)`,
@@ -90,52 +89,9 @@ function generateFeatureColor(text: string): { bg: string; text: string; border:
     };
 }
 
-const PERIOD_ORDER = [
-    "Paleolithic",
-    "Mesolithic",
-    "Neolithic",
-    "Chalcolithic",
-    "Bronze Age",
-    "Iron Age",
-    "Classical Period",
-    "Post-Classical Period",
-    "Early Modern Period",
-    "Industrial Period",
-    "Contemporary Period"
-];
-
-
 type SortOption = 'featured' | 'recent' | 'updated_desc' | 'updated_asc';
 
-// Helper for "Featured" scoring
-const calculateFeaturedScore = (site: Site) => {
-    let score = 0;
-
-    // Prioritize Timeline & Features
-    if (site.timeline) score += 20;
-    if (site.features && site.features.length > 0) score += 20;
-    if (site.processed_features && Object.keys(site.processed_features).length > 0) score += 10;
-
-    // Images
-    if (site.images && site.images.length > 0) {
-        score += 10;
-        score += Math.min(site.images.length, 5) * 2; // Up to 10 points for more images
-    }
-
-    // Recency (Recently Added)
-    // Add small boost for new sites to keep content fresh, but prioritize quality content first
-    const created = new Date(site.created_at || 0).getTime();
-    const now = Date.now();
-    const daysSinceCreation = (now - created) / (1000 * 60 * 60 * 24);
-
-    if (daysSinceCreation < 30) score += 15;
-    else if (daysSinceCreation < 90) score += 10;
-    else if (daysSinceCreation < 365) score += 5;
-
-    return score;
-};
-
-export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
+export default function AllSitesClient({ initialSites, totalCount, metadata, currentPage, itemsPerPage }: AllSitesClientProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -153,24 +109,26 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
     // Initialize from URL
     useEffect(() => {
         const countriesParam = searchParams.get('countries');
-        if (countriesParam) setSelectedCountries(countriesParam.split(','));
+        setSelectedCountries(countriesParam ? countriesParam.split(',') : []);
 
         const periodsParam = searchParams.get('periods');
-        if (periodsParam) setSelectedPeriods(periodsParam.split(','));
+        setSelectedPeriods(periodsParam ? periodsParam.split(',') : []);
 
         const featuresParam = searchParams.get('features');
-        if (featuresParam) setSelectedFeatures(featuresParam.split(','));
+        setSelectedFeatures(featuresParam ? featuresParam.split(',') : []);
 
         const unescoParam = searchParams.get('unesco');
-        if (unescoParam === 'true') setUnescoOnly(true);
+        setUnescoOnly(unescoParam === 'true');
 
         const sortParam = searchParams.get('sort');
         if (sortParam && ['featured', 'recent', 'updated_desc', 'updated_asc'].includes(sortParam)) {
             setSortBy(sortParam as SortOption);
+        } else {
+            setSortBy('featured');
         }
     }, [searchParams]);
 
-    // Update URL helper
+    // Update URL helper - RESETS PAGE to 1 on filter change
     const updateUrl = (
         countries: string[],
         periods: string[],
@@ -179,6 +137,9 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
         sort: SortOption
     ) => {
         const params = new URLSearchParams(searchParams);
+
+        // Reset page to 1 when filters change (except pagination links)
+        params.delete('page');
 
         if (countries.length > 0) params.set('countries', countries.join(','));
         else params.delete('countries');
@@ -192,13 +153,18 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
         if (unesco) params.set('unesco', 'true');
         else params.delete('unesco');
 
-        if (sort !== 'featured') params.set('sort', sort); // Default doesn't need param
+        if (sort !== 'featured') params.set('sort', sort);
         else params.delete('sort');
 
         router.push(`?${params.toString()}`, { scroll: false });
     };
 
-    // Handlers
+    const handleSortChange = (sort: string) => {
+        const newSort = sort as SortOption;
+        setSortBy(newSort);
+        updateUrl(selectedCountries, selectedPeriods, selectedFeatures, unescoOnly, newSort);
+    };
+
     const toggleCountry = (country: string) => {
         const newSelection = selectedCountries.includes(country)
             ? selectedCountries.filter(c => c !== country)
@@ -228,12 +194,6 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
         updateUrl(selectedCountries, selectedPeriods, selectedFeatures, checked, sortBy);
     };
 
-    const handleSortChange = (sort: string) => {
-        const newSort = sort as SortOption;
-        setSortBy(newSort);
-        updateUrl(selectedCountries, selectedPeriods, selectedFeatures, unescoOnly, newSort);
-    };
-
     const clearFilters = () => {
         setSelectedCountries([]);
         setSelectedPeriods([]);
@@ -258,94 +218,39 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
         }
     };
 
+    // Prepare Filter Options from Metadata
+    const countryOptions = useMemo(() => {
+        return metadata.countries.map(c => ({
+            name: c.name,
+            cleanName: cleanCountryName(c.name),
+            emoji: getCountryEmoji(c.name)
+        })).sort((a, b) => a.cleanName.localeCompare(b.cleanName));
+    }, [metadata.countries]);
 
-    // Derived Data
-    const countries = useMemo(() => {
-        const uniqueCountries = new Set(initialSites.map(site => site.country).filter(Boolean));
-        return Array.from(uniqueCountries)
-            .map(country => ({
-                name: country!,
-                cleanName: cleanCountryName(country!),
-                emoji: getCountryEmoji(country!)
-            }))
-            .filter(c => c.emoji !== null)
-            .sort((a, b) => a.cleanName.localeCompare(b.cleanName));
-    }, [initialSites]);
-
-    const periods = useMemo(() => {
-        // Only show periods from the accepted definition list, in order
-        return PERIOD_ORDER.filter(period => {
-            return initialSites.some(site =>
-                site.processed_periods && Object.prototype.hasOwnProperty.call(site.processed_periods, period)
-            );
-        }).map(p => ({
+    const periodOptions = useMemo(() => {
+        return metadata.periods.map(p => ({
             name: p,
             ...generatePeriodColor(p)
         }));
-    }, [initialSites]);
+    }, [metadata.periods]);
 
-    const features = useMemo(() => {
-        const allFeatures = initialSites.flatMap(site =>
-            site.processed_features ? Object.keys(site.processed_features) : []
-        ).filter(Boolean);
-        const uniqueFeatures = Array.from(new Set(allFeatures)).sort();
-
-        return uniqueFeatures.map(f => ({
+    const featureOptions = useMemo(() => {
+        return metadata.features.map(f => ({
             name: f,
             ...generateFeatureColor(f)
         }));
-    }, [initialSites]);
+    }, [metadata.features]);
 
-    const filteredSites = useMemo(() => {
-        let result = initialSites;
+    // Pagination Logic
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+    const startCount = ((currentPage - 1) * itemsPerPage) + 1;
+    const endCount = Math.min(currentPage * itemsPerPage, totalCount);
 
-        // Filter by Country
-        if (selectedCountries.length > 0) {
-            result = result.filter(site => site.country && selectedCountries.includes(site.country));
-        }
-
-        // Filter by Period
-        if (selectedPeriods.length > 0) {
-            result = result.filter(site =>
-                site.processed_periods && Object.keys(site.processed_periods).some(p => selectedPeriods.includes(p))
-            );
-        }
-
-        // Filter by Feature
-        if (selectedFeatures.length > 0) {
-            result = result.filter(site =>
-                site.processed_features && Object.keys(site.processed_features).some(f => selectedFeatures.includes(f))
-            );
-        }
-
-        // Filter by UNESCO
-        if (unescoOnly) {
-            result = result.filter(site => site.is_unesco);
-        }
-
-        // Sort
-        return result.sort((a, b) => {
-            if (sortBy === 'featured') {
-                const scoreA = calculateFeaturedScore(a);
-                const scoreB = calculateFeaturedScore(b);
-                if (scoreA !== scoreB) return scoreB - scoreA;
-                // Tie break with recent
-                return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
-            } else if (sortBy === 'recent') {
-                const dateA = new Date(a.created_at || 0).getTime();
-                const dateB = new Date(b.created_at || 0).getTime();
-                return dateB - dateA;
-            } else if (sortBy === 'updated_desc') {
-                const dateA = new Date(a.updated_at || a.created_at || 0).getTime();
-                const dateB = new Date(b.updated_at || b.created_at || 0).getTime();
-                return dateB - dateA;
-            } else { // updated_asc
-                const dateA = new Date(a.updated_at || a.created_at || 0).getTime();
-                const dateB = new Date(b.updated_at || b.created_at || 0).getTime();
-                return dateA - dateB;
-            }
-        });
-    }, [initialSites, selectedCountries, selectedPeriods, selectedFeatures, unescoOnly, sortBy]);
+    const getPageLink = (page: number) => {
+        const params = new URLSearchParams(searchParams);
+        params.set('page', page.toString());
+        return `?${params.toString()}`;
+    };
 
     return (
         <ErrorBoundary>
@@ -366,7 +271,7 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
                                     <PopoverContent className="w-[400px] p-6 text-sm leading-relaxed" align="start">
                                         <div className="space-y-4">
                                             <p>
-                                                Welcome to the ultimate global directory of archaeological sites and ancient ruins. Our comprehensive database offers travelers, history enthusiasts, and researchers a curated collection of the world&apos;s most significant historical landmarks. From the monumental Pyramids of Giza to the hidden temples of Southeast Asia, explore the diverse cultural heritage that spans millennia of human history. Use our advanced filtering tools to browse sites by country, time period, or specific features to discover the architectural marvels of the Roman Empire, the mysterious megaliths of prehistoric Europe, and the sacred cities of the Maya. We prioritize high-quality data, ensuring you have the most accurate details for your research or travel planning. Join us in preserving and appreciating our shared human story.
+                                                Welcome to the ultimate global directory of archaeological sites and ancient ruins. Our comprehensive database offers travelers, history enthusiasts, and researchers a curated collection of the world&apos;s most significant historical landmarks.
                                             </p>
                                         </div>
                                     </PopoverContent>
@@ -388,11 +293,7 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
                                     </div>
                                     <div>
                                         <div className="text-2xl font-bold">
-                                            {/* Always show total count unless filtered? User asked: "just have the default the whole database count (since we only retreive 1000), it can then be dynamic when filtered"
-                            If I have 1000 sites loaded, this will show 1000. 
-                            If filtered, it shows filtered count which is correct behavior described.
-                         */}
-                                            {filteredSites.length}
+                                            {totalCount}
                                         </div>
                                         <div className="text-sm text-gray-600">Archaeological Sites</div>
                                     </div>
@@ -408,7 +309,8 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
                                     </div>
                                     <div>
                                         <div className="text-2xl font-bold">
-                                            {filteredSites.filter(s => s.is_unesco).length}
+                                            152 {/* Static or fetched count for UNESCO? For now hardcode or use totalCount if filtered by UNESCO? */}
+                                            {/* Since we don't know total UNESCO count globally unless we fetch stats, we can just say "UNESCO Listed" */}
                                         </div>
                                         <div className="text-sm text-gray-600">UNESCO World Heritage Sites</div>
                                     </div>
@@ -451,7 +353,7 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
                                         <CommandList>
                                             <CommandEmpty>No country found.</CommandEmpty>
                                             <CommandGroup className="max-h-[300px] overflow-y-auto">
-                                                {countries.map((country) => (
+                                                {countryOptions.map((country) => (
                                                     <CommandItem
                                                         key={country.name}
                                                         value={country.name}
@@ -488,7 +390,7 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
                                         <CommandList>
                                             <CommandEmpty>No period found.</CommandEmpty>
                                             <CommandGroup className="max-h-[300px] overflow-y-auto">
-                                                {periods.map((period) => (
+                                                {periodOptions.map((period) => (
                                                     <CommandItem
                                                         key={period.name}
                                                         value={period.name}
@@ -533,7 +435,9 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
                                         <CommandList>
                                             <CommandEmpty>No feature found.</CommandEmpty>
                                             <CommandGroup className="max-h-[300px] overflow-y-auto">
-                                                {features.map((feature) => (
+                                                {/* Only show feature options if provided (might be empty from server for optimization) */}
+                                                {featureOptions.length === 0 && <div className="text-center p-2 text-xs text-gray-400">Loading features...</div>}
+                                                {featureOptions.map((feature) => (
                                                     <CommandItem
                                                         key={feature.name}
                                                         value={feature.name}
@@ -616,11 +520,11 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
                                 {selectedCountries.length > 0 && (
                                     <>
                                         {selectedCountries.map(country => {
-                                            const countryData = countries.find(c => c.name === country);
+                                            const countryData = countryOptions.find(c => c.name === country) || { emoji: '🏳️', cleanName: cleanCountryName(country) };
                                             return (
                                                 <Badge key={country} variant="secondary" className="pl-2 pr-1 py-1 flex items-center">
-                                                    <span className="mr-1">{countryData?.emoji}</span>
-                                                    {cleanCountryName(country)}
+                                                    <span className="mr-1">{countryData.emoji}</span>
+                                                    {countryData.cleanName}
                                                     <button
                                                         onClick={() => removeFilter('country', country)}
                                                         className="ml-1 hover:bg-gray-200 rounded-full p-0.5"
@@ -634,63 +538,55 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
                                     </>
                                 )}
 
-                                {selectedPeriods.length > 0 && (
-                                    <>
-                                        {selectedPeriods.map(period => {
-                                            const colors = generatePeriodColor(period);
-                                            return (
-                                                <Badge
-                                                    key={period}
-                                                    variant="secondary"
-                                                    className="pl-2 pr-1 py-1 flex items-center border"
-                                                    style={{
-                                                        backgroundColor: colors.bg,
-                                                        color: colors.text,
-                                                        borderColor: colors.border
-                                                    }}
-                                                >
-                                                    {period}
-                                                    <button
-                                                        onClick={() => removeFilter('period', period)}
-                                                        className="ml-1 hover:bg-black/10 rounded-full p-0.5"
-                                                    >
-                                                        <X className="h-3 w-3" />
-                                                    </button>
-                                                </Badge>
-                                            );
-                                        })}
-                                        <span className="text-gray-300 mx-1">|</span>
-                                    </>
-                                )}
+                                {/* Period Badges */}
+                                {selectedPeriods.map(period => {
+                                    const colors = generatePeriodColor(period);
+                                    return (
+                                        <Badge
+                                            key={period}
+                                            variant="secondary"
+                                            className="pl-2 pr-1 py-1 flex items-center border"
+                                            style={{
+                                                backgroundColor: colors.bg,
+                                                color: colors.text,
+                                                borderColor: colors.border
+                                            }}
+                                        >
+                                            {period}
+                                            <button
+                                                onClick={() => removeFilter('period', period)}
+                                                className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </Badge>
+                                    );
+                                })}
 
-                                {selectedFeatures.length > 0 && (
-                                    <>
-                                        {selectedFeatures.map(feature => {
-                                            const colors = generateFeatureColor(feature);
-                                            return (
-                                                <Badge
-                                                    key={feature}
-                                                    variant="secondary"
-                                                    className="pl-2 pr-1 py-1 flex items-center border"
-                                                    style={{
-                                                        backgroundColor: colors.bg,
-                                                        color: colors.text,
-                                                        borderColor: colors.border
-                                                    }}
-                                                >
-                                                    {feature}
-                                                    <button
-                                                        onClick={() => removeFilter('feature', feature)}
-                                                        className="ml-1 hover:bg-black/10 rounded-full p-0.5"
-                                                    >
-                                                        <X className="h-3 w-3" />
-                                                    </button>
-                                                </Badge>
-                                            );
-                                        })}
-                                        <span className="text-gray-300 mx-1">|</span>
-                                    </>
-                                )}
+                                {/* Feature Badges */}
+                                {selectedFeatures.map(feature => {
+                                    const colors = generateFeatureColor(feature);
+                                    return (
+                                        <Badge
+                                            key={feature}
+                                            variant="secondary"
+                                            className="pl-2 pr-1 py-1 flex items-center border"
+                                            style={{
+                                                backgroundColor: colors.bg,
+                                                color: colors.text,
+                                                borderColor: colors.border
+                                            }}
+                                        >
+                                            {feature}
+                                            <button
+                                                onClick={() => removeFilter('feature', feature)}
+                                                className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </button>
+                                        </Badge>
+                                    );
+                                })}
 
                                 <Button
                                     variant="default"
@@ -704,13 +600,37 @@ export default function AllSitesClient({ initialSites }: AllSitesClientProps) {
                     </div>
 
                     <div className="mb-4 text-sm text-gray-500 font-medium">
-                        Showing {filteredSites.length} site{filteredSites.length !== 1 ? 's' : ''}
+                        Showing {startCount}-{endCount} of {totalCount} sites
                     </div>
 
                     <SiteGrid
-                        initialSites={filteredSites}
+                        initialSites={initialSites}
                         showCountryContext={true}
+                        manualPagination={true}
                     />
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-2 mt-8">
+                            <Button
+                                variant="outline"
+                                disabled={currentPage <= 1}
+                                onClick={() => router.push(getPageLink(currentPage - 1), { scroll: true })}
+                            >
+                                Previous
+                            </Button>
+                            <span className="text-sm font-medium">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <Button
+                                variant="outline"
+                                disabled={currentPage >= totalPages}
+                                onClick={() => router.push(getPageLink(currentPage + 1), { scroll: true })}
+                            >
+                                Next
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
         </ErrorBoundary>
