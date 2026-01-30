@@ -1,7 +1,7 @@
 // src/app/sites/[country_slug]/[slug]/page.tsx
 
 import { createClient } from '@supabase/supabase-js'
-import { notFound } from 'next/navigation'
+import { notFound, redirect, permanentRedirect } from 'next/navigation'
 import Link from 'next/link'
 import { ExternalLink, MapPin } from 'lucide-react'
 import { Site } from '../../../../types/site'
@@ -123,7 +123,22 @@ export default async function Page({ params }: { params: { country_slug: string;
 
   if (!data) {
     console.log(`No data found for site: ${params.country_slug}/${params.slug}`);
-    notFound()
+
+    // Tier 1: Check if the site exists under a different country (Smart Redirect)
+    const { data: movedSite } = await supabase
+      .from('sites')
+      .select('country_slug')
+      .eq('slug', params.slug)
+      .single();
+
+    if (movedSite && movedSite.country_slug && movedSite.country_slug !== params.country_slug) {
+      console.log(`Site moved! Redirecting to: /sites/${movedSite.country_slug}/${params.slug}`);
+      permanentRedirect(`/sites/${movedSite.country_slug}/${params.slug}`);
+    }
+
+    // Tier 2: Site not found at all, redirect to the country/category page (Graceful Fallback)
+    console.log(`Site gone. Redirecting to country page: /sites/${params.country_slug}`);
+    redirect(`/sites/${params.country_slug}`);
   }
 
   // Fetch a pool of related sites from the same country
