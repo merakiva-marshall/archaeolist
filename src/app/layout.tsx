@@ -84,6 +84,14 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={`${geist.className} flex flex-col min-h-screen`}>
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-NDXB6JDJ"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <Header />
         <main className="flex-1 relative">
           {children}
