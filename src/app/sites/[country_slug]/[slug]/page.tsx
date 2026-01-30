@@ -1,7 +1,7 @@
 // src/app/sites/[country_slug]/[slug]/page.tsx
 
 import { createClient } from '@supabase/supabase-js'
-import { notFound, redirect, permanentRedirect } from 'next/navigation'
+import { redirect, permanentRedirect } from 'next/navigation'
 import Link from 'next/link'
 import { ExternalLink, MapPin } from 'lucide-react'
 import { Site } from '../../../../types/site'
