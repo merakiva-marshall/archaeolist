@@ -1,6 +1,10 @@
 User-agent: *
 Allow: /
 Disallow: /_next/image
+Disallow: /admin
+Disallow: /admin/
+Disallow: /auth
+Disallow: /auth/
 
 Sitemap: https://archaeolist.com/sitemap.xml
 Sitemap: https://archaeolist.com/sitemap-sites.xml

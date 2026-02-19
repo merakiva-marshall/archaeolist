@@ -37,6 +37,7 @@ export default function Header() {
                   <ul className="space-y-4 px-4">
                     <li><a href="/sites" className="hover:text-blue-600">All Sites</a></li>
                     <li><a href="/sites/unesco" className="hover:text-blue-600">UNESCO Sites</a></li>
+                    <li><a href="/countries" className="hover:text-blue-600">Browse by Country</a></li>
                   </ul>
                 </nav>
               </SheetContent>

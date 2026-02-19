@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Site } from '../types/site';
 import SiteGrid from './SiteGrid';
@@ -185,10 +186,25 @@ export default function UnescoSitesClient({
 
                                             <h4 className="text-gray-900 font-semibold text-base mt-6 mb-2">How does a place become a World Heritage Site?</h4>
                                             <p>
-                                                The process begins with a country (State Party) creating a Tentative List of important sites. From this list, they can select a site to prepare a comprehensive Nomination File...
+                                                The process begins with a country (State Party) creating a Tentative List of important sites. From this list, they can select a site to prepare a comprehensive Nomination File. This file is evaluated by independent advisory bodies: ICOMOS (for cultural sites) and IUCN (for natural sites). Finally, the World Heritage Committee meets annually to make the final decision on inscription.
                                             </p>
 
-                                            {/* Truncating standard text to save space in code, logic remains matching original */}
+                                            <h4 className="text-gray-900 font-semibold text-base mt-6 mb-2">What are the different types of sites?</h4>
+                                            <ul className="list-disc pl-4 space-y-1">
+                                                <li><strong>Cultural:</strong> Man-made sites like monuments, cities, or buildings (e.g., Taj Mahal, Historic Centre of Rome).</li>
+                                                <li><strong>Natural:</strong> Physical or biological formations with exceptional beauty or scientific value (e.g., Great Barrier Reef, Yellowstone).</li>
+                                                <li><strong>Mixed:</strong> Sites that satisfy both cultural and natural criteria (e.g., Machu Picchu).</li>
+                                            </ul>
+
+                                            <h4 className="text-gray-900 font-semibold text-base mt-6 mb-2">What threats do these sites face?</h4>
+                                            <p>
+                                                Many sites are in danger due to climate change (rising sea levels, extreme weather), overtourism causing physical degradation, armed conflict and war, as well as urbanization, poaching, and neglect. UNESCO maintains a <a href="https://whc.unesco.org/en/danger/" target="_blank" rel="noopener noreferrer">List of World Heritage in Danger</a> to rally international support for these threatened treasures.
+                                            </p>
+
+                                            <h4 className="text-gray-900 font-semibold text-base mt-6 mb-2">Famous World Heritage Sites</h4>
+                                            <p>
+                                                Some of the most recognizable sites include the <Link href="/sites/egypt/giza-pyramid-complex" className="font-bold underline">Pyramids of Giza</Link>, <Link href="/sites/cambodia/angkor" className="font-bold underline">Angkor Wat</Link>, <Link href="/sites/italy/pompeii" className="font-bold underline">Pompeii</Link>, and <Link href="/sites/mexico/chichen-itza" className="font-bold underline">Chichen Itza</Link>.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

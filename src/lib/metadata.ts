@@ -52,6 +52,10 @@ export function generateBaseMetadata({
     alternates: {
       canonical: canonicalUrl || url, // Add canonical URL support
     },
+    robots: {
+      index: true,
+      follow: true,
+    },
     openGraph: {
       title: finalTitle,
       description: finalDescription,
