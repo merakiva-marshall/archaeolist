@@ -10,6 +10,15 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(newUrl, { status: 301 });
     }
 
+    // Only run auth check for admin routes — avoids a Supabase roundtrip on every public request
+    const isAdminRoute =
+        request.nextUrl.pathname.startsWith('/admin') ||
+        request.nextUrl.pathname.startsWith('/api/admin');
+
+    if (!isAdminRoute) {
+        return NextResponse.next();
+    }
+
     let response = NextResponse.next({
         request: {
             headers: request.headers,
@@ -46,9 +55,6 @@ export async function middleware(request: NextRequest) {
         }
     );
 
-    // Refresh session if expired - required for Server Components
-    // https://supabase.com/docs/guides/auth/server-side/nextjs
-    // console.log("Middleware: Path:", request.nextUrl.pathname, "User:", user?.email);
     const { data: { user } } = await supabase.auth.getUser();
 
     // Protect Admin Routes (UI and API)

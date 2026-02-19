@@ -141,22 +141,23 @@ export default async function Page({ params }: { params: { country_slug: string;
     redirect(`/sites/${params.country_slug}`);
   }
 
-  // Fetch a pool of related sites from the same country
-  // We fetch more than 6 to perform client-side filtering for relevance (time periods) and randomization
+  // Fetch a pool of related sites from the same country.
+  // 18 candidates (3x the 6 displayed) is enough for period-overlap scoring + randomization.
   const { data: relatedSitesData } = await supabase
     .from('sites')
     .select('name, slug, country_slug, short_description, images, processed_periods')
     .eq('country_slug', params.country_slug)
     .neq('slug', params.slug)
-    .limit(60); // Retrieve a pool of candidates
+    .limit(18);
 
-  // Fetch Viator Tours
+  // Fetch Viator Tours — exclude invalid prices in SQL; keyword scoring still happens in JS below.
   const { data: toursData } = await supabase
     .from('viator_tours')
     .select('*')
     .eq('site_id', data.id)
-    .order('review_count', { ascending: false }) // Fetch most popular first
-    .limit(100); // Fetch a larger pool for client-side sorting
+    .or('price.is.null,price.gt.0')
+    .order('review_count', { ascending: false })
+    .limit(20);
 
   const toursDataTyped = (toursData as ViatorTour[]) || [];
 
@@ -176,14 +177,11 @@ export default async function Page({ params }: { params: { country_slug: string;
     .filter((word: string) => !stopWords.includes(word) && word.length > 2);
 
   // 3. Process & Filter Tours
+  // Note: price <= 0 is already excluded by the SQL query; only keyword relevance filtering here.
   const processedTours = toursDataTyped
     .filter(t => {
-      // Price Filter - Remove strictly 0 or negative prices. Allow null (treat as 'on request' or unknown)
-      if (t.price !== null && t.price !== undefined && t.price <= 0) return false;
-
       // Relevance Filter
       const titleLower = t.title.toLowerCase();
-      // Only strict match if we have keywords, otherwise safe-allow (shouldn't happen for valid sites)
       if (siteKeywords.length > 0) {
         const hasKeyword = siteKeywords.some((k: string) => titleLower.includes(k));
         if (!hasKeyword) return false;

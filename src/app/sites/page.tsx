@@ -4,7 +4,7 @@ import { generateBaseMetadata } from '../../lib/metadata'
 import AllSitesClient from '../../components/AllSitesClient'
 import { getSites, getSiteMetadata, ITEMS_PER_PAGE } from '../../lib/sites'
 
-export const revalidate = 3600; // Cache for 1 hour (as per quick fix recommendation)
+export const revalidate = 86400; // Cache for 24 hours
 
 export async function generateMetadata(): Promise<Metadata> {
     return generateBaseMetadata({

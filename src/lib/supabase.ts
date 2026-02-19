@@ -1,12 +1,17 @@
 // src/lib/supabase.ts
 
 import { createClient } from '@supabase/supabase-js'
-import { Site, SiteImage, Timeline } from '../types/site'
+import { Site, SiteImage } from '../types/site'
 
 export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
+
+// Only the columns needed for map pin rendering and the initial sidebar preview.
+// Heavy JSONB fields (processed_features, processed_periods, timeline) and unused columns
+// are excluded — they're fetched on-demand when a user clicks a pin (see HomepageClient.tsx).
+const MAP_SITE_COLUMNS = 'id, name, description, location, country, country_slug, slug, address, images, wikipedia_url, is_unesco, short_description' as const;
 
 export interface RawSite {
   id: string;
@@ -21,12 +26,6 @@ export interface RawSite {
   wikipedia_url?: string;
   is_unesco?: boolean;
   short_description?: string;
-  processed_features?: { [key: string]: string[] };
-  processed_periods?: { [key: string]: string[] };
-  timeline?: Timeline;
-  archaeological_site_yn?: boolean;
-  featured?: boolean;
-  updated_at: string;
 }
 
 export async function fetchSites(): Promise<Site[]> {
@@ -37,11 +36,9 @@ export async function fetchSites(): Promise<Site[]> {
     let hasMore = true;
 
     while (hasMore) {
-      console.log('Fetching page:', page);
-
       const { data, error } = await supabase
         .from('sites')
-        .select('*')
+        .select(MAP_SITE_COLUMNS)
         .range(page * pageSize, (page + 1) * pageSize - 1)
         .order('id', { ascending: true });
 
@@ -51,34 +48,25 @@ export async function fetchSites(): Promise<Site[]> {
       }
 
       if (data) {
-        const formattedSites = data.map((site: RawSite) => {
-          const formattedSite: Site = {
-            id: site.id,
-            name: site.name,
-            description: site.description,
-            location: site.location.coordinates,
-            address: site.address,
-            country: site.country,
-            country_slug: site.country_slug,
-            slug: site.slug,
-            images: Array.isArray(site.images) ? site.images : (site.images ? JSON.parse(site.images as unknown as string) : null),
-            wikipedia_url: site.wikipedia_url,
-            is_unesco: site.is_unesco,
-            short_description: site.short_description,
-            processed_features: site.processed_features,
-            processed_periods: site.processed_periods,
-            timeline: site.timeline,
-            archaeological_site_yn: site.archaeological_site_yn,
-            featured: site.featured
-          };
-
-          return formattedSite;
-        });
+        const formattedSites = data.map((site: RawSite) => ({
+          id: site.id,
+          name: site.name,
+          description: site.description,
+          location: site.location.coordinates,
+          address: site.address,
+          country: site.country,
+          country_slug: site.country_slug,
+          slug: site.slug,
+          images: Array.isArray(site.images) ? site.images : (site.images ? JSON.parse(site.images as unknown as string) : null),
+          wikipedia_url: site.wikipedia_url,
+          is_unesco: site.is_unesco,
+          short_description: site.short_description,
+        } as Site));
 
         allSites = [...allSites, ...formattedSites];
       }
 
-      hasMore = data && data.length === pageSize;
+      hasMore = data !== null && data.length === pageSize;
       page++;
     }
 

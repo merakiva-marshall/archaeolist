@@ -6,7 +6,7 @@ import { getSites, getSiteMetadata, ITEMS_PER_PAGE } from '../../../lib/sites'
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '../../../types/supabase'
 
-export const revalidate = 3600;
+export const revalidate = 86400; // Cache for 24 hours
 
 const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

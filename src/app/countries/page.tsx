@@ -13,7 +13,7 @@ const supabase = createClient(
 )
 
 // Add revalidation to ensure data is fresh but cached for performance
-export const revalidate = 3600;
+export const revalidate = 86400; // Cache for 24 hours
 
 export default async function AllCountriesPage() {
     const { data: sites } = await supabase
