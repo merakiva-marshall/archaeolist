@@ -273,7 +273,7 @@ export default async function Page({ params }: { params: { country_slug: string;
     <>
       <ErrorBoundary>
         <StructuredData site={site} />
-        <main className="min-h-[calc(100vh-4rem)] bg-gray-50">
+        <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
           <div className="container mx-auto px-4 py-8 pb-16 max-w-4xl">
 
             <article className="space-y-8">
@@ -460,7 +460,7 @@ export default async function Page({ params }: { params: { country_slug: string;
               </div>
             </article>
           </div>
-        </main>
+        </div>
       </ErrorBoundary>
     </>
   );

@@ -1,13 +1,26 @@
 // src/app/about/page.tsx
 
-'use client'
-
+import type { Metadata } from 'next'
 import { ExternalLink, Compass, Map, Globe, Book } from 'lucide-react'
 import Link from 'next/link'
 
+export const metadata: Metadata = {
+  title: 'About | Archaeolist',
+  description: 'Learn about Archaeolist — our mission to make archaeology accessible to everyone, and the team behind the world\'s most comprehensive archaeological site directory.',
+  alternates: {
+    canonical: 'https://archaeolist.com/about',
+  },
+  openGraph: {
+    title: 'About | Archaeolist',
+    description: 'Learn about Archaeolist — our mission to make archaeology accessible to everyone, and the team behind the world\'s most comprehensive archaeological site directory.',
+    url: 'https://archaeolist.com/about',
+    type: 'website',
+  },
+}
+
 export default function AboutPage() {
   return (
-    <main className="flex-1 relative w-full h-full overflow-auto">
+    <div className="flex-1 relative w-full h-full overflow-auto">
       <div className="mx-auto px-4 py-12 max-w-4xl">
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -153,6 +166,6 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
