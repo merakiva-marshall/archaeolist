@@ -1,7 +1,7 @@
 // src/app/sites/[country_slug]/[slug]/page.tsx
 
 import { createClient } from '@supabase/supabase-js'
-import { redirect, permanentRedirect } from 'next/navigation'
+import { permanentRedirect } from 'next/navigation'
 import Link from 'next/link'
 import { ExternalLink, MapPin } from 'lucide-react'
 import { Site } from '../../../../types/site'
@@ -43,6 +43,7 @@ export async function generateMetadata(
     .select('name, short_description, images, country')
     .eq('country_slug', params.country_slug)
     .eq('slug', params.slug)
+    .eq('archaeological_site_yn', true)
     .single()
 
   if (!data) return generateBaseMetadata()
@@ -70,6 +71,7 @@ export async function generateStaticParams() {
     const { data, error } = await supabase
       .from('sites')
       .select('country_slug, slug')
+      .eq('archaeological_site_yn', true)
       .range(page * pageSize, (page + 1) * pageSize - 1)
       .order('id', { ascending: true });
 
@@ -121,6 +123,10 @@ export default async function Page({ params }: { params: { country_slug: string;
     console.error('Supabase error:', error);
   }
 
+  if (data && data.archaeological_site_yn === false) {
+    permanentRedirect(`/sites/${params.country_slug}`);
+  }
+
   if (!data) {
     console.log(`No data found for site: ${params.country_slug}/${params.slug}`);
 
@@ -138,7 +144,7 @@ export default async function Page({ params }: { params: { country_slug: string;
 
     // Tier 2: Site not found at all, redirect to the country/category page (Graceful Fallback)
     console.log(`Site gone. Redirecting to country page: /sites/${params.country_slug}`);
-    redirect(`/sites/${params.country_slug}`);
+    permanentRedirect(`/sites/${params.country_slug}`);
   }
 
   // Fetch a pool of related sites from the same country

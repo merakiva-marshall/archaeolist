@@ -63,7 +63,8 @@ export async function getSites({
       featured,
       processed_features,
       processed_periods
-    `, { count: 'exact' });
+    `, { count: 'exact' })
+        .eq('archaeological_site_yn', true);
 
     // Apply filters
     if (countries.length > 0) {
@@ -165,6 +166,7 @@ export async function getSiteMetadata(): Promise<SiteMetadata> {
     const { data: countriesData } = await supabase
         .from('sites')
         .select('country')
+        .eq('archaeological_site_yn', true)
         .not('country', 'is', null);
 
     const countrySet = new Set<string>();
