@@ -113,7 +113,7 @@ export default async function CountryPage({ params }: PageParams) {
     <>
       <ErrorBoundary>
         <StructuredData countryInfo={countryInfo} />
-        <main className="flex-1 relative w-full h-full overflow-y-auto">
+        <div className="flex-1 relative w-full h-full overflow-y-auto">
           <div className="min-h-screen bg-gray-50">
             <div className="container mx-auto px-4 py-8">
               {/* Header Section */}
@@ -192,7 +192,7 @@ export default async function CountryPage({ params }: PageParams) {
               </Suspense>
             </div>
           </div>
-        </main>
+        </div>
       </ErrorBoundary>
     </>
   );

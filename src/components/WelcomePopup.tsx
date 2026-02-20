@@ -18,23 +18,22 @@ export default function WelcomePopup() {
     localStorage.setItem('hasSeenWelcome', 'true')
   }
 
-  // This content is used for both the popup and SEO
   const welcomeContent = (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">
+      <h2 className="text-2xl font-bold">
         Discover Archaeological Sites Worldwide
-      </h1>
+      </h2>
       <div>
-        <h2 className="text-xl font-semibold mb-3">
+        <h3 className="text-xl font-semibold mb-3">
           Explore Ancient History Around the Globe
-        </h2>
+        </h3>
         <p className="text-gray-600 mb-4">
           Welcome to Archaeolist, your comprehensive guide to archaeological sites worldwide. 
           Browse our interactive map, discover ancient ruins, and plan your next historical adventure.
         </p>
       </div>
       <div>
-        <h2 className="text-xl font-semibold mb-3">How to Use Archaeolist</h2>
+        <h3 className="text-xl font-semibold mb-3">How to Use Archaeolist</h3>
         <ul className="space-y-2 text-gray-600">
           <li>🗺️ Navigate the interactive map to find sites</li>
           <li>🎨 Look for darker blue areas with high concentrations of sites</li>
@@ -48,12 +47,6 @@ export default function WelcomePopup() {
 
   return (
     <>
-      {/* Always render content for SEO, but hide visually */}
-      <div className="sr-only">
-        {welcomeContent}
-      </div>
-
-      {/* Popup version */}
       {isVisible && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 p-4 z-50">
           <Card className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 relative">
