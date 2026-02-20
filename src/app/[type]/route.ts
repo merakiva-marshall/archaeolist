@@ -144,6 +144,7 @@ export async function GET(
           const { data, error } = await supabase
             .from('sites')
             .select('country_slug, slug, updated_at')
+            .eq('archaeological_site_yn', true)
             .range(page * pageSize, (page + 1) * pageSize - 1)
             .order('id', { ascending: true })
 
@@ -179,6 +180,7 @@ export async function GET(
         const { data: countryCounts, error } = await supabase
           .from('sites')
           .select('country_slug, updated_at')
+          .eq('archaeological_site_yn', true)
 
         if (error || !countryCounts) {
           return new Response('Error generating sitemap', { status: 500 })

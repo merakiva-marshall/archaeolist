@@ -34,6 +34,7 @@ export default async function AllCountriesPage() {
         const { data, error } = await supabase
             .from('sites')
             .select('country, country_slug')
+            .eq('archaeological_site_yn', true)
             .order('country')
             .range(page * pageSize, (page + 1) * pageSize - 1);
 
@@ -61,6 +62,7 @@ export default async function AllCountriesPage() {
         const { data: imgData } = await supabase
             .from('sites')
             .select('country_slug, images')
+            .eq('archaeological_site_yn', true)
             .in('country_slug', chunk)
             .not('images', 'is', null)
             .limit(chunk.length * 3); // a few rows per country is enough

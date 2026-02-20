@@ -1,0 +1,1464 @@
+{
+  "generated": "2026-02-19",
+  "description": "Maps non-country slugs (regions, governorates) to canonical country slugs. Use for 301 redirects + Supabase country_slug updates.",
+  "total_redirects": 208,
+  "collisions": [],
+  "redirects": [
+    {
+      "old_path": "aleppo-governorate/umm-el-marra",
+      "new_path": "syria/umm-el-marra",
+      "old_country_slug": "aleppo-governorate",
+      "new_country_slug": "syria",
+      "site_slug": "umm-el-marra"
+    },
+    {
+      "old_path": "amazonas-region/carachupa",
+      "new_path": "peru/carachupa",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "carachupa"
+    },
+    {
+      "old_path": "amazonas-region/cochabamba-archaeological-site",
+      "new_path": "peru/cochabamba-archaeological-site",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "cochabamba-archaeological-site"
+    },
+    {
+      "old_path": "amazonas-region/gran-saposoa",
+      "new_path": "peru/gran-saposoa",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "gran-saposoa"
+    },
+    {
+      "old_path": "amazonas-region/gran-vilaya",
+      "new_path": "peru/gran-vilaya",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "gran-vilaya"
+    },
+    {
+      "old_path": "amazonas-region/kuelap",
+      "new_path": "peru/kuelap",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "kuelap"
+    },
+    {
+      "old_path": "amazonas-region/laguna-de-las-momias",
+      "new_path": "peru/laguna-de-las-momias",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "laguna-de-las-momias"
+    },
+    {
+      "old_path": "amazonas-region/llactan",
+      "new_path": "peru/llactan",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "llactan"
+    },
+    {
+      "old_path": "amazonas-region/machu-pirqa",
+      "new_path": "peru/machu-pirqa",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "machu-pirqa"
+    },
+    {
+      "old_path": "amazonas-region/purunllacta-cheto",
+      "new_path": "peru/purunllacta-cheto",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "purunllacta-cheto"
+    },
+    {
+      "old_path": "amazonas-region/purunllacta-soloco",
+      "new_path": "peru/purunllacta-soloco",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "purunllacta-soloco"
+    },
+    {
+      "old_path": "amazonas-region/revash",
+      "new_path": "peru/revash",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "revash"
+    },
+    {
+      "old_path": "amazonas-region/sarcophagi-of-carajia",
+      "new_path": "peru/sarcophagi-of-carajia",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "sarcophagi-of-carajia"
+    },
+    {
+      "old_path": "amazonas-region/wilca",
+      "new_path": "peru/wilca",
+      "old_country_slug": "amazonas-region",
+      "new_country_slug": "peru",
+      "site_slug": "wilca"
+    },
+    {
+      "old_path": "ancash-region/casmasechin-culture",
+      "new_path": "peru/casmasechin-culture",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "casmasechin-culture"
+    },
+    {
+      "old_path": "ancash-region/cerro-sechin",
+      "new_path": "peru/cerro-sechin",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "cerro-sechin"
+    },
+    {
+      "old_path": "ancash-region/chanquillo",
+      "new_path": "peru/chanquillo",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "chanquillo"
+    },
+    {
+      "old_path": "ancash-region/chavin-de-huantar",
+      "new_path": "peru/chavin-de-huantar",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "chavin-de-huantar"
+    },
+    {
+      "old_path": "ancash-region/el-castillo-de-huarmey",
+      "new_path": "peru/el-castillo-de-huarmey",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "el-castillo-de-huarmey"
+    },
+    {
+      "old_path": "ancash-region/guitarrero-cave",
+      "new_path": "peru/guitarrero-cave",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "guitarrero-cave"
+    },
+    {
+      "old_path": "ancash-region/honcopampa",
+      "new_path": "peru/honcopampa",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "honcopampa"
+    },
+    {
+      "old_path": "ancash-region/huacramarca",
+      "new_path": "peru/huacramarca",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "huacramarca"
+    },
+    {
+      "old_path": "ancash-region/intipanawin",
+      "new_path": "peru/intipanawin",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "intipanawin"
+    },
+    {
+      "old_path": "ancash-region/las-haldas",
+      "new_path": "peru/las-haldas",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "las-haldas"
+    },
+    {
+      "old_path": "ancash-region/maray-qalla",
+      "new_path": "peru/maray-qalla",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "maray-qalla"
+    },
+    {
+      "old_path": "ancash-region/markahirka",
+      "new_path": "peru/markahirka",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "markahirka"
+    },
+    {
+      "old_path": "ancash-region/mojeque",
+      "new_path": "peru/mojeque",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "mojeque"
+    },
+    {
+      "old_path": "ancash-region/panamarca",
+      "new_path": "peru/panamarca",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "panamarca"
+    },
+    {
+      "old_path": "ancash-region/tumshukayko",
+      "new_path": "peru/tumshukayko",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "tumshukayko"
+    },
+    {
+      "old_path": "ancash-region/waraqayuq",
+      "new_path": "peru/waraqayuq",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "waraqayuq"
+    },
+    {
+      "old_path": "ancash-region/wilcahuain",
+      "new_path": "peru/wilcahuain",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "wilcahuain"
+    },
+    {
+      "old_path": "ancash-region/yanaque-quilcamarca",
+      "new_path": "peru/yanaque-quilcamarca",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "yanaque-quilcamarca"
+    },
+    {
+      "old_path": "ancash-region/yaynu",
+      "new_path": "peru/yaynu",
+      "old_country_slug": "ancash-region",
+      "new_country_slug": "peru",
+      "site_slug": "yaynu"
+    },
+    {
+      "old_path": "apurímac-region/inka-raqay-apurimac",
+      "new_path": "peru/inka-raqay-apurimac",
+      "old_country_slug": "apurímac-region",
+      "new_country_slug": "peru",
+      "site_slug": "inka-raqay-apurimac"
+    },
+    {
+      "old_path": "apurímac-region/muyu-muyu",
+      "new_path": "peru/muyu-muyu",
+      "old_country_slug": "apurímac-region",
+      "new_country_slug": "peru",
+      "site_slug": "muyu-muyu"
+    },
+    {
+      "old_path": "apurímac-region/sondor",
+      "new_path": "peru/sondor",
+      "old_country_slug": "apurímac-region",
+      "new_country_slug": "peru",
+      "site_slug": "sondor"
+    },
+    {
+      "old_path": "apurímac-region/usnu-muqu",
+      "new_path": "peru/usnu-muqu",
+      "old_country_slug": "apurímac-region",
+      "new_country_slug": "peru",
+      "site_slug": "usnu-muqu"
+    },
+    {
+      "old_path": "apurímac-region/yanaca",
+      "new_path": "peru/yanaca",
+      "old_country_slug": "apurímac-region",
+      "new_country_slug": "peru",
+      "site_slug": "yanaca"
+    },
+    {
+      "old_path": "arequipa-region/huinao",
+      "new_path": "peru/huinao",
+      "old_country_slug": "arequipa-region",
+      "new_country_slug": "peru",
+      "site_slug": "huinao"
+    },
+    {
+      "old_path": "arequipa-region/marpa-peru",
+      "new_path": "peru/marpa-peru",
+      "old_country_slug": "arequipa-region",
+      "new_country_slug": "peru",
+      "site_slug": "marpa-peru"
+    },
+    {
+      "old_path": "arequipa-region/mawkallaqta-castilla",
+      "new_path": "peru/mawkallaqta-castilla",
+      "old_country_slug": "arequipa-region",
+      "new_country_slug": "peru",
+      "site_slug": "mawkallaqta-castilla"
+    },
+    {
+      "old_path": "arequipa-region/paraccra-archaeological-site",
+      "new_path": "peru/paraccra-archaeological-site",
+      "old_country_slug": "arequipa-region",
+      "new_country_slug": "peru",
+      "site_slug": "paraccra-archaeological-site"
+    },
+    {
+      "old_path": "arequipa-region/toro-muerto",
+      "new_path": "peru/toro-muerto",
+      "old_country_slug": "arequipa-region",
+      "new_country_slug": "peru",
+      "site_slug": "toro-muerto"
+    },
+    {
+      "old_path": "arequipa-region/uskallaqta",
+      "new_path": "peru/uskallaqta",
+      "old_country_slug": "arequipa-region",
+      "new_country_slug": "peru",
+      "site_slug": "uskallaqta"
+    },
+    {
+      "old_path": "arequipa-region/uyu-uyu",
+      "new_path": "peru/uyu-uyu",
+      "old_country_slug": "arequipa-region",
+      "new_country_slug": "peru",
+      "site_slug": "uyu-uyu"
+    },
+    {
+      "old_path": "arusha-region/engaruka",
+      "new_path": "tanzania/engaruka",
+      "old_country_slug": "arusha-region",
+      "new_country_slug": "tanzania",
+      "site_slug": "engaruka"
+    },
+    {
+      "old_path": "arusha-region/olduvai-gorge",
+      "new_path": "tanzania/olduvai-gorge",
+      "old_country_slug": "arusha-region",
+      "new_country_slug": "tanzania",
+      "site_slug": "olduvai-gorge"
+    },
+    {
+      "old_path": "ayacucho-region/hatun-usnu",
+      "new_path": "peru/hatun-usnu",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "hatun-usnu"
+    },
+    {
+      "old_path": "ayacucho-region/huari-archaeological-site",
+      "new_path": "peru/huari-archaeological-site",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "huari-archaeological-site"
+    },
+    {
+      "old_path": "ayacucho-region/inka-raqay-ayacucho",
+      "new_path": "peru/inka-raqay-ayacucho",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "inka-raqay-ayacucho"
+    },
+    {
+      "old_path": "ayacucho-region/inka-wasi-ayacucho",
+      "new_path": "peru/inka-wasi-ayacucho",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "inka-wasi-ayacucho"
+    },
+    {
+      "old_path": "ayacucho-region/inti-watana-ayacucho",
+      "new_path": "peru/inti-watana-ayacucho",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "inti-watana-ayacucho"
+    },
+    {
+      "old_path": "ayacucho-region/kallapayuq-urqu",
+      "new_path": "peru/kallapayuq-urqu",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "kallapayuq-urqu"
+    },
+    {
+      "old_path": "ayacucho-region/kanichi-peru",
+      "new_path": "peru/kanichi-peru",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "kanichi-peru"
+    },
+    {
+      "old_path": "ayacucho-region/millka",
+      "new_path": "peru/millka",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "millka"
+    },
+    {
+      "old_path": "ayacucho-region/nawpallaqta-fajardo",
+      "new_path": "peru/nawpallaqta-fajardo",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "nawpallaqta-fajardo"
+    },
+    {
+      "old_path": "ayacucho-region/nawpallaqta-lucanas",
+      "new_path": "peru/nawpallaqta-lucanas",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "nawpallaqta-lucanas"
+    },
+    {
+      "old_path": "ayacucho-region/pikimachay",
+      "new_path": "peru/pikimachay",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "pikimachay"
+    },
+    {
+      "old_path": "ayacucho-region/pilluchu",
+      "new_path": "peru/pilluchu",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "pilluchu"
+    },
+    {
+      "old_path": "ayacucho-region/puka-urqu-ayacucho",
+      "new_path": "peru/puka-urqu-ayacucho",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "puka-urqu-ayacucho"
+    },
+    {
+      "old_path": "ayacucho-region/pukara-victor-fajardo",
+      "new_path": "peru/pukara-victor-fajardo",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "pukara-victor-fajardo"
+    },
+    {
+      "old_path": "ayacucho-region/puntay-urqu",
+      "new_path": "peru/puntay-urqu",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "puntay-urqu"
+    },
+    {
+      "old_path": "ayacucho-region/qunchupata-ayacucho",
+      "new_path": "peru/qunchupata-ayacucho",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "qunchupata-ayacucho"
+    },
+    {
+      "old_path": "ayacucho-region/sara-sara",
+      "new_path": "peru/sara-sara",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "sara-sara"
+    },
+    {
+      "old_path": "ayacucho-region/tinyaq",
+      "new_path": "peru/tinyaq",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "tinyaq"
+    },
+    {
+      "old_path": "ayacucho-region/usnu-ayacucho",
+      "new_path": "peru/usnu-ayacucho",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "usnu-ayacucho"
+    },
+    {
+      "old_path": "ayacucho-region/usqunta",
+      "new_path": "peru/usqunta",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "usqunta"
+    },
+    {
+      "old_path": "ayacucho-region/vilcashuaman",
+      "new_path": "peru/vilcashuaman",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "vilcashuaman"
+    },
+    {
+      "old_path": "ayacucho-region/wichqana",
+      "new_path": "peru/wichqana",
+      "old_country_slug": "ayacucho-region",
+      "new_country_slug": "peru",
+      "site_slug": "wichqana"
+    },
+    {
+      "old_path": "cajamarca-region/collor",
+      "new_path": "peru/collor",
+      "old_country_slug": "cajamarca-region",
+      "new_country_slug": "peru",
+      "site_slug": "collor"
+    },
+    {
+      "old_path": "cajamarca-region/condorcaga",
+      "new_path": "peru/condorcaga",
+      "old_country_slug": "cajamarca-region",
+      "new_country_slug": "peru",
+      "site_slug": "condorcaga"
+    },
+    {
+      "old_path": "cajamarca-region/huayrapongo",
+      "new_path": "peru/huayrapongo",
+      "old_country_slug": "cajamarca-region",
+      "new_country_slug": "peru",
+      "site_slug": "huayrapongo"
+    },
+    {
+      "old_path": "cajamarca-region/ingatambo",
+      "new_path": "peru/ingatambo",
+      "old_country_slug": "cajamarca-region",
+      "new_country_slug": "peru",
+      "site_slug": "ingatambo"
+    },
+    {
+      "old_path": "cajamarca-region/kuntur-wasi",
+      "new_path": "peru/kuntur-wasi",
+      "old_country_slug": "cajamarca-region",
+      "new_country_slug": "peru",
+      "site_slug": "kuntur-wasi"
+    },
+    {
+      "old_path": "cajamarca-region/pacopampa",
+      "new_path": "peru/pacopampa",
+      "old_country_slug": "cajamarca-region",
+      "new_country_slug": "peru",
+      "site_slug": "pacopampa"
+    },
+    {
+      "old_path": "cajamarca-region/ventanillas-de-otuzco",
+      "new_path": "peru/ventanillas-de-otuzco",
+      "old_country_slug": "cajamarca-region",
+      "new_country_slug": "peru",
+      "site_slug": "ventanillas-de-otuzco"
+    },
+    {
+      "old_path": "callao-region/el-paraiso-peru",
+      "new_path": "peru/el-paraiso-peru",
+      "old_country_slug": "callao-region",
+      "new_country_slug": "peru",
+      "site_slug": "el-paraiso-peru"
+    },
+    {
+      "old_path": "campania/pompeii",
+      "new_path": "italy/pompeii",
+      "old_country_slug": "campania",
+      "new_country_slug": "italy",
+      "site_slug": "pompeii"
+    },
+    {
+      "old_path": "cusco-region/chawaytiri",
+      "new_path": "peru/chawaytiri",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "chawaytiri"
+    },
+    {
+      "old_path": "cusco-region/choquequirao",
+      "new_path": "peru/choquequirao",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "choquequirao"
+    },
+    {
+      "old_path": "cusco-region/choquequirao-puquio",
+      "new_path": "peru/choquequirao-puquio",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "choquequirao-puquio"
+    },
+    {
+      "old_path": "cusco-region/colcampata",
+      "new_path": "peru/colcampata",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "colcampata"
+    },
+    {
+      "old_path": "cusco-region/coricancha",
+      "new_path": "peru/coricancha",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "coricancha"
+    },
+    {
+      "old_path": "cusco-region/huamanmarca-la-convencion",
+      "new_path": "peru/huamanmarca-la-convencion",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "huamanmarca-la-convencion"
+    },
+    {
+      "old_path": "cusco-region/huayna-picchu",
+      "new_path": "peru/huayna-picchu",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "huayna-picchu"
+    },
+    {
+      "old_path": "cusco-region/huchuy-qosqo",
+      "new_path": "peru/huchuy-qosqo",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "huchuy-qosqo"
+    },
+    {
+      "old_path": "cusco-region/inca-complex-at-pisac",
+      "new_path": "peru/inca-complex-at-pisac",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "inca-complex-at-pisac"
+    },
+    {
+      "old_path": "cusco-region/inca-trail-to-machu-picchu",
+      "new_path": "peru/inca-trail-to-machu-picchu",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "inca-trail-to-machu-picchu"
+    },
+    {
+      "old_path": "cusco-region/inkilltambo",
+      "new_path": "peru/inkilltambo",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "inkilltambo"
+    },
+    {
+      "old_path": "cusco-region/inti-punku",
+      "new_path": "peru/inti-punku",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "inti-punku"
+    },
+    {
+      "old_path": "cusco-region/inti-watana-calca",
+      "new_path": "peru/inti-watana-calca",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "inti-watana-calca"
+    },
+    {
+      "old_path": "cusco-region/intihuatana-urubamba",
+      "new_path": "peru/intihuatana-urubamba",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "intihuatana-urubamba"
+    },
+    {
+      "old_path": "cusco-region/kanamarka",
+      "new_path": "peru/kanamarka",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "kanamarka"
+    },
+    {
+      "old_path": "cusco-region/killarumiyuq",
+      "new_path": "peru/killarumiyuq",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "killarumiyuq"
+    },
+    {
+      "old_path": "cusco-region/llaqtapata",
+      "new_path": "peru/llaqtapata",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "llaqtapata"
+    },
+    {
+      "old_path": "cusco-region/machu-colca",
+      "new_path": "peru/machu-colca",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "machu-colca"
+    },
+    {
+      "old_path": "cusco-region/machu-picchu",
+      "new_path": "peru/machu-picchu",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "machu-picchu"
+    },
+    {
+      "old_path": "cusco-region/machu-pitumarka",
+      "new_path": "peru/machu-pitumarka",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "machu-pitumarka"
+    },
+    {
+      "old_path": "cusco-region/machu-qinti",
+      "new_path": "peru/machu-qinti",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "machu-qinti"
+    },
+    {
+      "old_path": "cusco-region/mawkallaqta-espinar",
+      "new_path": "peru/mawkallaqta-espinar",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "mawkallaqta-espinar"
+    },
+    {
+      "old_path": "cusco-region/mawkallaqta-paruro",
+      "new_path": "peru/mawkallaqta-paruro",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "mawkallaqta-paruro"
+    },
+    {
+      "old_path": "cusco-region/moray-inca-ruin",
+      "new_path": "peru/moray-inca-ruin",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "moray-inca-ruin"
+    },
+    {
+      "old_path": "cusco-region/mullu-qawa",
+      "new_path": "peru/mullu-qawa",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "mullu-qawa"
+    },
+    {
+      "old_path": "cusco-region/muyu-urqu",
+      "new_path": "peru/muyu-urqu",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "muyu-urqu"
+    },
+    {
+      "old_path": "cusco-region/muyuq-marka",
+      "new_path": "peru/muyuq-marka",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "muyuq-marka"
+    },
+    {
+      "old_path": "cusco-region/ninamarca",
+      "new_path": "peru/ninamarca",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "ninamarca"
+    },
+    {
+      "old_path": "cusco-region/nusta-hispana",
+      "new_path": "peru/nusta-hispana",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "nusta-hispana"
+    },
+    {
+      "old_path": "cusco-region/ollantaytambo",
+      "new_path": "peru/ollantaytambo",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "ollantaytambo"
+    },
+    {
+      "old_path": "cusco-region/pachatusan",
+      "new_path": "peru/pachatusan",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "pachatusan"
+    },
+    {
+      "old_path": "cusco-region/patallacta",
+      "new_path": "peru/patallacta",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "patallacta"
+    },
+    {
+      "old_path": "cusco-region/pikillaqta",
+      "new_path": "peru/pikillaqta",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "pikillaqta"
+    },
+    {
+      "old_path": "cusco-region/pinkuylluna",
+      "new_path": "peru/pinkuylluna",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "pinkuylluna"
+    },
+    {
+      "old_path": "cusco-region/puka-pukara",
+      "new_path": "peru/puka-pukara",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "puka-pukara"
+    },
+    {
+      "old_path": "cusco-region/pumamarka-urubamba",
+      "new_path": "peru/pumamarka-urubamba",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "pumamarka-urubamba"
+    },
+    {
+      "old_path": "cusco-region/pumawasi-anta",
+      "new_path": "peru/pumawasi-anta",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "pumawasi-anta"
+    },
+    {
+      "old_path": "cusco-region/puyupatamarca",
+      "new_path": "peru/puyupatamarca",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "puyupatamarca"
+    },
+    {
+      "old_path": "cusco-region/qenko",
+      "new_path": "peru/qenko",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "qenko"
+    },
+    {
+      "old_path": "cusco-region/qollmay",
+      "new_path": "peru/qollmay",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "qollmay"
+    },
+    {
+      "old_path": "cusco-region/quispiguanca",
+      "new_path": "peru/quispiguanca",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "quispiguanca"
+    },
+    {
+      "old_path": "cusco-region/raqchi",
+      "new_path": "peru/raqchi",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "raqchi"
+    },
+    {
+      "old_path": "cusco-region/rumicolca",
+      "new_path": "peru/rumicolca",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "rumicolca"
+    },
+    {
+      "old_path": "cusco-region/rumiwasi",
+      "new_path": "peru/rumiwasi",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "rumiwasi"
+    },
+    {
+      "old_path": "cusco-region/runkuraqay",
+      "new_path": "peru/runkuraqay",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "runkuraqay"
+    },
+    {
+      "old_path": "cusco-region/sacred-valley",
+      "new_path": "peru/sacred-valley",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "sacred-valley"
+    },
+    {
+      "old_path": "cusco-region/sacsayhuaman",
+      "new_path": "peru/sacsayhuaman",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "sacsayhuaman"
+    },
+    {
+      "old_path": "cusco-region/sayacmarca",
+      "new_path": "peru/sayacmarca",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "sayacmarca"
+    },
+    {
+      "old_path": "cusco-region/tambomachay",
+      "new_path": "peru/tambomachay",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "tambomachay"
+    },
+    {
+      "old_path": "cusco-region/taqrachullu",
+      "new_path": "peru/taqrachullu",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "taqrachullu"
+    },
+    {
+      "old_path": "cusco-region/tarahuasi",
+      "new_path": "peru/tarahuasi",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "tarahuasi"
+    },
+    {
+      "old_path": "cusco-region/temple-of-the-moon-peru",
+      "new_path": "peru/temple-of-the-moon-peru",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "temple-of-the-moon-peru"
+    },
+    {
+      "old_path": "cusco-region/tipon",
+      "new_path": "peru/tipon",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "tipon"
+    },
+    {
+      "old_path": "cusco-region/twelve-angled-stone",
+      "new_path": "peru/twelve-angled-stone",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "twelve-angled-stone"
+    },
+    {
+      "old_path": "cusco-region/vitcos",
+      "new_path": "peru/vitcos",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "vitcos"
+    },
+    {
+      "old_path": "cusco-region/wanakawri-cusco",
+      "new_path": "peru/wanakawri-cusco",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "wanakawri-cusco"
+    },
+    {
+      "old_path": "cusco-region/waqrapukara",
+      "new_path": "peru/waqrapukara",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "waqrapukara"
+    },
+    {
+      "old_path": "cusco-region/wata-cusco",
+      "new_path": "peru/wata-cusco",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "wata-cusco"
+    },
+    {
+      "old_path": "cusco-region/wayna-qinti",
+      "new_path": "peru/wayna-qinti",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "wayna-qinti"
+    },
+    {
+      "old_path": "cusco-region/wayna-tawqaray",
+      "new_path": "peru/wayna-tawqaray",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "wayna-tawqaray"
+    },
+    {
+      "old_path": "cusco-region/winay-wayna",
+      "new_path": "peru/winay-wayna",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "winay-wayna"
+    },
+    {
+      "old_path": "cusco-region/wiraqucha-cusco",
+      "new_path": "peru/wiraqucha-cusco",
+      "old_country_slug": "cusco-region",
+      "new_country_slug": "peru",
+      "site_slug": "wiraqucha-cusco"
+    },
+    {
+      "old_path": "huancavelica-region/inka-machay-peru",
+      "new_path": "peru/inka-machay-peru",
+      "old_country_slug": "huancavelica-region",
+      "new_country_slug": "peru",
+      "site_slug": "inka-machay-peru"
+    },
+    {
+      "old_path": "huancavelica-region/inka-wasi-huancavelica",
+      "new_path": "peru/inka-wasi-huancavelica",
+      "old_country_slug": "huancavelica-region",
+      "new_country_slug": "peru",
+      "site_slug": "inka-wasi-huancavelica"
+    },
+    {
+      "old_path": "huancavelica-region/uchkus-inkanan",
+      "new_path": "peru/uchkus-inkanan",
+      "old_country_slug": "huancavelica-region",
+      "new_country_slug": "peru",
+      "site_slug": "uchkus-inkanan"
+    },
+    {
+      "old_path": "huancavelica-region/wiraqucha-pirqa",
+      "new_path": "peru/wiraqucha-pirqa",
+      "old_country_slug": "huancavelica-region",
+      "new_country_slug": "peru",
+      "site_slug": "wiraqucha-pirqa"
+    },
+    {
+      "old_path": "huánuco-region/hatun-machay",
+      "new_path": "peru/hatun-machay",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "hatun-machay"
+    },
+    {
+      "old_path": "huánuco-region/hatun-uchku",
+      "new_path": "peru/hatun-uchku",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "hatun-uchku"
+    },
+    {
+      "old_path": "huánuco-region/hualpayunca",
+      "new_path": "peru/hualpayunca",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "hualpayunca"
+    },
+    {
+      "old_path": "huánuco-region/huanuco-pampa",
+      "new_path": "peru/huanuco-pampa",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "huanuco-pampa"
+    },
+    {
+      "old_path": "huánuco-region/isog",
+      "new_path": "peru/isog",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "isog"
+    },
+    {
+      "old_path": "huánuco-region/kotosh",
+      "new_path": "peru/kotosh",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "kotosh"
+    },
+    {
+      "old_path": "huánuco-region/miyu-pampa",
+      "new_path": "peru/miyu-pampa",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "miyu-pampa"
+    },
+    {
+      "old_path": "huánuco-region/pumaq-hirka",
+      "new_path": "peru/pumaq-hirka",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "pumaq-hirka"
+    },
+    {
+      "old_path": "huánuco-region/quillarumi",
+      "new_path": "peru/quillarumi",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "quillarumi"
+    },
+    {
+      "old_path": "huánuco-region/quillcay-machay",
+      "new_path": "peru/quillcay-machay",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "quillcay-machay"
+    },
+    {
+      "old_path": "huánuco-region/susupillo",
+      "new_path": "peru/susupillo",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "susupillo"
+    },
+    {
+      "old_path": "huánuco-region/takaq",
+      "new_path": "peru/takaq",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "takaq"
+    },
+    {
+      "old_path": "huánuco-region/tikra",
+      "new_path": "peru/tikra",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "tikra"
+    },
+    {
+      "old_path": "huánuco-region/urpish",
+      "new_path": "peru/urpish",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "urpish"
+    },
+    {
+      "old_path": "huánuco-region/usnu-huanuco",
+      "new_path": "peru/usnu-huanuco",
+      "old_country_slug": "huánuco-region",
+      "new_country_slug": "peru",
+      "site_slug": "usnu-huanuco"
+    },
+    {
+      "old_path": "ica-region/cantalloc-aqueducts",
+      "new_path": "peru/cantalloc-aqueducts",
+      "old_country_slug": "ica-region",
+      "new_country_slug": "peru",
+      "site_slug": "cantalloc-aqueducts"
+    },
+    {
+      "old_path": "ica-region/huayuri",
+      "new_path": "peru/huayuri",
+      "old_country_slug": "ica-region",
+      "new_country_slug": "peru",
+      "site_slug": "huayuri"
+    },
+    {
+      "old_path": "ica-region/la-centinela",
+      "new_path": "peru/la-centinela",
+      "old_country_slug": "ica-region",
+      "new_country_slug": "peru",
+      "site_slug": "la-centinela"
+    },
+    {
+      "old_path": "ica-region/paracas-candelabra",
+      "new_path": "peru/paracas-candelabra",
+      "old_country_slug": "ica-region",
+      "new_country_slug": "peru",
+      "site_slug": "paracas-candelabra"
+    },
+    {
+      "old_path": "ica-region/pernil-alto",
+      "new_path": "peru/pernil-alto",
+      "old_country_slug": "ica-region",
+      "new_country_slug": "peru",
+      "site_slug": "pernil-alto"
+    },
+    {
+      "old_path": "ica-region/puquios",
+      "new_path": "peru/puquios",
+      "old_country_slug": "ica-region",
+      "new_country_slug": "peru",
+      "site_slug": "puquios"
+    },
+    {
+      "old_path": "ica-region/tambo-colorado",
+      "new_path": "peru/tambo-colorado",
+      "old_country_slug": "ica-region",
+      "new_country_slug": "peru",
+      "site_slug": "tambo-colorado"
+    },
+    {
+      "old_path": "jersey/grouville-hoard",
+      "new_path": "united-kingdom/grouville-hoard",
+      "old_country_slug": "jersey",
+      "new_country_slug": "united-kingdom",
+      "site_slug": "grouville-hoard"
+    },
+    {
+      "old_path": "jersey/haut-de-la-garenne",
+      "new_path": "united-kingdom/haut-de-la-garenne",
+      "old_country_slug": "jersey",
+      "new_country_slug": "united-kingdom",
+      "site_slug": "haut-de-la-garenne"
+    },
+    {
+      "old_path": "jersey/la-cotte-de-st-brelade",
+      "new_path": "united-kingdom/la-cotte-de-st-brelade",
+      "old_country_slug": "jersey",
+      "new_country_slug": "united-kingdom",
+      "site_slug": "la-cotte-de-st-brelade"
+    },
+    {
+      "old_path": "jersey/la-motte-jersey",
+      "new_path": "united-kingdom/la-motte-jersey",
+      "old_country_slug": "jersey",
+      "new_country_slug": "united-kingdom",
+      "site_slug": "la-motte-jersey"
+    },
+    {
+      "old_path": "jersey/le-couperon-dolmen",
+      "new_path": "united-kingdom/le-couperon-dolmen",
+      "old_country_slug": "jersey",
+      "new_country_slug": "united-kingdom",
+      "site_slug": "le-couperon-dolmen"
+    },
+    {
+      "old_path": "jersey/le-pinacle",
+      "new_path": "united-kingdom/le-pinacle",
+      "old_country_slug": "jersey",
+      "new_country_slug": "united-kingdom",
+      "site_slug": "le-pinacle"
+    },
+    {
+      "old_path": "jersey/les-landes",
+      "new_path": "united-kingdom/les-landes",
+      "old_country_slug": "jersey",
+      "new_country_slug": "united-kingdom",
+      "site_slug": "les-landes"
+    },
+    {
+      "old_path": "jersey/trinity-hoard",
+      "new_path": "united-kingdom/trinity-hoard",
+      "old_country_slug": "jersey",
+      "new_country_slug": "united-kingdom",
+      "site_slug": "trinity-hoard"
+    },
+    {
+      "old_path": "jersey/ville-es-nouaux",
+      "new_path": "united-kingdom/ville-es-nouaux",
+      "old_country_slug": "jersey",
+      "new_country_slug": "united-kingdom",
+      "site_slug": "ville-es-nouaux"
+    },
+    {
+      "old_path": "junín-region/chacamarca-historic-sanctuary",
+      "new_path": "peru/chacamarca-historic-sanctuary",
+      "old_country_slug": "junín-region",
+      "new_country_slug": "peru",
+      "site_slug": "chacamarca-historic-sanctuary"
+    },
+    {
+      "old_path": "junín-region/quri-winchus",
+      "new_path": "peru/quri-winchus",
+      "old_country_slug": "junín-region",
+      "new_country_slug": "peru",
+      "site_slug": "quri-winchus"
+    },
+    {
+      "old_path": "junín-region/tarmatambo",
+      "new_path": "peru/tarmatambo",
+      "old_country_slug": "junín-region",
+      "new_country_slug": "peru",
+      "site_slug": "tarmatambo"
+    },
+    {
+      "old_path": "junín-region/wari-willka",
+      "new_path": "peru/wari-willka",
+      "old_country_slug": "junín-region",
+      "new_country_slug": "peru",
+      "site_slug": "wari-willka"
+    },
+    {
+      "old_path": "la-libertad-region/caballo-muerto",
+      "new_path": "peru/caballo-muerto",
+      "old_country_slug": "la-libertad-region",
+      "new_country_slug": "peru",
+      "site_slug": "caballo-muerto"
+    },
+    {
+      "old_path": "la-libertad-region/el-brujo",
+      "new_path": "peru/el-brujo",
+      "old_country_slug": "la-libertad-region",
+      "new_country_slug": "peru",
+      "site_slug": "el-brujo"
+    },
+    {
+      "old_path": "la-libertad-region/gran-pajaten",
+      "new_path": "peru/gran-pajaten",
+      "old_country_slug": "la-libertad-region",
+      "new_country_slug": "peru",
+      "site_slug": "gran-pajaten"
+    },
+    {
+      "old_path": "la-libertad-region/huaca-prieta",
+      "new_path": "peru/huaca-prieta",
+      "old_country_slug": "la-libertad-region",
+      "new_country_slug": "peru",
+      "site_slug": "huaca-prieta"
+    },
+    {
+      "old_path": "la-libertad-region/marcahuamachuco",
+      "new_path": "peru/marcahuamachuco",
+      "old_country_slug": "la-libertad-region",
+      "new_country_slug": "peru",
+      "site_slug": "marcahuamachuco"
+    },
+    {
+      "old_path": "la-libertad-region/pacatnamu",
+      "new_path": "peru/pacatnamu",
+      "old_country_slug": "la-libertad-region",
+      "new_country_slug": "peru",
+      "site_slug": "pacatnamu"
+    },
+    {
+      "old_path": "la-libertad-region/pirca-pirca-la-libertad",
+      "new_path": "peru/pirca-pirca-la-libertad",
+      "old_country_slug": "la-libertad-region",
+      "new_country_slug": "peru",
+      "site_slug": "pirca-pirca-la-libertad"
+    },
+    {
+      "old_path": "la-libertad-region/san-jose-de-moro",
+      "new_path": "peru/san-jose-de-moro",
+      "old_country_slug": "la-libertad-region",
+      "new_country_slug": "peru",
+      "site_slug": "san-jose-de-moro"
+    },
+    {
+      "old_path": "lambayeque-region/batan-grande",
+      "new_path": "peru/batan-grande",
+      "old_country_slug": "lambayeque-region",
+      "new_country_slug": "peru",
+      "site_slug": "batan-grande"
+    },
+    {
+      "old_path": "lambayeque-region/cerro-patapo-ruins",
+      "new_path": "peru/cerro-patapo-ruins",
+      "old_country_slug": "lambayeque-region",
+      "new_country_slug": "peru",
+      "site_slug": "cerro-patapo-ruins"
+    },
+    {
+      "old_path": "lambayeque-region/chotuna-chornancap",
+      "new_path": "peru/chotuna-chornancap",
+      "old_country_slug": "lambayeque-region",
+      "new_country_slug": "peru",
+      "site_slug": "chotuna-chornancap"
+    },
+    {
+      "old_path": "lambayeque-region/tucume",
+      "new_path": "peru/tucume",
+      "old_country_slug": "lambayeque-region",
+      "new_country_slug": "peru",
+      "site_slug": "tucume"
+    },
+    {
+      "old_path": "lima-region/buena-vista-peru",
+      "new_path": "peru/buena-vista-peru",
+      "old_country_slug": "lima-region",
+      "new_country_slug": "peru",
+      "site_slug": "buena-vista-peru"
+    },
+    {
+      "old_path": "lima-region/caral",
+      "new_path": "peru/caral",
+      "old_country_slug": "lima-region",
+      "new_country_slug": "peru",
+      "site_slug": "caral"
+    },
+    {
+      "old_path": "lima-region/huaca-pucllana",
+      "new_path": "peru/huaca-pucllana",
+      "old_country_slug": "lima-region",
+      "new_country_slug": "peru",
+      "site_slug": "huaca-pucllana"
+    },
+    {
+      "old_path": "lima-region/huaycan-de-pariachi",
+      "new_path": "peru/huaycan-de-pariachi",
+      "old_country_slug": "lima-region",
+      "new_country_slug": "peru",
+      "site_slug": "huaycan-de-pariachi"
+    },
+    {
+      "old_path": "lima-region/incahuasi-lima",
+      "new_path": "peru/incahuasi-lima",
+      "old_country_slug": "lima-region",
+      "new_country_slug": "peru",
+      "site_slug": "incahuasi-lima"
+    },
+    {
+      "old_path": "lima-region/pirca-pirca-lima",
+      "new_path": "peru/pirca-pirca-lima",
+      "old_country_slug": "lima-region",
+      "new_country_slug": "peru",
+      "site_slug": "pirca-pirca-lima"
+    },
+    {
+      "old_path": "lima-region/puruchuco",
+      "new_path": "peru/puruchuco",
+      "old_country_slug": "lima-region",
+      "new_country_slug": "peru",
+      "site_slug": "puruchuco"
+    },
+    {
+      "old_path": "lima-region/wamanmarka-lima",
+      "new_path": "peru/wamanmarka-lima",
+      "old_country_slug": "lima-region",
+      "new_country_slug": "peru",
+      "site_slug": "wamanmarka-lima"
+    },
+    {
+      "old_path": "madre-de-dios-region/pusharo",
+      "new_path": "peru/pusharo",
+      "old_country_slug": "madre-de-dios-region",
+      "new_country_slug": "peru",
+      "site_slug": "pusharo"
+    },
+    {
+      "old_path": "pasco-region/guellayhuasin",
+      "new_path": "peru/guellayhuasin",
+      "old_country_slug": "pasco-region",
+      "new_country_slug": "peru",
+      "site_slug": "guellayhuasin"
+    },
+    {
+      "old_path": "pasco-region/kuntuyuq",
+      "new_path": "peru/kuntuyuq",
+      "old_country_slug": "pasco-region",
+      "new_country_slug": "peru",
+      "site_slug": "kuntuyuq"
+    },
+    {
+      "old_path": "pasco-region/markapukyu",
+      "new_path": "peru/markapukyu",
+      "old_country_slug": "pasco-region",
+      "new_country_slug": "peru",
+      "site_slug": "markapukyu"
+    },
+    {
+      "old_path": "pasco-region/qaqapatan",
+      "new_path": "peru/qaqapatan",
+      "old_country_slug": "pasco-region",
+      "new_country_slug": "peru",
+      "site_slug": "qaqapatan"
+    },
+    {
+      "old_path": "pasco-region/warawtampu",
+      "new_path": "peru/warawtampu",
+      "old_country_slug": "pasco-region",
+      "new_country_slug": "peru",
+      "site_slug": "warawtampu"
+    },
+    {
+      "old_path": "pasco-region/yuraq-machay",
+      "new_path": "peru/yuraq-machay",
+      "old_country_slug": "pasco-region",
+      "new_country_slug": "peru",
+      "site_slug": "yuraq-machay"
+    },
+    {
+      "old_path": "raqqa-governorate/al-jarud",
+      "new_path": "syria/al-jarud",
+      "old_country_slug": "raqqa-governorate",
+      "new_country_slug": "syria",
+      "site_slug": "al-jarud"
+    },
+    {
+      "old_path": "southeastern-anatolia/hirbemerdon-tepe",
+      "new_path": "turkey/hirbemerdon-tepe",
+      "old_country_slug": "southeastern-anatolia",
+      "new_country_slug": "turkey",
+      "site_slug": "hirbemerdon-tepe"
+    }
+  ]
+}

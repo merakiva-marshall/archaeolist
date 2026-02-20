@@ -40,7 +40,8 @@ async function getCountryInfo(country_slug: string): Promise<CountryInfo | null>
   const { data: sites, error } = await supabase
     .from('sites')
     .select('*')
-    .eq('country_slug', country_slug);
+    .eq('country_slug', country_slug)
+    .eq('archaeological_site_yn', true);
 
   const countrySites = sites as unknown as Site[];
 
