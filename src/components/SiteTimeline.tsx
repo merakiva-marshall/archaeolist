@@ -149,11 +149,11 @@ export default function SiteTimeline({ timeline }: TimelineProps) {
       const dateStr = dates[0] || centuries[0] || '';
       return {
         parsedDate: parseDateString(dateStr),
-        item: { 
+        item: {
           title,
-          date: item.date,
-          century: item.century,
-          description: item.description
+          date: dates,
+          century: centuries,
+          description: Array.isArray(item.description) ? item.description : []
         }
       } as TimelineItemWithDate;
     })
