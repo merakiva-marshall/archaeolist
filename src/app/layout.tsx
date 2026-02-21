@@ -9,7 +9,7 @@ import { daysOne, geist, geistMono } from './fonts/fonts'
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export const metadata: Metadata = {
-  title: 'Archaeolist',
+  title: 'Archaeolist | Archaeological Sites Worldwide',
   description: 'Discover archaeological sites worldwide on our interactive map. Explore ancient history and plan your next adventure with Archaeolist.',
   metadataBase: new URL('https://archaeolist.com'),
   openGraph: {
