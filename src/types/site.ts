@@ -59,7 +59,7 @@ export interface Site {
   timeline?: Timeline;
   featured?: boolean;
   archaeological_site_yn?: boolean;
-  faqs?: FAQData;
+  faqs?: FAQData | FAQ[];  // DB returns a plain array; FAQData shape is legacy
   created_at?: string;
   updated_at?: string;
 }
