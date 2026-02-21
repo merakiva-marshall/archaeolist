@@ -91,7 +91,8 @@ interface CountrySlugRow {
 export async function generateStaticParams() {
   const { data } = await supabase
     .from('sites')
-    .select<'country_slug', CountrySlugRow>('country_slug');
+    .select<'country_slug', CountrySlugRow>('country_slug')
+    .eq('archaeological_site_yn', true);
 
   const uniqueSlugs = Array.from(
     new Set(data?.map(row => row.country_slug))

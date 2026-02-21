@@ -260,12 +260,14 @@ export default async function Page({ params }: { params: { country_slug: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     location: (data.location as any)?.coordinates || data.location,
   } as Site;
-  const faqsRaw = site.faqs;
-  const faqs: import('../../../../types/site').FAQ[] = Array.isArray(faqsRaw)
-    ? faqsRaw
-    : Array.isArray(faqsRaw?.faqs)
-    ? faqsRaw.faqs
-    : [];
+  // DB stores faqs as a plain array; the FAQData wrapper type was aspirational.
+  // Handle both shapes: raw array and { faqs: [...] } object.
+  const rawFaqs = site.faqs;
+  const faqs: import('@/types/site').FAQ[] = Array.isArray(rawFaqs)
+    ? rawFaqs
+    : Array.isArray((rawFaqs as { faqs?: unknown })?.faqs)
+      ? (rawFaqs as { faqs: import('@/types/site').FAQ[] }).faqs
+      : [];
 
   const timeline = site.timeline || {};
   const processedFeatures = site.processed_features || {};
