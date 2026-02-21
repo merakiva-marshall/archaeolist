@@ -152,8 +152,8 @@ export default function SiteTimeline({ timeline }: TimelineProps) {
         parsedDate: parseDateString(dateStr),
         item: {
           title,
-          date: item.date,
-          century: item.century,
+          date: dates,
+          century: centuries,
           description: descriptions
         }
       } as TimelineItemWithDate;
