@@ -147,13 +147,14 @@ export default function SiteTimeline({ timeline }: TimelineProps) {
       const centuries = Array.isArray(item.century) ? item.century : [];
       // Use the first available date or century for sorting
       const dateStr = dates[0] || centuries[0] || '';
+      const descriptions = Array.isArray(item.description) ? item.description : (typeof item.description === 'string' && item.description ? [item.description] : []);
       return {
         parsedDate: parseDateString(dateStr),
-        item: { 
+        item: {
           title,
           date: item.date,
           century: item.century,
-          description: item.description
+          description: descriptions
         }
       } as TimelineItemWithDate;
     })

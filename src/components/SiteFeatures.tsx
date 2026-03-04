@@ -83,14 +83,16 @@ export default function SiteFeatures({ features = {}, siteId }: SiteFeaturesProp
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      {Object.entries(features || {}).map(([category, categoryFeatures]) => (
-        <FeatureCard
-          key={category}
-          category={category}
-          features={categoryFeatures}
-          siteId={siteId}
-        />
-      ))}
+      {Object.entries(features || {})
+        .filter(([, categoryFeatures]) => Array.isArray(categoryFeatures))
+        .map(([category, categoryFeatures]) => (
+          <FeatureCard
+            key={category}
+            category={category}
+            features={categoryFeatures}
+            siteId={siteId}
+          />
+        ))}
     </div>
   );
 }

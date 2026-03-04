@@ -58,12 +58,12 @@ export default function StructuredData({ site, countryInfo }: StructuredDataProp
       // Only include features if we have them
       ...(site.processed_features && {
         amenityFeature: Object.entries(site.processed_features).flatMap(([category, features]) =>
-          features.map(feature => ({
+          Array.isArray(features) ? features.map(feature => ({
             '@type': 'LocationFeatureSpecification',
             name: feature,
             value: true,
             category: category
-          }))
+          })) : []
         )
       }),
 

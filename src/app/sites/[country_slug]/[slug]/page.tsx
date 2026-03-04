@@ -90,7 +90,6 @@ export async function generateStaticParams() {
 }
 
 export default async function Page({ params }: { params: { country_slug: string; slug: string } }) {
-  console.log('Fetching site data for:', params.country_slug, params.slug);
   const { data, error } = await supabase
     .from('sites_with_ref_count')
     .select(`
@@ -261,9 +260,12 @@ export default async function Page({ params }: { params: { country_slug: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     location: (data.location as any)?.coordinates || data.location,
   } as Site;
-  console.log('Raw FAQs:', site.faqs);
-  const faqs = site.faqs?.faqs || [];
-  console.log('Processed FAQs:', faqs);
+  const faqsRaw = site.faqs;
+  const faqs: import('../../../../types/site').FAQ[] = Array.isArray(faqsRaw)
+    ? faqsRaw
+    : Array.isArray(faqsRaw?.faqs)
+    ? faqsRaw.faqs
+    : [];
 
   const timeline = site.timeline || {};
   const processedFeatures = site.processed_features || {};
@@ -383,15 +385,7 @@ export default async function Page({ params }: { params: { country_slug: string;
                   )}
 
                   {/* FAQ Section */}
-                  {(() => {
-                    console.log('Rendering FAQ section, faqs:', faqs);
-                    console.log('faqs type:', typeof faqs);
-                    console.log('faqs is array:', Array.isArray(faqs));
-                    console.log('faqs length:', faqs?.length);
-                    return faqs && Array.isArray(faqs) && faqs.length > 0 && (
-                      <SiteFAQ faqs={faqs} />
-                    );
-                  })()}
+                  {faqs.length > 0 && <SiteFAQ faqs={faqs} />}
 
                   {/* Visit Section */}
                   <VisitSection
