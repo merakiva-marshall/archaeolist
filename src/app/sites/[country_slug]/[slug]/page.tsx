@@ -152,6 +152,7 @@ export default async function Page({ params }: { params: { country_slug: string;
     .from('sites')
     .select('name, slug, country_slug, short_description, images, processed_periods')
     .eq('country_slug', params.country_slug)
+    .eq('archaeological_site_yn', true)
     .neq('slug', params.slug)
     .limit(15); // Retrieve a pool of candidates
 
@@ -211,21 +212,6 @@ export default async function Page({ params }: { params: { country_slug: string;
 
   // 5. Slice Top 6
   const tours: ViatorTour[] = processedTours.slice(0, 6);
-
-  // Debug logs
-  console.log(`Site: ${data.name} | Keywords: ${siteKeywords.join(', ')}`);
-  console.log('Top 3 Tours:', tours.slice(0, 3).map(t => ({
-    title: t.title.substring(0, 30) + '...',
-    rating: t.rating,
-    reviews: t.review_count,
-    price: t.price,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    bayesian: ((t as any).bayesian as number).toFixed(3),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    final: ((t as any).finalScore as number).toFixed(3)
-  })));
-
-
 
   let relatedSites = relatedSitesData || [];
 

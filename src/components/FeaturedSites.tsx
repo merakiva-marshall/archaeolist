@@ -23,6 +23,7 @@ export default async function FeaturedSites() {
             .from('sites')
             .select('id, name, slug, country_slug, country, short_description, description, images, is_unesco, featured')
             .eq('featured', true)
+            .eq('archaeological_site_yn', true)
             .limit(5);
 
         if (data && data.length > 0) {
@@ -37,6 +38,7 @@ export default async function FeaturedSites() {
                 .from('sites')
                 .select('id, name, slug, country_slug, country, short_description, description, images, is_unesco, featured')
                 .eq('is_unesco', true)
+                .eq('archaeological_site_yn', true)
                 .limit(4);
 
             if (fallbackData) {
