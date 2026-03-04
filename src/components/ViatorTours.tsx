@@ -28,7 +28,6 @@ export default function ViatorTours({ tours }: { tours: ViatorTour[] }) {
                                     alt={tour.title}
                                     fill
                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                    unoptimized
                                 />
                             ) : (
                                 <div className="h-full w-full flex items-center justify-center">

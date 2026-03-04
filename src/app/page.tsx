@@ -1,5 +1,7 @@
 // src/app/page.tsx
 
+export const revalidate = 3600;
+
 import HomepageClient from '../components/HomepageClient'
 import FeaturedSites from '../components/FeaturedSites'
 import PopularCountries from '../components/PopularCountries'

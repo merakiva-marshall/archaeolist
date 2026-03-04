@@ -154,15 +154,15 @@ export default async function Page({ params }: { params: { country_slug: string;
     .select('name, slug, country_slug, short_description, images, processed_periods')
     .eq('country_slug', params.country_slug)
     .neq('slug', params.slug)
-    .limit(60); // Retrieve a pool of candidates
+    .limit(15); // Retrieve a pool of candidates
 
   // Fetch Viator Tours
   const { data: toursData } = await supabase
     .from('viator_tours')
-    .select('*')
+    .select('id, site_id, title, price, currency, url, image_url, rating, review_count')
     .eq('site_id', data.id)
     .order('review_count', { ascending: false }) // Fetch most popular first
-    .limit(100); // Fetch a larger pool for client-side sorting
+    .limit(20); // Fetch a pool for client-side scoring and filtering
 
   const toursDataTyped = (toursData as ViatorTour[]) || [];
 

@@ -78,7 +78,6 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
                   alt={firstImage.filename}
                   fill
                   className="object-cover"
-                  unoptimized
                   sizes="(max-width: 640px) 100vw, 400px"
                 />
               </div>

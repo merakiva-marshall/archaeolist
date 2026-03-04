@@ -21,7 +21,7 @@ export default async function FeaturedSites() {
     try {
         const { data } = await supabase
             .from('sites')
-            .select('*, images')
+            .select('id, name, slug, country_slug, country, short_description, description, images, is_unesco, featured')
             .eq('featured', true)
             .limit(5);
 
@@ -35,7 +35,7 @@ export default async function FeaturedSites() {
             // Fallback: fetch 4 random UNESCO sites.
             const { data: fallbackData } = await supabase
                 .from('sites')
-                .select('*, images')
+                .select('id, name, slug, country_slug, country, short_description, description, images, is_unesco, featured')
                 .eq('is_unesco', true)
                 .limit(4);
 
@@ -73,7 +73,6 @@ export default async function FeaturedSites() {
                                         fill
                                         className="object-cover transform group-hover:scale-105 transition-transform duration-500"
                                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                                        unoptimized
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400">

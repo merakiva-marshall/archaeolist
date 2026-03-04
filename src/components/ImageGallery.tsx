@@ -63,7 +63,6 @@ export default function ImageGallery({ site }: ImageGalleryProps) {
                 alt={image.filename}
                 fill
                 className="object-cover"
-                unoptimized
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             </div>
@@ -115,7 +114,6 @@ export default function ImageGallery({ site }: ImageGalleryProps) {
                     alt={selectedImage.filename}
                     fill
                     className="object-contain"
-                    unoptimized
                     sizes="100vw"
                     priority
                   />

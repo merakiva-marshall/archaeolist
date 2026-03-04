@@ -160,7 +160,6 @@ export default function UnescoSitesClient({
                                                 alt="UNESCO World Heritage"
                                                 fill
                                                 className="object-cover"
-                                                unoptimized
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
                                                 <div className="text-white">

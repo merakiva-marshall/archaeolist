@@ -1,4 +1,5 @@
 
+import Image from 'next/image'
 import Link from 'next/link'
 
 const countries = [
@@ -61,10 +62,12 @@ export default function PopularCountries() {
                     {countries.map((country) => (
                         <div key={country.slug} className="flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
                             <div className="relative h-48 w-full">
-                                <img
+                                <Image
                                     src={country.image}
                                     alt={`Archaeological sites in ${country.name}`}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                                 <h3 className="absolute bottom-4 left-4 text-2xl font-bold text-white">

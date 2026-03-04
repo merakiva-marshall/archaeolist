@@ -56,45 +56,66 @@ export const useMap = (container: React.RefObject<HTMLDivElement>, sites: Site[]
         map.current.removeSource('sites');
       }
 
-      // Add source with clustering enabled
-      map.current.addSource('sites', {
-        ...siteSourceConfig,
-        data: {
-          type: 'FeatureCollection',
-          features: sites.map(site => ({
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: site.location
-            },
-            properties: { ...site }
-          }))
-        }
-      });
+      const addData = () => {
+        if (!map.current) return;
 
-      // Add layers in correct order
-      layerOrder.forEach(layerId => {
-        map.current!.addLayer(getLayerConfig(layerId));
-      });
+        // Add source with clustering enabled
+        map.current.addSource('sites', {
+          ...siteSourceConfig,
+          data: {
+            type: 'FeatureCollection',
+            features: sites.map(site => ({
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: site.location
+              },
+              properties: {
+                id: site.id,
+                name: site.name,
+                description: site.description,
+                short_description: site.short_description,
+                location: JSON.stringify(site.location),
+                country: site.country,
+                country_slug: site.country_slug,
+                slug: site.slug,
+                address: site.address,
+                images: JSON.stringify(site.images),
+                wikipedia_url: site.wikipedia_url,
+                is_unesco: site.is_unesco
+              }
+            }))
+          }
+        });
+
+        // Add layers in correct order
+        layerOrder.forEach(layerId => {
+          map.current!.addLayer(getLayerConfig(layerId));
+        });
+      };
+
+      // Load the custom marker image first, then add source + layers so the
+      // symbol layer always finds the image ready (fixes race condition).
+      if (map.current.hasImage('archaeological-site')) {
+        addData();
+      } else {
+        map.current.loadImage(
+          'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+          (error, image) => {
+            if (error) throw error;
+            if (image && map.current && !map.current.hasImage('archaeological-site')) {
+              map.current.addImage('archaeological-site', image);
+            }
+            addData();
+          }
+        );
+      }
     }
 
     if (map.current.loaded()) {
       addSourceAndLayers();
     } else {
       map.current.on('load', addSourceAndLayers);
-    }
-
-    // Add custom icon
-    if (!map.current.hasImage('archaeological-site')) {
-      map.current.loadImage(
-        'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
-        (error, image) => {
-          if (error) throw error;
-          if (image && map.current && !map.current.hasImage('archaeological-site')) {
-            map.current.addImage('archaeological-site', image);
-          }
-        }
-      );
     }
   }, [sites])
 
@@ -139,19 +160,15 @@ export const useMapEventHandlers = (
           id: properties.id,
           name: properties.name,
           description: properties.description,
+          short_description: properties.short_description,
           location: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
           country: properties.country,
           country_slug: properties.country_slug,
           slug: properties.slug,
           address: properties.address,
-          images: properties.images,
+          images: typeof properties.images === 'string' ? JSON.parse(properties.images) : properties.images,
           wikipedia_url: properties.wikipedia_url,
-          is_unesco: properties.is_unesco,
-          short_description: properties.short_description,
-          processed_features: properties.processed_features,
-          processed_periods: properties.processed_periods,
-          timeline: properties.timeline,
-          archaeological_site_yn: properties.archaeological_site_yn
+          is_unesco: properties.is_unesco
         };
 
         onSiteClick(site);

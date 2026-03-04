@@ -39,7 +39,7 @@ interface PageParams {
 async function getCountryInfo(country_slug: string): Promise<CountryInfo | null> {
   const { data: sites, error } = await supabase
     .from('sites')
-    .select('*')
+    .select('id, name, slug, country_slug, short_description, images, is_unesco, location, country, archaeological_site_yn')
     .eq('country_slug', country_slug)
     .eq('archaeological_site_yn', true);
 

@@ -1,7 +1,7 @@
 // src/lib/supabase.ts
 
 import { createClient } from '@supabase/supabase-js'
-import { Site, SiteImage, Timeline } from '../types/site'
+import { Site, SiteImage } from '../types/site'
 
 export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,12 +21,7 @@ export interface RawSite {
   wikipedia_url?: string;
   is_unesco?: boolean;
   short_description?: string;
-  processed_features?: { [key: string]: string[] };
-  processed_periods?: { [key: string]: string[] };
-  timeline?: Timeline;
   archaeological_site_yn?: boolean;
-  featured?: boolean;
-  updated_at: string;
 }
 
 export async function fetchSites(): Promise<Site[]> {
@@ -41,7 +36,8 @@ export async function fetchSites(): Promise<Site[]> {
 
       const { data, error } = await supabase
         .from('sites')
-        .select('*')
+        .select('id, name, description, short_description, location, country, country_slug, slug, address, images, wikipedia_url, is_unesco, archaeological_site_yn')
+        .eq('archaeological_site_yn', true)
         .range(page * pageSize, (page + 1) * pageSize - 1)
         .order('id', { ascending: true });
 
@@ -56,20 +52,16 @@ export async function fetchSites(): Promise<Site[]> {
             id: site.id,
             name: site.name,
             description: site.description,
+            short_description: site.short_description,
             location: site.location.coordinates,
-            address: site.address,
             country: site.country,
             country_slug: site.country_slug,
             slug: site.slug,
+            address: site.address,
             images: Array.isArray(site.images) ? site.images : (site.images ? JSON.parse(site.images as unknown as string) : null),
             wikipedia_url: site.wikipedia_url,
             is_unesco: site.is_unesco,
-            short_description: site.short_description,
-            processed_features: site.processed_features,
-            processed_periods: site.processed_periods,
-            timeline: site.timeline,
-            archaeological_site_yn: site.archaeological_site_yn,
-            featured: site.featured
+            archaeological_site_yn: site.archaeological_site_yn
           };
 
           return formattedSite;

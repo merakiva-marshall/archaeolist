@@ -26,7 +26,6 @@ export default function SiteCard({ site, showCountryContext }: SiteCardProps) {
               alt={site.name}
               fill
               className="object-cover transition-transform group-hover:scale-105"
-              unoptimized
             />
           ) : (
             <div className="absolute inset-0">

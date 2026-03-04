@@ -104,7 +104,6 @@ export default function VisitSection({
                     width={240}
                     height={80}
                     className="mb-4"
-                    unoptimized
                   />
                   <div className="space-y-3">
                     <p className="text-gray-700">

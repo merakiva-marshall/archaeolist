@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { createClient } from '@supabase/supabase-js'
+import Image from 'next/image'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
@@ -92,10 +93,13 @@ export default async function AllCountriesPage() {
                         return (
                             <Link key={country.slug} href={`/sites/${country.slug}`} className="group relative block bg-gray-100 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 h-64">
                                 {image ? (
-                                    <img
+                                    <Image
                                         src={image}
                                         alt={country.name}
-                                        className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                        fill
+                                        className="object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                        loading="lazy"
                                     />
                                 ) : (
                                     <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
