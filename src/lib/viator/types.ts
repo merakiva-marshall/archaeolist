@@ -1,7 +1,6 @@
 export interface ViatorTour {
-    id: string;
-    site_id: string;
     tour_id: string;
+    site_id: string;
     title: string;
     description: string | null;
     price: number | null;
@@ -10,6 +9,7 @@ export interface ViatorTour {
     image_url: string | null;
     rating: number | null;
     review_count: number | null;
+    relevance_score: number | null;
     last_updated: string;
 }
 

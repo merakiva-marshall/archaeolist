@@ -61,6 +61,7 @@ export async function getSites({
       created_at,
       updated_at,
       featured,
+      featured_score,
       processed_features,
       processed_periods
     `, { count: 'exact' })
@@ -120,8 +121,11 @@ export async function getSites({
     // Sort
     switch (sort) {
         case 'featured':
-            // Sort by featured boolean first (desc), then created_at (desc)
-            query = query.order('featured', { ascending: false }).order('created_at', { ascending: false });
+            // Sort by featured boolean first (desc), then featured_score (desc), then created_at (desc)
+            query = query
+                .order('featured', { ascending: false })
+                .order('featured_score', { ascending: false, nullsFirst: false })
+                .order('created_at', { ascending: false });
             break;
         case 'recent':
             query = query.order('created_at', { ascending: false });

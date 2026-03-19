@@ -31,9 +31,8 @@ const isAllowedCountry = async (): Promise<boolean> => {
 
     const data = await response.json();
     return ['US', 'CA', 'GB'].includes(data.country_code); // Added GB for testing if needed, or stick to US/CA as per original
-  } catch (error) {
-    console.error('Error checking location:', error);
-    return false; // Fail safe to hidden if strict restriction desired
+  } catch {
+    return true; // Fail open — better to show the CTA than silently hide it on API errors
   }
 };
 

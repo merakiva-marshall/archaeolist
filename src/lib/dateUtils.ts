@@ -49,7 +49,7 @@ function parseCentury(centuryStr: string): number {
   const cleanStr = centuryStr.toLowerCase().trim();
   
   // Extract the century number
-  const numberMatch = cleanStr.match(/(\d+)(st|nd|rd|th)/);
+  const numberMatch = cleanStr.match(/(\d+)(?:st|nd|rd|th)?/);
   if (!numberMatch) return 0;
   
   const century = parseInt(numberMatch[1]);
@@ -60,7 +60,7 @@ function parseCentury(centuryStr: string): number {
 
 function parseMillennium(millenniumStr: string): number {
   const cleanStr = millenniumStr.toLowerCase().trim();
-  const numberMatch = cleanStr.match(/(\d+)(st|nd|rd|th)/);
+  const numberMatch = cleanStr.match(/(\d+)(?:st|nd|rd|th)?/);
   if (!numberMatch) return 0;
   
   const millennium = parseInt(numberMatch[1]);

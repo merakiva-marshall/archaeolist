@@ -2,6 +2,12 @@ import type { Metadata } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import Image from 'next/image'
 import Link from 'next/link'
+import countryRedirects from '../../data/country-redirects.json'
+
+// Slugs that are regions/governorates, not actual countries
+const NON_COUNTRY_SLUGS = new Set(
+  countryRedirects.redirects.map((r: { old_country_slug: string }) => r.old_country_slug)
+)
 
 export const metadata: Metadata = {
   title: 'Archaeological Sites by Country | Archaeolist',
@@ -43,6 +49,7 @@ export default async function AllCountriesPage() {
 
         data.forEach(site => {
             if (!site.country || !site.country_slug) return;
+            if (NON_COUNTRY_SLUGS.has(site.country_slug)) return;
             if (!countryMap.has(site.country_slug)) {
                 countryMap.set(site.country_slug, { name: site.country, slug: site.country_slug, count: 0 });
             }

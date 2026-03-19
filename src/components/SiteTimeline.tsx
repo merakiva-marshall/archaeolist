@@ -143,17 +143,18 @@ export default function SiteTimeline({ timeline }: TimelineProps) {
   // Sort periods chronologically and process timeline items
   const timelineItems = Object.entries(timeline)
     .map(([title, item]) => {
-      const dates = Array.isArray(item.date) ? item.date : [];
-      const centuries = Array.isArray(item.century) ? item.century : [];
+      // Normalise — DB has two formats: arrays (new) and plain strings (legacy)
+      const dates = Array.isArray(item.date) ? item.date : (typeof item.date === 'string' && item.date ? [item.date] : []);
+      const centuries = Array.isArray(item.century) ? item.century : (typeof item.century === 'string' && item.century ? [item.century] : []);
+      const descriptions = Array.isArray(item.description) ? item.description : (typeof item.description === 'string' && item.description ? [item.description] : []);
       // Use the first available date or century for sorting
       const dateStr = dates[0] || centuries[0] || '';
-      const descriptions = Array.isArray(item.description) ? item.description : (typeof item.description === 'string' && item.description ? [item.description] : []);
       return {
         parsedDate: parseDateString(dateStr),
         item: {
           title,
-          date: item.date,
-          century: item.century,
+          date: dates,
+          century: centuries,
           description: descriptions
         }
       } as TimelineItemWithDate;
