@@ -5,6 +5,8 @@
 ## Context
 The project has accumulated ~16 improvement items spanning data quality, UI, maps, filtering, Viator integration, and redirects. There are also several unmerged `claude/*` branches with overlapping work that need consolidation. This plan organizes all items into a logical execution order with dependencies.
 
+Once each aspect of this plan is implemented, track progress (including tasks completed and any emergent issues or bugs) in /.claude/worktrees/upbeat-blackwell/docs/branch_progress.md
+
 ---
 
 ## Phase 0: Branch Cleanup & Consolidation
@@ -32,13 +34,14 @@ The project has accumulated ~16 improvement items spanning data quality, UI, map
 
 ### 1a. Review `archaeological_site_yn` values
 - Query Supabase for `archaeological_site_yn = false` sites — review which are actually real
-- Cross-reference with Google Analytics top pages
+- Cross-reference with Google Analytics top pages. CSV to be shared (confirm CSV data and analysis before proceeding)
 - Anything with real traffic → flag as `archaeological_site_yn = true`
 - Automated: script to match analytics URLs to site slugs
 
 ### 1b. Fix non-country entries
 - Already handled on this branch (NON_COUNTRY_SLUGS filter using `country-redirects.json`)
 - Verify after merge: countries page should not show "Cuzco Area", "Aleppo Governorate", etc.
+- Verify the "All Countries" page only lists real countries
 - Also check `generateStaticParams` in `[country_slug]/page.tsx`
 
 ### 1c. Verify redirects work
@@ -50,6 +53,8 @@ The project has accumulated ~16 improvement items spanning data quality, UI, map
   - `/sites/northkorea` → correct country slug
   - `/sites/italy/colosseum` → correct slug (probably `the-colosseum`)
   - `/sites/egypt/temple-of-debod` → correct location (Temple of Debod is in Madrid, Spain)
+- Verify any 404 patterns from analytics. Check and confirm if any additional missed. Understand and verify the new pattern. 
+- Identify if 404 redirects have a correct page to redirect to and adjust in 'next.config.mjs' 
 
 ---
 
