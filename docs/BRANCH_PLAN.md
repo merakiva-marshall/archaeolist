@@ -101,36 +101,55 @@ The project has accumulated ~16 improvement items spanning data quality, UI, map
 - "Private Transfer from Positano" filtered out for Pompeii because "Pompeii" isn't in the title
 - Stop words remove "great", "park", "complex" — breaks matching for many sites
 
-### Fix Plan:
+### Additional Data Findings:
+- Only **23 sites** have tours where the exact site name appears in the tour title
+- Only **129 sites** have tours where any meaningful keyword matches — **4.7% relevance rate**
+- Pompeii has its own Viator destination (0.4km away), yet got "Private Transfer from Positano to Rome"
+- The API sorts by **PRICE DESCENDING**, returning the most expensive (private transfers, multi-day packages) first
+- Most archaeological sites simply don't have dedicated Viator tours — the best we can offer is quality tours in the area
 
-**3a. Fix RLS — add public read policy** (CRITICAL, fixes the immediate blocker)
-- Add `SELECT` policy for `anon` role on `viator_tours`: `CREATE POLICY "Public read" ON viator_tours FOR SELECT USING (true);`
-- Same for `viator_destinations` if needed
-- **This alone will make existing tours visible**, even if the data quality is imperfect
+### Why the current approach fundamentally can't work:
+The Viator `/products/search` API `text` filter does a full-text search across tour descriptions (not just titles). Combined with `sort: PRICE DESC` and `count: 10`, we get the 10 most expensive tours that vaguely mention the site name somewhere in their description — which are private transfers and multi-day packages, not actual archaeological tours.
 
-**3b. Fix sync relevance** (`/src/lib/viator/client.ts`, `/src/lib/viator/sync.ts`)
-- Search by destination + broader terms (not exact site name). Try: site name OR "archaeological" OR "historical tour"
-- Increase results from 10 to 25-50; sort by popularity/reviews instead of price desc
-- Increase radius from 100km to 200-300km (or search country-level destinations)
-- 57% of sites get `no_dest_100km` — that's too many skipped
+Even fixing the sort and increasing count won't help for most sites. "Suburban Baths of Pompeii" will never have a dedicated Viator tour. The fundamental mismatch: we have ~5,500 granular archaeological sites but Viator has tours at the city/region level, not the individual-site level.
 
-**3c. Clean up existing tour data**
-- Delete tours linked to 10+ sites (generic spam tours, not site-relevant)
-- Deduplicate: many tours appear multiple times for the same site_id
-- Consider a relevance score: does the tour title/description mention the site name, country, or "archaeological"?
+### Fix Plan — New Architecture:
 
-**3d. Fix display filtering** (`/src/app/sites/[country_slug]/[slug]/page.tsx`)
-- Remove keyword matching entirely — trust the `site_id` linkage
-- Keep Bayesian scoring for quality ranking
-- Add quality threshold: `review_count >= 3` AND `rating >= 3.5`
+**3a. Fix RLS — add public read policy** (required regardless)
+- `CREATE POLICY "Public read" ON viator_tours FOR SELECT USING (true);`
+- Same for `viator_destinations`
+- No security concern — tour data is all public Viator catalog info
+
+**3b. Completely rethink the sync strategy** (`/src/lib/viator/client.ts`, `/src/lib/viator/sync.ts`)
+New approach:
+1. **Search by destination WITHOUT text filter** — get the broadly popular tours in the area
+2. **Sort by TRAVELER_RATING or REVIEW_AVG_RATING** instead of PRICE DESC
+3. **Fetch 50 results** per destination instead of 10
+4. **Post-filter for relevance**: score each tour based on whether title/description contains:
+   - The site name (highest weight)
+   - Archaeological/historical keywords ("archaeological", "ruins", "ancient", "historical", "heritage", "excavation", "temple", "tomb")
+   - The country name
+5. **Store a `relevance_score`** on each `viator_tours` row so the frontend can sort by it
+6. **Don't link one tour to hundreds of sites** — if a tour has no site-specific keywords, only link to the ~3 nearest sites within a destination, not all of them
+
+**3c. Nuke and rebuild tour data**
+- Truncate `viator_tours` — current data is 95% irrelevant
+- Re-run sync with new logic
+- Add `relevance_score` column to `viator_tours` table
+
+**3d. Simplify display logic** (`/src/app/sites/[country_slug]/[slug]/page.tsx`)
+- Remove keyword matching entirely
+- Query tours ordered by `relevance_score DESC, review_count DESC`
+- Only show tours with `relevance_score > 0` OR `review_count >= 10`
+- Keep Bayesian scoring only as a tiebreaker
 - Remove debug console.logs (lines 216-226)
 
-**3e. Re-run full sync** after fixing 3b
-- Clear `last_viator_sync` and `viator_sync_status` on all sites
-- Run in larger batches (50+ at a time)
+**3e. Graceful "no tours" handling**
+- For sites with no relevant tours, don't show the section (already works)
+- Consider a fallback: "Explore tours near {country}" linking to Viator's destination page with our affiliate link
 
 **Files:** `/src/lib/viator/client.ts`, `/src/lib/viator/sync.ts`, `/src/app/sites/[country_slug]/[slug]/page.tsx`
-**Supabase:** Add RLS read policy on `viator_tours` + `viator_destinations`, clean up tour data
+**Supabase:** Add RLS read policy, add `relevance_score` column, truncate + re-sync tour data
 
 ---
 
