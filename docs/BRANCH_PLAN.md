@@ -108,10 +108,25 @@ The project has accumulated ~16 improvement items spanning data quality, UI, map
 - The API sorts by **PRICE DESCENDING**, returning the most expensive (private transfers, multi-day packages) first
 - Most archaeological sites simply don't have dedicated Viator tours — the best we can offer is quality tours in the area
 
-### Why the current approach fundamentally can't work:
-The Viator `/products/search` API `text` filter does a full-text search across tour descriptions (not just titles). Combined with `sort: PRICE DESC` and `count: 10`, we get the 10 most expensive tours that vaguely mention the site name somewhere in their description — which are private transfers and multi-day packages, not actual archaeological tours.
+### Why the current approach fails:
+The current code only uses `/products/search` with `text: siteName` + `sort: PRICE DESC` + `count: 10`. This ignores three powerful Viator API features we should be using:
 
-Even fixing the sort and increasing count won't help for most sites. "Suburban Baths of Pompeii" will never have a dedicated Viator tour. The fundamental mismatch: we have ~5,500 granular archaeological sites but Viator has tours at the city/region level, not the individual-site level.
+1. **Tag filtering** — Viator has category tags including `Archaeology Tours` (tagId: 12077) and `Historical Tours` (tagId: 12029). We can filter to ONLY get archaeological/historical tours.
+2. **Attractions endpoint** (`/attractions/search`) — Returns Viator's own "attractions" (points of interest) within a destination, each with linked product codes. Many archaeological sites ARE Viator attractions.
+3. **Freetext attraction search** (`/search/freetext` with `searchType: ATTRACTIONS`) — Search for attractions by name. "Pompeii" would return Viator's Pompeii attraction entity, which links to all Pompeii-specific tours.
+
+### Key Viator Tag IDs for our use case:
+| Tag Name | Tag ID | Category |
+|----------|--------|----------|
+| Archaeology Tours | 12077 | Cultural & Theme Tours |
+| Historical Tours | 12029 | Cultural & Theme Tours |
+| Cultural Tours | 12028 | Cultural & Theme Tours |
+| Walking Tours | 12046 | Walking & Biking Tours |
+| Museum Tickets & Passes | 11901 | Sightseeing Tickets & Passes |
+| Private Sightseeing Tours | 11941 | Private & Custom Tours |
+| Self-guided Tours & Rentals | 12041 | Tours & Sightseeing |
+
+(Source: https://docs.viator.com/partner-api/technical/v1-subcategories-v2-tags.xlsx)
 
 ### Fix Plan — New Architecture:
 
@@ -120,36 +135,55 @@ Even fixing the sort and increasing count won't help for most sites. "Suburban B
 - Same for `viator_destinations`
 - No security concern — tour data is all public Viator catalog info
 
-**3b. Completely rethink the sync strategy** (`/src/lib/viator/client.ts`, `/src/lib/viator/sync.ts`)
-New approach:
-1. **Search by destination WITHOUT text filter** — get the broadly popular tours in the area
-2. **Sort by TRAVELER_RATING or REVIEW_AVG_RATING** instead of PRICE DESC
-3. **Fetch 50 results** per destination instead of 10
-4. **Post-filter for relevance**: score each tour based on whether title/description contains:
-   - The site name (highest weight)
-   - Archaeological/historical keywords ("archaeological", "ruins", "ancient", "historical", "heritage", "excavation", "temple", "tomb")
-   - The country name
-5. **Store a `relevance_score`** on each `viator_tours` row so the frontend can sort by it
-6. **Don't link one tour to hundreds of sites** — if a tour has no site-specific keywords, only link to the ~3 nearest sites within a destination, not all of them
+**3b. New sync strategy — attraction-first with tag filtering**
 
-**3c. Nuke and rebuild tour data**
-- Truncate `viator_tours` — current data is 95% irrelevant
+**Step 1: Match sites to Viator attractions**
+- For each site, call `/search/freetext` with `searchType: ATTRACTIONS` + site name
+- If Viator has a matching attraction (e.g., "Pompeii" → Viator attraction ID), store the `attractionId` on our site record
+- This is a one-time mapping step — store in a new `viator_attraction_id` column on `sites`
+
+**Step 2: Fetch tours via attraction ID (best case)**
+- For sites WITH a matched attraction: `/products/search` with `attractionId` + tags `[12077, 12029, 12028]`
+- Sort by `TRAVELER_RATING` descending
+- Fetch 30 results — these will be tours that specifically visit this attraction
+- This is the highest-quality match possible
+
+**Step 3: Fallback — destination + tags (for sites without attraction match)**
+- For sites WITHOUT a matched attraction: `/products/search` with `destination` + tags `[12077, 12029, 12028, 12046]`
+- Sort by `TRAVELER_RATING` descending
+- Fetch 30 results — archaeological/historical tours in the area
+- Post-filter: score by whether title mentions site name, nearby landmarks, or archaeological keywords
+- Link to the nearest 3-5 sites within the destination, not all of them
+
+**Step 4: Quality gate**
+- Only store tours with `review_count >= 3` AND `rating >= 3.5`
+- Store a `relevance_score` on each tour row (attraction-matched tours score highest)
+
+**3c. New Viator client methods** (`/src/lib/viator/client.ts`)
+- `searchAttractions(siteName)` — calls `/search/freetext` with `searchType: ATTRACTIONS`
+- `fetchToursByAttraction(attractionId, tagIds)` — calls `/products/search` with `attractionId` + tags
+- `fetchToursByDestination(destId, tagIds)` — calls `/products/search` with `destination` + tags, no text filter
+- All sort by `TRAVELER_RATING` descending, fetch 30 results
+
+**3d. Nuke and rebuild tour data**
+- Truncate `viator_tours`
+- Add `relevance_score integer` column
+- Add `viator_attraction_id text` column to `sites` table
 - Re-run sync with new logic
-- Add `relevance_score` column to `viator_tours` table
 
-**3d. Simplify display logic** (`/src/app/sites/[country_slug]/[slug]/page.tsx`)
+**3e. Simplify display logic** (`/src/app/sites/[country_slug]/[slug]/page.tsx`)
 - Remove keyword matching entirely
+- Remove stop words list
 - Query tours ordered by `relevance_score DESC, review_count DESC`
-- Only show tours with `relevance_score > 0` OR `review_count >= 10`
-- Keep Bayesian scoring only as a tiebreaker
+- Keep Bayesian scoring as tiebreaker for tours with similar relevance
 - Remove debug console.logs (lines 216-226)
 
-**3e. Graceful "no tours" handling**
+**3f. Graceful "no tours" handling**
 - For sites with no relevant tours, don't show the section (already works)
-- Consider a fallback: "Explore tours near {country}" linking to Viator's destination page with our affiliate link
+- Consider a fallback: "Explore tours near {country}" linking to Viator's destination page with affiliate link
 
 **Files:** `/src/lib/viator/client.ts`, `/src/lib/viator/sync.ts`, `/src/app/sites/[country_slug]/[slug]/page.tsx`
-**Supabase:** Add RLS read policy, add `relevance_score` column, truncate + re-sync tour data
+**Supabase:** RLS read policy, `relevance_score` column on `viator_tours`, `viator_attraction_id` on `sites`, truncate + re-sync
 
 ---
 
