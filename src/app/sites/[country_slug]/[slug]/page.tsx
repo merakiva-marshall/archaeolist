@@ -385,7 +385,7 @@ export default async function Page({ params }: { params: { country_slug: string;
               <p className="text-sm text-on-surface-variant font-label mb-10">
                 Journey through time and discover key events in this site&apos;s history
               </p>
-              <SiteTimeline timeline={timeline} variant="redesign" activePeriods={processedPeriods} />
+              <SiteTimeline timeline={timeline} variant="redesign" />
             </div>
           </section>
         )}
