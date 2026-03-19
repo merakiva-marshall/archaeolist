@@ -59,12 +59,31 @@ export default function SitesList() {
         <div className="rounded-lg border border-slate-800 bg-slate-900 p-6">
             <div className="mb-6 flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-blue-500">Sites</h1>
-                <button
-                    onClick={() => create("sites")}
-                    className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                >
-                    + Add Site
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={async () => {
+                            if (confirm("Recalculate all featured scores? This may take a moment.")) {
+                                try {
+                                    const res = await fetch('/api/admin/recalculate-scores', { method: 'POST' });
+                                    const json = await res.json();
+                                    if (!res.ok) throw new Error(json.error || 'Failed');
+                                    alert("Success: " + json.message);
+                                } catch (e) {
+                                    alert("Error: " + (e instanceof Error ? e.message : 'Unknown error'));
+                                }
+                            }
+                        }}
+                        className="rounded bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+                    >
+                        Recalculate Scores
+                    </button>
+                    <button
+                        onClick={() => create("sites")}
+                        className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    >
+                        + Add Site
+                    </button>
+                </div>
             </div>
 
             {/* Search Filters */}

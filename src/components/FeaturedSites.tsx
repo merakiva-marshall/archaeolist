@@ -21,9 +21,10 @@ export default async function FeaturedSites() {
     try {
         const { data } = await supabase
             .from('sites')
-            .select('id, name, slug, country_slug, country, short_description, description, images, is_unesco, featured')
-            .eq('featured', true)
+            .select('id, name, slug, country_slug, country, short_description, description, images, is_unesco, featured, featured_score')
             .eq('archaeological_site_yn', true)
+            .order('featured', { ascending: false })
+            .order('featured_score', { ascending: false, nullsFirst: false })
             .limit(5);
 
         if (data && data.length > 0) {
@@ -32,22 +33,6 @@ export default async function FeaturedSites() {
                 ...site,
                 location: site.location?.coordinates || site.location
             }));
-        } else {
-            // Fallback: fetch 4 random UNESCO sites.
-            const { data: fallbackData } = await supabase
-                .from('sites')
-                .select('id, name, slug, country_slug, country, short_description, description, images, is_unesco, featured')
-                .eq('is_unesco', true)
-                .eq('archaeological_site_yn', true)
-                .limit(4);
-
-            if (fallbackData) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                featuredSites = fallbackData.map((site: any) => ({
-                    ...site,
-                    location: site.location?.coordinates || site.location
-                }));
-            }
         }
     } catch (err) {
         console.error("Error loading featured sites:", err);

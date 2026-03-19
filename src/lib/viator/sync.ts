@@ -1,10 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { ViatorClient } from './client';
+import { ViatorClient, ATTRACTION_TAGS, DESTINATION_TAGS } from './client';
 import { ViatorDestination, ViatorProduct } from './types';
-
-// Initialize Supabase (Use service role if available for backend ops, but client needs safe env check)
-// In a real API route, we'd use 'process.env.SUPABASE_SERVICE_ROLE_KEY'
-// logic here assumes this is running in a server context (Node/Next API).
 
 const getSupabase = () => {
     return createClient(
@@ -15,7 +11,7 @@ const getSupabase = () => {
 
 // Helper for Haversine distance
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371; // Earth's radius in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a =
@@ -38,7 +34,6 @@ export async function findNearestDestination(lat: number, lng: number, destinati
 
         if (destLat && destLng) {
             const distance = calculateDistance(lat, lng, destLat, destLng);
-
             if (distance < minDistance) {
                 minDistance = distance;
                 nearest = dest;
@@ -46,48 +41,68 @@ export async function findNearestDestination(lat: number, lng: number, destinati
         }
     }
 
-    // Only return destination if it's within 100km
     return minDistance <= 100 ? nearest : null;
+}
+
+/**
+ * Quality gate: only keep tours with enough reviews and a decent rating.
+ */
+function meetsQualityGate(tour: ViatorProduct): boolean {
+    const reviewCount = tour.reviews?.totalReviews ?? 0;
+    const rating = tour.reviews?.sources?.[0]?.averageRating ?? 0;
+    return reviewCount >= 3 && rating >= 3.5;
+}
+
+function mapTourToRow(tour: ViatorProduct, siteId: string, relevanceScore: number) {
+    return {
+        site_id: siteId,
+        tour_id: tour.productCode,
+        title: tour.title,
+        description: tour.description || '',
+        price: tour.pricing?.summary?.fromPrice ?? null,
+        currency: tour.pricing?.currency || 'USD',
+        url: tour.productUrl,
+        image_url: tour.images?.[0]?.variants?.find((v) => v.height === 480)?.url || '',
+        rating: tour.reviews?.sources?.[0]?.averageRating ?? null,
+        review_count: tour.reviews?.totalReviews ?? 0,
+        relevance_score: relevanceScore,
+        last_updated: new Date().toISOString(),
+    };
 }
 
 // Logic to sync specific sites
 export async function syncSites(siteIds: string[] | null, searchQuery: string | null, limit: number = 5) {
     const supabase = getSupabase();
     const apiKey = process.env.VIATOR_API_KEY;
-    if (!apiKey) throw new Error("VIATOR_API_KEY is missing");
+    if (!apiKey) throw new Error('VIATOR_API_KEY is missing');
 
     const viatorClient = new ViatorClient(apiKey);
 
     // 1. Fetch sites
-    let query = supabase.from('sites').select('id, name, location, last_viator_sync');
+    let query = supabase
+        .from('sites')
+        .select('id, name, location, last_viator_sync, viator_attraction_id');
 
     if (siteIds && siteIds.length > 0) {
         query = query.in('id', siteIds);
     } else if (searchQuery) {
         query = query.or(`name.ilike.%${searchQuery}%`);
     } else {
-        // Fetch sites that haven't been synced locally OR were synced more than 24 hours ago
-        // Default sort: Oldest sync first (nulls first)
-        // This naturally prioritizes "never synced" and "oldest synced".
-        query = query.order('last_viator_sync', { ascending: true, nullsFirst: true }).limit(limit);
+        query = query
+            .order('last_viator_sync', { ascending: true, nullsFirst: true })
+            .limit(limit);
     }
 
     const { data: sites, error } = await query;
     if (error) throw error;
-    if (!sites || sites.length === 0) return { message: "No sites found" };
+    if (!sites || sites.length === 0) return { message: 'No sites found' };
 
-    // 2. Fetch Viator destinations (Cache-first strategy)
-    // Check if we have destinations in DB
+    // 2. Load destinations (cache-first)
     const { data: localDestinations } = await supabase.from('viator_destinations').select('*');
 
-    let destinations = [];
+    let destinations: ViatorDestination[] = [];
     if (localDestinations && localDestinations.length > 0) {
-        console.log(`Using ${localDestinations.length} local destinations.`);
-        // Map back to ViatorDestination shape if needed, or adjust findNearest to work with DB shape.
-        // Since logic uses ViatorDestination interface, let's map DB -> Interface.
-        // Actually, we need to ensure types match.
-        // For simplicity in this fix, let's just use the API fetch if DB is empty to populate it once.
-        // But to properly use local, we need to map the fields.
+        console.log(`Using ${localDestinations.length} cached destinations.`);
         destinations = localDestinations.map(d => ({
             destinationId: parseInt(d.destination_id),
             name: d.destination_name,
@@ -95,14 +110,13 @@ export async function syncSites(siteIds: string[] | null, searchQuery: string | 
             parentDestinationId: d.parent_id ? parseInt(d.parent_id) : null,
             lookupId: d.lookup_id,
             destinationUrl: d.primary_url,
-            center: { latitude: d.latitude, longitude: d.longitude }
+            center: { latitude: d.latitude, longitude: d.longitude },
             /* eslint-disable @typescript-eslint/no-explicit-any */
-        })) as any; // Cast to bypass strict strict ViatorDestination checks for now
+        })) as any;
     } else {
-        console.log("Fetching fresh destinations from Viator...");
+        console.log('Fetching fresh destinations from Viator...');
         destinations = await viatorClient.fetchAllDestinations();
 
-        // Store destinations
         const destinationsToStore = destinations.map(dest => ({
             destination_id: dest.destinationId.toString(),
             destination_name: dest.name,
@@ -112,69 +126,113 @@ export async function syncSites(siteIds: string[] | null, searchQuery: string | 
             lookup_id: dest.lookupId,
             destination_type: dest.type,
             primary_url: dest.destinationUrl,
-            last_updated: new Date().toISOString()
+            last_updated: new Date().toISOString(),
         }));
 
-        const { error: destError } = await supabase.from('viator_destinations').upsert(destinationsToStore, { onConflict: 'destination_id' });
-        if (destError) console.error("Error storing destinations:", destError);
+        const { error: destError } = await supabase
+            .from('viator_destinations')
+            .upsert(destinationsToStore, { onConflict: 'destination_id' });
+        if (destError) console.error('Error storing destinations:', destError);
         else console.log(`Stored ${destinationsToStore.length} destinations.`);
     }
 
-    // destinations is now populated either from DB or API
-
-
-    // 3. Process sites
+    // 3. Process sites with attraction-first strategy
     const results = [];
+
     for (const site of sites) {
         const lat = site.location?.coordinates?.[1];
         const lng = site.location?.coordinates?.[0];
 
         if (!lat || !lng) {
-            results.push({ site: site.name, status: "skipped_no_coords" });
-            // Mark as synced so we don't retry immediately? Maybe set status 'skipped'
-            await supabase.from('sites').update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'skipped_no_coords' }).eq('id', site.id);
-            continue;
-        }
-
-        const nearestDest = await findNearestDestination(lat, lng, destinations);
-
-        if (!nearestDest) {
-            results.push({ site: site.name, status: "no_nearby_destination" });
-            await supabase.from('sites').update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'no_dest_100km' }).eq('id', site.id);
+            await supabase
+                .from('sites')
+                .update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'skipped_no_coords' })
+                .eq('id', site.id);
+            results.push({ site: site.name, status: 'skipped_no_coords' });
             continue;
         }
 
         try {
-            const tours = await viatorClient.fetchToursForDestination(nearestDest.destinationId.toString(), site.name);
+            // Step 1: Resolve attraction ID (use cached value or search fresh)
+            let attractionId: string | null = site.viator_attraction_id || null;
 
-            if (tours.length > 0) {
-                const toursData = tours.map((tour: ViatorProduct) => ({
-                    site_id: site.id,
-                    tour_id: tour.productCode,
-                    title: tour.title,
-                    description: tour.description || '',
-                    price: tour.pricing?.summary?.fromPrice || null,
-                    currency: tour.pricing?.currency || 'USD',
-                    url: tour.productUrl,
-                    image_url: tour.images?.[0]?.variants?.find((v) => v.height === 480)?.url || '',
-                    rating: tour.reviews?.sources?.[0]?.averageRating || null,
-                    review_count: tour.reviews?.totalReviews || 0,
-                    last_updated: new Date().toISOString()
-                }));
-
-                await supabase.from('viator_tours').upsert(toursData);
-                await supabase.from('sites').update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'synced_found' }).eq('id', site.id);
-                results.push({ site: site.name, toursFound: tours.length, status: "updated" });
-            } else {
-                await supabase.from('sites').update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'synced_no_tours' }).eq('id', site.id);
-                results.push({ site: site.name, status: "no_tours_found" });
+            if (!attractionId) {
+                const attraction = await viatorClient.searchAttractions(site.name);
+                if (attraction) {
+                    attractionId = attraction;
+                    // Cache the attraction key on the site record
+                    await supabase
+                        .from('sites')
+                        .update({ viator_attraction_id: attractionId })
+                        .eq('id', site.id);
+                    console.log(`  Matched attraction key "${attractionId}" for site "${site.name}"`);
+                }
             }
 
-        } catch (e: unknown) { // Changed to unknown for better type safety
+            let tours: ViatorProduct[] = [];
+            let relevanceScore: number;
+
+            if (attractionId) {
+                // Step 2: Fetch tours by attraction (best quality — tours that specifically visit this site)
+                console.log(`  Fetching tours by attraction for "${site.name}"...`);
+                tours = await viatorClient.fetchToursByAttraction(attractionId, ATTRACTION_TAGS);
+                relevanceScore = 100; // Attraction-matched tours score highest
+            } else {
+                // Step 3: Fallback to destination + tag filtering
+                const nearestDest = await findNearestDestination(lat, lng, destinations);
+                if (!nearestDest) {
+                    await supabase
+                        .from('sites')
+                        .update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'no_dest_100km' })
+                        .eq('id', site.id);
+                    results.push({ site: site.name, status: 'no_nearby_destination' });
+                    continue;
+                }
+
+                console.log(`  Fetching tours by destination for "${site.name}" (dest: ${nearestDest.name})...`);
+                tours = await viatorClient.fetchToursByDestination(
+                    nearestDest.destinationId.toString(),
+                    DESTINATION_TAGS
+                );
+                relevanceScore = 50; // Destination-fallback tours score lower
+            }
+
+            // Step 4: Quality gate — only store tours with sufficient reviews and rating
+            const qualityTours = tours.filter(meetsQualityGate);
+
+            if (qualityTours.length > 0) {
+                const toursData = qualityTours.map(tour => mapTourToRow(tour, site.id, relevanceScore));
+
+                await supabase
+                    .from('viator_tours')
+                    .upsert(toursData, { onConflict: 'site_id,tour_id' });
+                await supabase
+                    .from('sites')
+                    .update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'synced_found' })
+                    .eq('id', site.id);
+
+                results.push({
+                    site: site.name,
+                    toursFound: qualityTours.length,
+                    attractionMatched: !!attractionId,
+                    status: 'updated',
+                });
+            } else {
+                await supabase
+                    .from('sites')
+                    .update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'synced_no_tours' })
+                    .eq('id', site.id);
+                results.push({ site: site.name, status: 'no_tours_found' });
+            }
+
+        } catch (e: unknown) {
             const errorMessage = e instanceof Error ? e.message : 'Unknown error';
             console.error(`Error processing ${site.name}:`, errorMessage);
-            await supabase.from('sites').update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'error' }).eq('id', site.id);
-            results.push({ site: site.name, status: "error", error: errorMessage });
+            await supabase
+                .from('sites')
+                .update({ last_viator_sync: new Date().toISOString(), viator_sync_status: 'error' })
+                .eq('id', site.id);
+            results.push({ site: site.name, status: 'error', error: errorMessage });
         }
     }
 

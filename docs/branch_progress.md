@@ -18,17 +18,17 @@
 - [x] 2c. Timeline verification
 
 ## Phase 3: Viator Tour Overhaul
-- [ ] 3a. Fix RLS — add public read policy
-- [ ] 3b. New sync strategy — attraction-first with tag filtering
-- [ ] 3c. New Viator client methods
-- [ ] 3d. Nuke and rebuild tour data
-- [ ] 3e. Simplify display logic
-- [ ] 3f. Graceful "no tours" handling
+- [x] 3a. Fix RLS — added `Public read` policies on `viator_tours` + `viator_destinations` (main blocker: anon key was seeing 0 tours)
+- [x] 3b. New sync strategy — attraction-first with tag filtering + quality gate (rating ≥ 3.5, reviews ≥ 3)
+- [x] 3c. New Viator client methods — `searchAttractions`, `fetchToursByAttraction`, `fetchToursByDestination`
+- [x] 3d. DB schema — added `viator_tours.relevance_score` + `sites.viator_attraction_id`; **NOTE: existing tour data should be truncated + re-synced via admin panel**
+- [x] 3e. Simplified display logic — removed keyword/stop-word filter, orders by `relevance_score DESC` then Bayesian score
+- [x] 3f. Graceful "no tours" — already working (section hidden when no tours)
 
 ## Phase 4: Featured Scoring System
-- [ ] 4a. Add `featured_score` column and RPC
-- [ ] 4b. Update sort logic
-- [ ] 4c. Admin button to recalculate
+- [x] 4a. Add `featured_score` column and RPC
+- [x] 4b. Update sort logic
+- [x] 4c. Admin button to recalculate
 
 ## Phase 5: Country Page Enhancements
 - [ ] 5a. Embedded country map
