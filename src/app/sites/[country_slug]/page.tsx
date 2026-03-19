@@ -13,6 +13,11 @@ import StructuredData from '../../../components/StructuredData'
 import ErrorBoundary from '../../../components/ErrorBoundary'
 import { Card, CardContent } from '../../../components/ui/card'
 import { Building2, MapPin, Award } from 'lucide-react'
+import countryRedirects from '../../../data/country-redirects.json'
+
+const NON_COUNTRY_SLUGS = new Set(
+  countryRedirects.redirects.map((r: { old_country_slug: string }) => r.old_country_slug)
+)
 
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -96,7 +101,7 @@ export async function generateStaticParams() {
 
   const uniqueSlugs = Array.from(
     new Set(data?.map(row => row.country_slug))
-  );
+  ).filter(slug => !NON_COUNTRY_SLUGS.has(slug));
 
   return uniqueSlugs.map((slug: string) => ({
     country_slug: slug

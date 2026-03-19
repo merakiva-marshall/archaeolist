@@ -62,6 +62,24 @@ export async function middleware(request: NextRequest) {
         }
     }
 
+    // Singular to Plural /site/:slug redirect
+    if (request.nextUrl.pathname.startsWith('/site/') && !request.nextUrl.pathname.startsWith('/sites/')) {
+        const slugPath = request.nextUrl.pathname.replace('/site/', '');
+        const slug = slugPath.split('/')[0]; // just in case it has subpaths
+        if (slug) {
+            const { data } = await supabase
+                .from('sites')
+                .select('country_slug')
+                .eq('slug', slug)
+                .single();
+            
+            if (data?.country_slug) {
+                return NextResponse.redirect(new URL(`/sites/${data.country_slug}/${slugPath}`, request.url), { status: 301 });
+            }
+        }
+        return NextResponse.redirect(new URL('/sites', request.url), { status: 301 });
+    }
+
     return response;
 }
 

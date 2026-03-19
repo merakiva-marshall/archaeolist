@@ -8,22 +8,22 @@ The project has accumulated ~16 improvement items spanning data quality, UI, map
 ---
 
 ## Phase 0: Branch Cleanup & Consolidation
-**Goal**: Merge useful work from existing branches, delete stale ones.
+**Goal**: Clean up stale branches while preserving `upbeat-blackwell` as the active development branch.
 
 **Branch assessment:**
 - `claude/competent-heyrovsky` + `claude/vigorous-panini` — already merged to main, safe to delete
-- `claude/peaceful-engelbart` (1 commit) — performance improvements, removed `country-redirects.json` + 208 static redirects. **Risky** — verify dynamic redirects cover all cases first
-- `claude/upbeat-blackwell` (5 commits) — **THIS BRANCH** — data integrity filtering (NON_COUNTRY_SLUGS), timeline fixes, new redirects, welcome popup cleanup
-- `claude/youthful-satoshi` (4 commits) — subset of upbeat-blackwell
-- `claude/hungry-jennings` (1 commit) — overlaps with main
+- `claude/peaceful-engelbart` (1 commit) — performance improvements, removed `country-redirects.json` + 208 static redirects. **Risky** — evaluate carefully, may cherry-pick useful parts
+- `claude/upbeat-blackwell` (5 commits) — **THIS BRANCH** — **ACTIVE DEVELOPMENT** — data integrity filtering (NON_COUNTRY_SLUGS), timeline fixes, new redirects, welcome popup cleanup. **DO NOT MERGE TO MAIN** — this is the working branch for all improvements
+- `claude/youthful-satoshi` (4 commits) — subset of upbeat-blackwell, superseded
+- `claude/hungry-jennings` (1 commit) — overlaps with main, stale
 - Remote-only `origin/ful-map-refactoring` + `origin/refactor_attempt1` — abandoned
 
 **Steps:**
 1. Delete merged branches: `competent-heyrovsky`, `vigorous-panini`
-2. Merge `upbeat-blackwell` (this branch) onto main
-3. Evaluate `peaceful-engelbart`'s redirect removal — only merge if dynamic redirects fully cover the 208 static cases
-4. Delete `hungry-jennings`, `youthful-satoshi` (subsets)
-5. Delete remote `ful-map-refactoring` and `refactor_attempt1`
+2. Delete stale/superseded branches: `hungry-jennings`, `youthful-satoshi`
+3. Evaluate `peaceful-engelbart`'s redirect removal — may cherry-pick changes if useful, but verify dynamic redirects cover all cases first
+4. Delete remote abandoned branches: `ful-map-refactoring`, `refactor_attempt1` (if push access allows)
+5. **Keep `upbeat-blackwell` as the active development branch** — all improvements in this plan will be built on this branch
 
 ---
 
@@ -45,6 +45,11 @@ The project has accumulated ~16 improvement items spanning data quality, UI, map
 - Test the 208 static redirects in `next.config.mjs`
 - Test non-ASCII redirects (e.g., `apurímac-region`) — may fail on URL-encoded paths
 - Dynamic redirect in `[slug]/page.tsx` lines 131-146 covers remaining cases
+- **Known 404 patterns from analytics** that need redirect coverage:
+  - `/site/:slug` (singular) → `/sites/:country/:slug` — common user/bot pattern
+  - `/sites/northkorea` → correct country slug
+  - `/sites/italy/colosseum` → correct slug (probably `the-colosseum`)
+  - `/sites/egypt/temple-of-debod` → correct location (Temple of Debod is in Madrid, Spain)
 
 ---
 
@@ -58,6 +63,7 @@ The project has accumulated ~16 improvement items spanning data quality, UI, map
 ### 2b. Non-country redirect in prod
 - Audit `next.config.mjs` for non-ASCII characters that may not match URL-encoded paths
 - Add URL-encoded variants or move to middleware
+- Add `/site/:slug` → `/sites/:country/:slug` catch-all redirect (singular to plural pattern)
 - **Files:** `next.config.mjs`, possibly `src/middleware.ts`
 
 ### 2c. Timeline verification
