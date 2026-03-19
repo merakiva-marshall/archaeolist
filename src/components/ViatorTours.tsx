@@ -20,7 +20,7 @@ export default function ViatorTours({ tours }: { tours: ViatorTour[] }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {tours.map((tour) => (
-                    <div key={tour.id} className="group border rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full">
+                    <div key={tour.tour_id} className="group border rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full">
                         <div className="relative h-48 w-full overflow-hidden bg-gray-100">
                             {tour.image_url ? (
                                 <Image
