@@ -70,28 +70,67 @@ The project has accumulated ~16 improvement items spanning data quality, UI, map
 ## Phase 3: Viator Tour Overhaul
 **Goal**: Fundamentally fix why tours don't show up. Multi-layered problem.
 
-### Root Cause (3 layers of failure):
+### Supabase Data Findings (verified 2026-03-19):
+- **22,291 tour rows** exist in `viator_tours` (but only **4,272 unique tours**)
+- **3,410 destinations** cached in `viator_destinations`
+- **2,757 sites** have linked tours; **2,743** marked `synced_found`
+- **3,978 sites** marked `no_dest_100km` (57% of all sites — no Viator destination within 100km)
+- **155 sites** still `pending`, **43** `synced_no_tours`, **1** `skipped_no_coords`
 
-**Layer 1 — Sync search too specific** (`/src/lib/viator/client.ts`)
-- Uses `siteName` as `text` filter — too narrow, most tours don't match exact site names
-- Only 10 results max, sorted by price desc (not relevance)
+### Root Cause (4 layers of failure):
 
-**Layer 2 — 100km radius too restrictive** (`/src/lib/viator/sync.ts`)
-- Remote archaeological sites get marked `no_dest_100km` and skipped permanently
-- Only 5 sites per batch
+**Layer 1 (MAIN BLOCKER) — RLS blocks all frontend reads**
+- `viator_tours` and `viator_destinations` have RLS enabled with ONLY an admin policy (`admin@archaeolist.com`)
+- The site detail page reads tours with the **anon key** (`NEXT_PUBLIC_SUPABASE_ANON_KEY`)
+- `anon` role sees **0 tours**. Every single page shows zero tours because of this.
+- The 22,291 tours in the DB are completely invisible to visitors.
 
-**Layer 3 — Display filtering too aggressive** (`/src/app/sites/[country_slug]/[slug]/page.tsx`)
-- Keyword matching requires tour title to contain site name words
-- Stop words remove "great", "park", "complex" — breaks "Great Wall" etc.
-- Double filtering = almost nothing survives
+**Layer 2 — Synced tours are mostly irrelevant to the sites they're linked to**
+- "Pompeii" → "Private Transfer from Positano to Rome" (not a Pompeii tour)
+- "Machu Picchu" → "Humantay Lagoon" tours (nearby attraction, not Machu Picchu)
+- Archaeological sites in Massachusetts → "Whale Watching Tour in Gloucester"
+- The sync searches Viator by site name within nearest destination, but gets whatever's popular in that region
 
-### Fix:
-- **3a.** Search by destination only or broader terms; increase to 25-50 results; sort by popularity
-- **3b.** Increase radius to 200-300km, or search by country-level destination
-- **3c.** Remove/relax keyword matching; trust `site_id` linkage; keep Bayesian scoring; use quality thresholds instead
-- **3d.** Re-run full sync after fixes
+**Layer 3 — Massive duplication: generic tours linked to hundreds of sites**
+- One tour ("Best of the Holyland") linked to **152 different sites**
+- **557 tours** are each linked to **10+ different sites** — region-wide generic tours, not site-specific
+- 22,291 total rows but only 4,272 unique tours (5.2x duplication ratio)
+
+**Layer 4 — Display-side keyword filter kills remaining tours**
+- Even if RLS were fixed, keyword matching filters out tours where the site name doesn't appear in tour title
+- "Private Transfer from Positano" filtered out for Pompeii because "Pompeii" isn't in the title
+- Stop words remove "great", "park", "complex" — breaks matching for many sites
+
+### Fix Plan:
+
+**3a. Fix RLS — add public read policy** (CRITICAL, fixes the immediate blocker)
+- Add `SELECT` policy for `anon` role on `viator_tours`: `CREATE POLICY "Public read" ON viator_tours FOR SELECT USING (true);`
+- Same for `viator_destinations` if needed
+- **This alone will make existing tours visible**, even if the data quality is imperfect
+
+**3b. Fix sync relevance** (`/src/lib/viator/client.ts`, `/src/lib/viator/sync.ts`)
+- Search by destination + broader terms (not exact site name). Try: site name OR "archaeological" OR "historical tour"
+- Increase results from 10 to 25-50; sort by popularity/reviews instead of price desc
+- Increase radius from 100km to 200-300km (or search country-level destinations)
+- 57% of sites get `no_dest_100km` — that's too many skipped
+
+**3c. Clean up existing tour data**
+- Delete tours linked to 10+ sites (generic spam tours, not site-relevant)
+- Deduplicate: many tours appear multiple times for the same site_id
+- Consider a relevance score: does the tour title/description mention the site name, country, or "archaeological"?
+
+**3d. Fix display filtering** (`/src/app/sites/[country_slug]/[slug]/page.tsx`)
+- Remove keyword matching entirely — trust the `site_id` linkage
+- Keep Bayesian scoring for quality ranking
+- Add quality threshold: `review_count >= 3` AND `rating >= 3.5`
+- Remove debug console.logs (lines 216-226)
+
+**3e. Re-run full sync** after fixing 3b
+- Clear `last_viator_sync` and `viator_sync_status` on all sites
+- Run in larger batches (50+ at a time)
 
 **Files:** `/src/lib/viator/client.ts`, `/src/lib/viator/sync.ts`, `/src/app/sites/[country_slug]/[slug]/page.tsx`
+**Supabase:** Add RLS read policy on `viator_tours` + `viator_destinations`, clean up tour data
 
 ---
 
