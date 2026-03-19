@@ -132,10 +132,9 @@ interface TimelineItemWithDate {
 interface TimelineProps {
   timeline: Timeline;
   variant?: 'default' | 'redesign';
-  activePeriods?: Record<string, unknown>;
 }
 
-export default function SiteTimeline({ timeline, variant = 'default', activePeriods }: TimelineProps) {
+export default function SiteTimeline({ timeline, variant = 'default' }: TimelineProps) {
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
 
   if (!timeline || Object.keys(timeline).length === 0) {
