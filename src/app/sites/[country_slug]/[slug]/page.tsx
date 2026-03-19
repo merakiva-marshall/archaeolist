@@ -159,7 +159,7 @@ export default async function Page({ params }: { params: { country_slug: string;
   // Fetch Viator Tours — ordered by relevance_score (attraction-matched first), then review_count
   const { data: toursData } = await supabase
     .from('viator_tours')
-    .select('tour_id, site_id, title, price, currency, url, image_url, rating, review_count, relevance_score')
+    .select('tour_id, site_id, title, description, price, currency, url, image_url, rating, review_count, relevance_score')
     .eq('site_id', data.id)
     .order('relevance_score', { ascending: false })
     .order('review_count', { ascending: false })

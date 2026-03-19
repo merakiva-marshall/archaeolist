@@ -27,6 +27,18 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'media-cdn.tripadvisor.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dynamic-media-cdn.tripadvisor.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   async redirects() {
