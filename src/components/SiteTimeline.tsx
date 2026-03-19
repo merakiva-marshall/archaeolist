@@ -131,9 +131,11 @@ interface TimelineItemWithDate {
 
 interface TimelineProps {
   timeline: Timeline;
+  variant?: 'default' | 'redesign';
+  activePeriods?: Record<string, unknown>;
 }
 
-export default function SiteTimeline({ timeline }: TimelineProps) {
+export default function SiteTimeline({ timeline, variant = 'default', activePeriods }: TimelineProps) {
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
 
   if (!timeline || Object.keys(timeline).length === 0) {
@@ -159,8 +161,128 @@ export default function SiteTimeline({ timeline }: TimelineProps) {
         }
       } as TimelineItemWithDate;
     })
+    .filter(({ item }) => {
+      // Only show items that have content (non-empty title and at least one piece of data)
+      return item.title && (item.date.length > 0 || item.century.length > 0 || item.description.length > 0);
+    })
     .sort((a, b) => a.parsedDate.year - b.parsedDate.year)
     .map(({ item }) => item);
+
+  // Redesign variant - vertical alternating left/right layout
+  if (variant === 'redesign') {
+    return (
+      <div className="relative">
+        {/* Vertical center line */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-[#c3c6d6]/40 transform -translate-x-1/2" />
+
+        <div className="space-y-8">
+            {timelineItems.map((item, index) => {
+              const isLeft = index % 2 === 0;
+              const displayDate = Array.isArray(item.date) && item.date.length > 0
+                ? item.date.join(', ')
+                : Array.isArray(item.century) && item.century.length > 0
+                  ? item.century[0]
+                  : '';
+              const isExpanded = selectedPeriod === item.title;
+
+              return (
+                <div key={item.title} className="relative">
+                  {/* Timeline dot */}
+                  <div className="absolute left-1/2 top-6 w-4 h-4 bg-[#003b93] rounded-full transform -translate-x-1/2 z-10 border-4 border-white" />
+
+                  <div className={cn(
+                    "relative grid grid-cols-2 gap-4 md:gap-8"
+                  )}>
+                    {isLeft ? (
+                      <>
+                        <div className="text-right pr-2 md:pr-4">
+                          <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="inline-block text-left"
+                          >
+                            <div
+                              className={cn(
+                                "bg-[#ffffff] rounded-xl border border-[#c3c6d6]/20 p-3 md:p-4 cursor-pointer",
+                                "transition-all duration-200 hover:shadow-lg hover:border-[#003b93]/30",
+                                "overflow-hidden"
+                              )}
+                              onClick={() => setSelectedPeriod(isExpanded ? null : item.title)}
+                            >
+                              <h3 className="text-base md:text-lg font-headline font-semibold text-[#1b1c1c] mb-1">
+                                {item.title}
+                              </h3>
+                              <p className="text-xs md:text-sm font-label text-[#434653] mb-2">
+                                {displayDate}
+                              </p>
+                              {isExpanded && item.description.length > 0 && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: "auto" }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  className="mt-3 pt-3 border-t border-[#c3c6d6]/20"
+                                >
+                                  {item.description.map((paragraph, i) => (
+                                    <p key={i} className="text-xs md:text-sm font-body text-[#434653] mb-2 last:mb-0">
+                                      {paragraph}
+                                    </p>
+                                  ))}
+                                </motion.div>
+                              )}
+                            </div>
+                          </motion.div>
+                        </div>
+                        <div />
+                      </>
+                    ) : (
+                      <>
+                        <div />
+                        <div className="pl-2 md:pl-4">
+                          <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                          >
+                            <div
+                              className={cn(
+                                "bg-[#ffffff] rounded-xl border border-[#c3c6d6]/20 p-3 md:p-4 cursor-pointer",
+                                "transition-all duration-200 hover:shadow-lg hover:border-[#003b93]/30",
+                                "overflow-hidden"
+                              )}
+                              onClick={() => setSelectedPeriod(isExpanded ? null : item.title)}
+                            >
+                              <h3 className="text-base md:text-lg font-headline font-semibold text-[#1b1c1c] mb-1">
+                                {item.title}
+                              </h3>
+                              <p className="text-xs md:text-sm font-label text-[#434653] mb-2">
+                                {displayDate}
+                              </p>
+                              {isExpanded && item.description.length > 0 && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: "auto" }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  className="mt-3 pt-3 border-t border-[#c3c6d6]/20"
+                                >
+                                  {item.description.map((paragraph, i) => (
+                                    <p key={i} className="text-xs md:text-sm font-body text-[#434653] mb-2 last:mb-0">
+                                      {paragraph}
+                                    </p>
+                                  ))}
+                                </motion.div>
+                              )}
+                            </div>
+                          </motion.div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">

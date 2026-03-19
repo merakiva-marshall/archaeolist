@@ -11,7 +11,6 @@ import SiteFeatures from '../../../../components/SiteFeatures'
 import SitePeriods from '../../../../components/SitePeriods'
 import SiteTimeline from '../../../../components/SiteTimeline'
 import StructuredData from '../../../../components/StructuredData'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../../../components/ui/card'
 import { generateBaseMetadata } from '../../../../lib/metadata'
 import ErrorBoundary from '../../../../components/ErrorBoundary'
 import VisitSection from '../../../../components/VistSection'
@@ -225,190 +224,294 @@ export default async function Page({ params }: { params: { country_slug: string;
   const processedFeatures = site.processed_features || {};
   const processedPeriods = site.processed_periods || {};
 
+  // Get the main image for hero background
+  const heroImage = site.images?.[0]?.url;
+
   return (
     <>
       <ErrorBoundary>
         <StructuredData site={site} />
-        <div className="min-h-[calc(100vh-4rem)] bg-gray-50">
-          <div className="container mx-auto px-4 py-8 pb-16 max-w-4xl">
 
-            <article className="space-y-8">
-              {/* Header Section with H1 */}
-              <Card className="relative overflow-hidden">
-                {/* Unified UNESCO Top Bar */}
-                {site.is_unesco && (
-                  <div className="w-full bg-[#0077D4] flex items-center justify-end pr-4 py-1.5">
-                    <Link href="/sites/unesco" className="inline-block transition-opacity hover:opacity-90">
-                      <img
-                        src="https://www.unesco.org/themes/custom/bunesco8/assets/images/logo/logo.svg"
-                        alt="UNESCO World Heritage Site"
-                        className="h-[20px] md:h-[30px] w-auto brightness-0 invert"
-                      />
-                      <span className="sr-only">UNESCO World Heritage Site</span>
-                    </Link>
-                  </div>
-                )}
-
-                <CardHeader className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                  <div className="flex-1">
-                    <Link
-                      href={`/sites/${site.country_slug}`}
-                      className="group inline-flex items-center space-x-2 text-lg font-bold text-blue-600 underline-offset-4 hover:underline mb-4"
-                    >
-                      <MapPin className="h-5 w-5" />
-                      <span>{site.country}</span>
-                    </Link>
-                    <h1 className="text-3xl sm:text-4xl font-bold">{site.name}</h1>
-                    {site.short_description && (
-                      <p className="text-lg text-gray-600 mt-4 leading-relaxed">
-                        {site.short_description}
-                      </p>
-                    )}
-                  </div>
-                </CardHeader>
-              </Card>
-
-              {/* Mobile Periods */}
-              <div className="lg:hidden space-y-8">
-                <SitePeriods periods={processedPeriods} headingLevel="h2" variant="mobile" />
-                <div className="my-8">
-                  <h2 className="text-2xl font-bold mb-4 px-2">Location</h2>
-                  <div className="px-2"> {/* Extra padding for scroll safety */}
-                    <SingleSiteMap site={site} className="h-64 w-full" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-8">
-                <div className="flex-1 space-y-8">
-                  {/* Description Section */}
-                  <Card>
-                    <CardHeader>
-                      <h2 className="text-2xl font-semibold">About</h2>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="prose max-w-none">
-                        <p className="text-gray-700">{site.description}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Image Gallery */}
-                  {site.images && site.images.length > 0 && (
-                    <Card>
-                      <CardHeader>
-                        <h2 className="text-2xl font-semibold">Gallery</h2>
-                        <p className="text-sm text-muted-foreground">
-                          Explore photographs of ancient structures, artifacts, and archaeological excavations at {site.name}
-                        </p>
-                      </CardHeader>
-                      <CardContent>
-                        <ImageGallery site={site} />
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Features Section */}
-                  {processedFeatures && Object.keys(processedFeatures).length > 0 && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Archaeological Features</CardTitle>
-                        <CardDescription>
-                          Explore the unique architectural and cultural elements found at this historical site
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <SiteFeatures features={processedFeatures} siteId={site.id} />
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Timeline Section */}
-                  {timeline && Object.keys(timeline).length > 0 && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Historical Timeline</CardTitle>
-                        <CardDescription>
-                          Journey through time and discover key events in this site&apos;s archaeological history
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <SiteTimeline timeline={timeline} />
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* FAQ Section */}
-                  {faqs.length > 0 && <SiteFAQ faqs={faqs} />}
-
-                  {/* Visit Section */}
-                  <VisitSection
-                    siteName={site.name}
-                    slug={site.slug}
-                    country={site.country}
-                    country_slug={site.country_slug}
-                    hasTours={tours.length > 0}
-                    hasDirections={false}
-                    tours={tours}
-                  />
-
-                  {/* Details Section */}
-                  <Card>
-                    <CardHeader>
-                      <h2 className="text-2xl font-semibold">Details</h2>
-                    </CardHeader>
-                    <CardContent>
-                      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <dt className="font-medium text-gray-600">Country</dt>
-                          <dd className="mt-1">{site.country}</dd>
-                        </div>
-                        {site.wikipedia_url && (
-                          <div>
-                            <dt className="font-medium text-gray-600">Source</dt>
-                            <dd className="mt-1">
-                              <a
-                                href={site.wikipedia_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 inline-flex items-center"
-                              >
-                                Wikipedia
-                                <ExternalLink className="h-4 w-4 ml-1" />
-                              </a>
-                            </dd>
-                          </div>
-                        )}
-                      </dl>
-                    </CardContent>
-                  </Card>
-
-                  {/* Related Sites */}
-                  {relatedSites.length > 0 && (
-                    <RelatedSites sites={relatedSites} country={site.country} />
-                  )}
-
-                </div>
-
-                {/* Desktop Periods */}
-                <div className="hidden lg:block w-72">
-                  <div className="sticky top-24">
-                    <SitePeriods
-                      periods={processedPeriods}
-                      isFloating={true}
-                      headingLevel="h2"
-                      variant="desktop"
-                    />
-                    <div className="mt-8">
-                      <h3 className="text-sm font-semibold text-gray-900 mb-3">Location</h3>
-                      <SingleSiteMap site={site} className="h-64 w-full" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </article>
+        {/* UNESCO Banner (conditional) */}
+        {site.is_unesco && (
+          <div className="w-full bg-unesco-blue flex items-center justify-center sm:justify-end px-6 py-2.5 sticky top-[64px] z-40">
+            <Link
+              href="/sites/unesco"
+              className="flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity"
+            >
+              <span className="text-white text-[11px] font-label font-semibold uppercase tracking-widest hidden sm:inline">
+                UNESCO World Heritage Site
+              </span>
+              <img
+                src="https://www.unesco.org/themes/custom/bunesco8/assets/images/logo/logo.svg"
+                alt="UNESCO World Heritage Site"
+                className="h-[28px] w-auto brightness-0 invert"
+              />
+              <span className="text-white text-[11px] font-label font-semibold uppercase tracking-widest sm:hidden">
+                UNESCO Heritage
+              </span>
+            </Link>
           </div>
-        </div>
+        )}
+
+        {/* Hero Section */}
+        <section className={`relative flex items-end overflow-hidden ${heroImage ? 'h-[520px]' : 'h-[260px]'}`}>
+          <div className="absolute inset-0 z-0">
+            {heroImage ? (
+              <>
+                <img
+                  alt={site.name}
+                  className="w-full h-full object-cover"
+                  style={{ filter: 'grayscale(60%) contrast(1.1)', opacity: 0.45 }}
+                  src={heroImage}
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: 'linear-gradient(to top, #fbf9f8 0%, rgba(251,249,248,0.6) 40%, rgba(251,249,248,0.1) 70%, rgba(251,249,248,0) 100%)'
+                  }}
+                />
+              </>
+            ) : (
+              <div
+                className="w-full h-full"
+                style={{
+                  background: 'linear-gradient(135deg, #e8eef5 0%, #d5dde8 50%, #c5d0df 100%)'
+                }}
+              />
+            )}
+          </div>
+          <div className="relative z-10 max-w-5xl px-8 pb-12">
+            <Link
+              href={`/sites/${site.country_slug}`}
+              className="text-primary-brand font-headline text-sm font-semibold hover:underline underline-offset-4 flex items-center gap-1.5 mb-4"
+            >
+              <MapPin className="h-3.5 w-3.5" />
+              {site.country}
+            </Link>
+            <h1 className="text-5xl md:text-7xl font-black text-primary-brand font-headline tracking-tighter leading-[0.95] mb-5">
+              {site.name}
+            </h1>
+            {site.short_description && (
+              <p className="text-lg md:text-xl font-body text-on-surface-variant max-w-2xl leading-relaxed italic">
+                {site.short_description}
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* Map Section */}
+        <section className="py-16 px-8 bg-surface">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+              <div>
+                <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">
+                  Location
+                </span>
+                <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1">
+                  Explore the Map
+                </h2>
+              </div>
+            </div>
+            <div className="relative w-full bg-surface-container rounded-2xl overflow-hidden shadow-xl aspect-[4/3] md:aspect-[16/7]">
+              <SingleSiteMap site={site} className="h-full w-full" />
+              <div className="hidden md:block absolute bottom-6 left-6 p-5 bg-surface/75 backdrop-blur-2xl rounded-2xl border border-white/30 max-w-xs shadow-lg">
+                <h3 className="font-headline font-bold text-primary-brand text-sm mb-1 flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 bg-secondary-brand rounded-full"></span>
+                  {site.name}
+                </h3>
+                <p className="text-xs font-label text-on-surface-variant leading-relaxed">
+                  {site.location?.[1]?.toFixed(4)}° N, {site.location?.[0]?.toFixed(4)}° E
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* About + Time Periods */}
+        <section className="px-8 py-16 bg-surface-container-low">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-8">
+              <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">
+                Historical Context
+              </span>
+              <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1 mb-6">
+                About
+              </h2>
+              <div className="space-y-5 text-base font-body text-on-surface leading-loose">
+                <p>{site.description}</p>
+              </div>
+            </div>
+
+            {/* Time Periods Sidebar */}
+            <div className="lg:col-span-4">
+              <SitePeriods
+                periods={processedPeriods}
+                headingLevel="h3"
+                variant="redesign"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Image Gallery */}
+        {site.images && site.images.length > 0 && (
+          <section className="px-8 py-16 bg-surface">
+            <div className="max-w-6xl mx-auto">
+              <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">
+                Visual Archive
+              </span>
+              <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1 mb-2">
+                Gallery
+              </h2>
+              <p className="text-sm text-on-surface-variant font-label mb-8">
+                Explore photographs of ancient structures, artifacts, and archaeological excavations
+              </p>
+              <ImageGallery site={site} variant="redesign" />
+            </div>
+          </section>
+        )}
+
+        {/* Historical Timeline */}
+        {timeline && Object.keys(timeline).length > 0 && (
+          <section className="py-16 px-8 bg-surface-container-low overflow-hidden">
+            <div className="max-w-6xl mx-auto">
+              <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">
+                Temporal Epochs
+              </span>
+              <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1 mb-2">
+                Historical Timeline
+              </h2>
+              <p className="text-sm text-on-surface-variant font-label mb-10">
+                Journey through time and discover key events in this site&apos;s history
+              </p>
+              <SiteTimeline timeline={timeline} variant="redesign" activePeriods={processedPeriods} />
+            </div>
+          </section>
+        )}
+
+        {/* Archaeological Features */}
+        {processedFeatures && Object.keys(processedFeatures).length > 0 && (
+          <section className="px-8 py-16 bg-surface">
+            <div className="max-w-6xl mx-auto">
+              <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">
+                Classification
+              </span>
+              <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1 mb-2">
+                Archaeological Features
+              </h2>
+              <p className="text-sm text-on-surface-variant font-label mb-8">
+                Unique architectural and cultural elements found at this historical site
+              </p>
+              <SiteFeatures features={processedFeatures} siteId={site.id} variant="redesign" />
+            </div>
+          </section>
+        )}
+
+        {/* FAQ Section */}
+        {faqs.length > 0 && (
+          <section className="px-8 py-16 bg-surface-container-low">
+            <div className="max-w-6xl mx-auto">
+              <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">
+                Knowledge Base
+              </span>
+              <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1 mb-8">
+                Frequently Asked Questions
+              </h2>
+              <SiteFAQ faqs={faqs} variant="redesign" />
+            </div>
+          </section>
+        )}
+
+        {/* Plan Your Visit */}
+        <section className="px-8 py-16 bg-surface">
+          <div className="max-w-6xl mx-auto">
+            <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">
+              Explore
+            </span>
+            <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1 mb-2">
+              Plan Your Visit
+            </h2>
+            <p className="text-sm text-on-surface-variant font-label mb-8">
+              Tours, travel arrangements, and practical information
+            </p>
+            <VisitSection
+              siteName={site.name}
+              slug={site.slug}
+              country={site.country}
+              country_slug={site.country_slug}
+              hasTours={tours.length > 0}
+              hasDirections={false}
+              tours={tours}
+              variant="redesign"
+            />
+          </div>
+        </section>
+
+        {/* Details Section */}
+        <section className="px-8 py-16 bg-surface-container-low">
+          <div className="max-w-6xl mx-auto">
+            <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">
+              Reference
+            </span>
+            <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1 mb-8">
+              Details
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20">
+                <span className="text-xs font-label uppercase tracking-widest text-outline">Country</span>
+                <p className="font-headline font-semibold text-on-surface mt-1">{site.country}</p>
+              </div>
+              {site.wikipedia_url && (
+                <div className="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20">
+                  <span className="text-xs font-label uppercase tracking-widest text-outline">Source</span>
+                  <a
+                    href={site.wikipedia_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-headline font-semibold text-primary-brand mt-1 flex items-center gap-1 hover:underline"
+                  >
+                    Wikipedia <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              )}
+              {site.location && (
+                <div className="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20">
+                  <span className="text-xs font-label uppercase tracking-widest text-outline">Coordinates</span>
+                  <p className="font-headline font-semibold text-on-surface mt-1">
+                    {site.location[1]?.toFixed(2)}° N, {site.location[0]?.toFixed(2)}° E
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Related Sites */}
+        {relatedSites.length > 0 && (
+          <section className="px-8 py-16 bg-surface">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex items-end justify-between mb-8">
+                <div>
+                  <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">
+                    Discover More
+                  </span>
+                  <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1">
+                    More Sites in {site.country}
+                  </h2>
+                </div>
+                <Link
+                  href={`/sites/${site.country_slug}`}
+                  className="text-sm font-headline font-semibold text-primary-brand hover:underline underline-offset-4"
+                >
+                  View all →
+                </Link>
+              </div>
+              <RelatedSites sites={relatedSites} country={site.country} variant="redesign" />
+            </div>
+          </section>
+        )}
+
       </ErrorBoundary>
     </>
   );
