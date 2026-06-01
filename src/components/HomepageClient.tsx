@@ -67,9 +67,10 @@ export default function HomepageClient() {
   return (
     <div className="bg-white">
       {/* Header Section */}
-      <div className="bg-white border-b border-gray-100 pt-8 pb-4 px-4 sm:px-6 lg:px-8 text-center sm:text-left">
-        <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 tracking-wide font-days-one text-center mx-auto">
-          Explore Archaeological Sites from Around the World
+      <div className="bg-surface border-b border-outline-variant pt-8 pb-5 px-8">
+        <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">The World&apos;s Archaeological Record</span>
+        <h1 className="text-4xl sm:text-5xl font-black text-primary-brand font-headline tracking-tighter leading-[0.95] mt-1">
+          Explore Ancient Sites from Around the World
         </h1>
       </div>
 
@@ -81,7 +82,7 @@ export default function HomepageClient() {
       <div className="relative w-full border-b border-gray-200 shadow-sm group z-30 flex flex-col sm:block">
 
         {/* Map Container */}
-        <div className="relative w-full h-[75vh] sm:h-[65vh]">
+        <div className="relative w-full h-[75vh] sm:h-[65vh] bg-surface-container">
           <Map
             // ref={mapRef}
             onSiteClick={handleSiteClick}
