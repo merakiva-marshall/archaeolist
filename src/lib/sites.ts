@@ -58,6 +58,7 @@ export async function getSites({
       short_description,
       images,
       is_unesco,
+      location,
       created_at,
       updated_at,
       featured,

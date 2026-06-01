@@ -53,7 +53,14 @@ export default async function UnescoPage({ searchParams }: PageProps) {
         .limit(1)
         .single();
 
-    const [sitesResult, metadata, heroResult, fallbackHero] = await Promise.all([
+    // Fetch all UNESCO site locations for the map (lightweight — id/location/slugs only)
+    const allMapSitesPromise = supabase
+        .from('sites')
+        .select('id, name, slug, country_slug, country, location')
+        .eq('is_unesco', true)
+        .eq('archaeological_site_yn', true);
+
+    const [sitesResult, metadata, heroResult, fallbackHero, allMapSitesResult] = await Promise.all([
         getSites({
             page,
             limit: ITEMS_PER_PAGE,
@@ -63,8 +70,15 @@ export default async function UnescoPage({ searchParams }: PageProps) {
         }),
         getSiteMetadata(),
         heroPromise,
-        fallbackHeroPromise
+        fallbackHeroPromise,
+        allMapSitesPromise
     ]);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allMapSites = (allMapSitesResult.data || []).map((s: any) => ({
+        ...s,
+        location: s.location?.coordinates ?? s.location,
+    }));
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const heroSite = (heroResult.data || fallbackHero.data) as any;
@@ -79,6 +93,7 @@ export default async function UnescoPage({ searchParams }: PageProps) {
                 currentPage={page}
                 itemsPerPage={ITEMS_PER_PAGE}
                 heroImage={heroImageUrl}
+                allMapSites={allMapSites}
                 content={{
                     title: "UNESCO World Heritage Sites",
                     description: "Preserving Our Shared Heritage"

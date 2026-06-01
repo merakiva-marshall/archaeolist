@@ -3,7 +3,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import Link from 'next/link'
 import { Suspense } from 'react'
 import { Database } from '../../../types/supabase'
 import { generateBaseMetadata } from '../../../lib/metadata'
@@ -11,9 +10,14 @@ import SiteGrid from '../../../components/SiteGrid'
 import { Site } from '../../../types/site'
 import StructuredData from '../../../components/StructuredData'
 import ErrorBoundary from '../../../components/ErrorBoundary'
-import { Card, CardContent } from '../../../components/ui/card'
-import { Building2, MapPin, Award } from 'lucide-react'
+import { Building2, Award } from 'lucide-react'
 import countryRedirects from '../../../data/country-redirects.json'
+import dynamic from 'next/dynamic'
+
+const CountryMap = dynamic(() => import('../../../components/CountryMap'), {
+  ssr: false,
+  loading: () => <div className="w-full h-[400px] bg-surface-container animate-pulse rounded-2xl" />
+})
 
 const NON_COUNTRY_SLUGS = new Set(
   countryRedirects.redirects.map((r: { old_country_slug: string }) => r.old_country_slug)
@@ -44,20 +48,29 @@ interface PageParams {
 async function getCountryInfo(country_slug: string): Promise<CountryInfo | null> {
   const { data: sites, error } = await supabase
     .from('sites')
-    .select('id, name, slug, country_slug, short_description, images, is_unesco, location, country, archaeological_site_yn')
+    .select('id, name, slug, country_slug, short_description, images, is_unesco, location, country, archaeological_site_yn, featured, featured_score')
     .eq('country_slug', country_slug)
-    .eq('archaeological_site_yn', true);
+    .eq('archaeological_site_yn', true)
+    .order('featured', { ascending: false, nullsFirst: false })
+    .order('featured_score', { ascending: false, nullsFirst: false });
 
   const countrySites = sites as unknown as Site[];
 
   if (error || !countrySites || !countrySites.length) return null;
 
+  // Supabase returns PostGIS geography as {type, coordinates} — extract the array
+  const normalizedSites = countrySites.map(site => ({
+    ...site,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    location: (site.location as any)?.coordinates ?? site.location,
+  }));
+
   return {
-    country: countrySites[0].country,
-    country_slug: countrySites[0].country_slug,
-    site_count: countrySites.length,
-    unesco_count: countrySites.filter(site => site.is_unesco).length,
-    sites: countrySites
+    country: normalizedSites[0].country,
+    country_slug: normalizedSites[0].country_slug,
+    site_count: normalizedSites.length,
+    unesco_count: normalizedSites.filter(site => site.is_unesco).length,
+    sites: normalizedSites
   };
 }
 
@@ -119,85 +132,70 @@ export default async function CountryPage({ params }: PageParams) {
     <>
       <ErrorBoundary>
         <StructuredData countryInfo={countryInfo} />
-        <div className="flex-1 relative w-full h-full overflow-y-auto">
-          <div className="min-h-screen bg-gray-50">
-            <div className="container mx-auto px-4 py-8">
-              {/* Header Section */}
-              <div className="space-y-6 mb-8">
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-800 via-blue-700 to-indigo-800 text-white p-8">
-                  <div className="relative z-10">
-                    <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-                      {countryInfo.country}
-                    </h1>
-                    <p className="text-xl text-white max-w-3xl font-medium">
-                      Discover the rich archaeological heritage of {countryInfo.country}, featuring ancient ruins,
-                      historical landmarks, and cultural treasures spanning millennia of human history.
-                    </p>
+        <div className="min-h-screen bg-surface">
+
+          {/* Hero Header */}
+          <div className="bg-surface border-b border-outline-variant px-8 pt-10 pb-8">
+            <div className="max-w-6xl mx-auto">
+              <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">Archaeological Heritage</span>
+              <h1 className="text-5xl md:text-6xl font-black text-primary-brand font-headline tracking-tighter leading-[0.95] mt-1">
+                Explore {countryInfo.country}
+              </h1>
+            </div>
+          </div>
+
+          {/* Country Map + Stats */}
+          <section className="px-8 py-12 bg-surface-container-low border-b border-outline-variant">
+            <div className="max-w-6xl mx-auto">
+              <div className="bg-surface-container rounded-2xl overflow-hidden shadow-xl">
+                <CountryMap
+                  sites={countryInfo.sites}
+                  className="w-full h-[420px]"
+                />
+                <div className="flex flex-wrap gap-6 px-6 py-5 border-t border-outline-variant">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-surface-container-low rounded-lg text-primary-brand">
+                      <Building2 className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-headline font-black text-primary-brand leading-none">{countryInfo.site_count}</div>
+                      <div className="text-xs font-label text-on-surface-variant mt-0.5">Archaeological Sites</div>
+                    </div>
                   </div>
-                  {/* Add subtle overlay pattern */}
-                  <div className="absolute inset-0 bg-black/10"
-                    style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E")`,
-                    }}
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <Building2 className="h-6 w-6 text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold">{countryInfo.site_count}</div>
-                          <div className="text-sm text-gray-600">Archaeological Sites</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="p-2 bg-amber-100 rounded-lg">
-                          <Award className="h-6 w-6 text-amber-600" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold">{countryInfo.unesco_count}</div>
-                          <div className="text-sm text-gray-600">UNESCO World Heritage Sites</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Link href="/">
-                    <Card className="hover:shadow-md transition-shadow">
-                      <CardContent className="pt-6">
-                        <div className="flex items-center space-x-4">
-                          <div className="p-2 bg-green-100 rounded-lg">
-                            <MapPin className="h-6 w-6 text-green-600" />
-                          </div>
-                          <div>
-                            <div className="text-2xl font-bold">Interactive Map</div>
-                            <div className="text-sm text-gray-600">& Detailed Guides</div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-surface-container-low rounded-lg text-primary-brand">
+                      <Award className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-headline font-black text-primary-brand leading-none">{countryInfo.unesco_count}</div>
+                      <div className="text-xs font-label text-on-surface-variant mt-0.5">UNESCO World Heritage Sites</div>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+          </section>
 
-              {/* Sites Grid */}
-              <Suspense fallback={<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{[...Array(6)].map((_, i) => <div key={i} className="h-64 bg-gray-100 rounded-lg animate-pulse" />)}</div>}>
+          {/* Sites Grid */}
+          <section className="px-8 py-16 bg-surface">
+            <div className="max-w-6xl mx-auto">
+              <span className="text-xs font-headline font-bold uppercase tracking-[0.2em] text-primary-brand">Explore</span>
+              <h2 className="text-3xl font-headline font-black text-primary-brand tracking-tight mt-1 mb-8">
+                All Sites in {countryInfo.country}
+              </h2>
+              <Suspense fallback={
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[...Array(6)].map((_, i) => <div key={i} className="h-64 bg-surface-container rounded-2xl animate-pulse" />)}
+                </div>
+              }>
                 <SiteGrid
                   countrySlug={params.country_slug}
                   initialSites={countryInfo.sites}
                 />
               </Suspense>
             </div>
-          </div>
+          </section>
+
         </div>
       </ErrorBoundary>
     </>
