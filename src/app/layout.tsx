@@ -5,7 +5,7 @@ import type { Metadata } from 'next'
 import Script from 'next/script'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { daysOne, geist, geistMono } from './fonts/fonts'
+import { daysOne, geist, geistMono, spaceGrotesk, notoSerif, inter } from './fonts/fonts'
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export const metadata: Metadata = {
@@ -70,11 +70,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`h-full ${daysOne.variable} ${geist.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`h-full ${daysOne.variable} ${geist.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${notoSerif.variable} ${inter.variable}`}>
       <head>
         <OrganizationSchema />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="https://images.archaeolist.com/archaeolist_map_preview.png" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+          rel="stylesheet"
+        />
         <Script id="google-tag-manager" strategy="afterInteractive">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

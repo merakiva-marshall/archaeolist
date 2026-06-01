@@ -4,6 +4,7 @@
 
 import { ProcessedPeriods } from '../types/site';
 import { useState } from 'react';
+import { cn } from '../lib/utils';
 
 const PERIOD_DEFINITIONS = {
   "Paleolithic": "3.3 million years ago – 10,000 BCE",
@@ -85,7 +86,7 @@ interface SitePeriodsProps {
   periods?: ProcessedPeriods;
   isFloating?: boolean;
   headingLevel?: 'h2' | 'h3';
-  variant?: 'mobile' | 'desktop';
+  variant?: 'mobile' | 'desktop' | 'redesign';
 }
 
 export default function SitePeriods({
@@ -101,6 +102,73 @@ export default function SitePeriods({
   } | null>(null);
 
   const HeadingTag = headingLevel;
+
+  // Redesign variant - vertical stack (one period per line, oldest to newest)
+  if (variant === 'redesign') {
+    const sortedPeriods = Object.keys(PERIOD_DEFINITIONS);
+
+    return (
+      <div className="space-y-2">
+        {sortedPeriods.map((period) => {
+          const isPresent = period in periods;
+          const dateRange = PERIOD_DEFINITIONS[period as keyof typeof PERIOD_DEFINITIONS];
+
+          return (
+            <div
+              key={period}
+              className="relative group"
+              onMouseEnter={(e) => {
+                if (isPresent) {
+                  setTooltip({
+                    text: dateRange,
+                    x: e.clientX,
+                    y: e.clientY
+                  });
+                }
+              }}
+              onMouseLeave={() => setTooltip(null)}
+            >
+              <div className={cn(
+                "flex items-center gap-3 p-3 rounded-lg transition-all duration-200",
+                isPresent
+                  ? "bg-[#003b93]/5 hover:bg-[#003b93]/10"
+                  : "opacity-40 hover:opacity-60"
+              )}>
+                <div className={cn(
+                  "rounded-full transition-all duration-200 flex-shrink-0",
+                  isPresent
+                    ? 'w-3 h-3 bg-[#003b93]'
+                    : 'w-2.5 h-2.5 border-2 border-[#c3c6d6] bg-transparent'
+                )} />
+                <span className={cn(
+                  "font-label transition-all duration-200",
+                  isPresent
+                    ? 'text-base font-semibold text-[#1b1c1c]'
+                    : 'text-sm text-[#737785]'
+                )}>
+                  {period}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Tooltip */}
+        {tooltip && (
+          <div
+            className="fixed z-50 bg-white px-3 py-2 rounded-lg shadow-lg border text-sm whitespace-nowrap font-body"
+            style={{
+              left: `${tooltip.x + 10}px`,
+              top: `${tooltip.y - 10}px`,
+              transform: 'translateY(-100%)'
+            }}
+          >
+            {tooltip.text}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (variant === 'mobile') {
     return (

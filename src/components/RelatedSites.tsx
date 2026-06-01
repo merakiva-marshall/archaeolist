@@ -8,10 +8,60 @@ import { Site } from '../types/site'
 interface RelatedSitesProps {
     sites: Pick<Site, 'name' | 'slug' | 'country_slug' | 'short_description' | 'images'>[]
     country: string
+    variant?: 'default' | 'redesign'
 }
 
-export default function RelatedSites({ sites, country }: RelatedSitesProps) {
+export default function RelatedSites({ sites, country, variant = 'default' }: RelatedSitesProps) {
     if (!sites || sites.length === 0) return null
+
+    // Redesign variant - 3-column card grid
+    if (variant === 'redesign') {
+        return (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {sites.map((site) => (
+                  <Link
+                    key={`${site.country_slug}-${site.slug}`}
+                    href={`/sites/${site.country_slug}/${site.slug}`}
+                    className="group"
+                  >
+                    <div className="bg-[#ffffff] rounded-xl border border-[#c3c6d6]/20 overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-[#003b93]/30">
+                      <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
+                        {site.images && site.images.length > 0 ? (
+                          <Image
+                            src={site.images[0].url}
+                            alt={site.name}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                        ) : (
+                          <SitePlaceholder name={site.name} />
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-headline font-semibold text-lg text-[#1b1c1c] line-clamp-1 mb-2 group-hover:text-[#003b93] transition-colors">
+                          {site.name}
+                        </h3>
+                        <p className="text-sm font-body text-[#434653] line-clamp-2">
+                          {site.short_description || 'Explore this archaeological site.'}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <div className="flex justify-center pt-4">
+                <Link
+                  href={`/sites/${sites[0].country_slug}`}
+                  className="inline-flex items-center px-6 py-3 rounded-xl border border-[#c3c6d6]/20 font-label font-medium text-[#1b1c1c] bg-[#ffffff] hover:bg-[#003b93] hover:text-white hover:border-[#003b93] transition-all duration-200"
+                >
+                  View all sites in {country}
+                </Link>
+              </div>
+            </>
+        )
+    }
 
     return (
         <Card>

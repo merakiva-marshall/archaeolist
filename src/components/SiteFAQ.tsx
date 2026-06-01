@@ -10,9 +10,10 @@ import ReactMarkdown from 'react-markdown';
 
 interface FAQProps {
   faqs: FAQ[];
+  variant?: 'default' | 'redesign';
 }
 
-export default function SiteFAQ({ faqs }: FAQProps) {
+export default function SiteFAQ({ faqs, variant = 'default' }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   if (!faqs || !Array.isArray(faqs) || faqs.length === 0) {
@@ -73,6 +74,74 @@ export default function SiteFAQ({ faqs }: FAQProps) {
   const processAnswer = (answer: string) => {
     return answer.replace(/\\n/g, '\n');
   };
+
+  // Redesign variant - accordion cards
+  if (variant === 'redesign') {
+    return (
+      <motion.div
+        className="max-w-3xl space-y-3"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {faqs.map((faq, index) => (
+          <motion.div
+            key={index}
+            variants={itemVariants}
+            className={cn(
+              "bg-[#ffffff] rounded-xl border transition-all duration-200",
+              openIndex === index
+                ? "border-[#003b93] shadow-md"
+                : "border-[#c3c6d6]/20 hover:shadow-lg"
+            )}
+          >
+            <button
+              onClick={() => setOpenIndex(openIndex === index ? null : index)}
+              className="w-full flex justify-between items-start gap-4 p-5 text-left"
+            >
+              <span className={cn(
+                "font-label font-semibold transition-colors duration-200",
+                openIndex === index ? "text-[#003b93]" : "text-[#1b1c1c]"
+              )}>
+                {faq.question}
+              </span>
+              <motion.div
+                animate={{ rotate: openIndex === index ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex-shrink-0"
+              >
+                <ChevronDown className={cn(
+                  "h-5 w-5 transition-colors duration-200",
+                  openIndex === index ? "text-[#003b93]" : "text-[#737785]"
+                )} />
+              </motion.div>
+            </button>
+            <AnimatePresence>
+              {openIndex === index && (
+                <motion.div
+                  variants={contentVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="overflow-hidden"
+                >
+                  <div className="px-5 pb-5 pt-0">
+                    <div className="prose max-w-none font-body text-[#434653]">
+                      <ReactMarkdown
+                        className="[&>p]:mb-4 [&>p]:leading-relaxed [&>h1]:mb-4 [&>h2]:mb-3 [&>h3]:mb-3 [&>ul]:mb-4 [&>ol]:mb-4 [&>ul]:space-y-2 [&>ol]:space-y-2"
+                      >
+                        {processAnswer(faq.answer)}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
+      </motion.div>
+    );
+  }
 
   return (
     <Card className="overflow-hidden bg-white/50 backdrop-blur-sm shadow-sm border border-border">
