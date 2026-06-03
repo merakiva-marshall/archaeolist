@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import Script from 'next/script'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import PageViewTracker from '../components/PageViewTracker'
 import { daysOne, geist, geistMono, spaceGrotesk, notoSerif, inter } from './fonts/fonts'
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -96,6 +97,7 @@ export default function RootLayout({
             style={{ display: 'none', visibility: 'hidden' }}
           />
         </noscript>
+        <PageViewTracker />
         <Header />
         <main className="flex-1 relative">
           {children}

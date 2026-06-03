@@ -1,7 +1,10 @@
+'use client';
+
 import Image from 'next/image';
 import { Star, ExternalLink } from 'lucide-react';
 import { Button } from './ui/button';
 import { ViatorTour } from '@/lib/viator/types';
+import { trackEvent } from '@/lib/analytics';
 
 export default function ViatorTours({ tours }: { tours: ViatorTour[] }) {
     if (!tours || tours.length === 0) return null;
@@ -19,12 +22,19 @@ export default function ViatorTours({ tours }: { tours: ViatorTour[] }) {
             </div>
 
             <div className="space-y-3">
-                {tours.map((tour) => (
+                {tours.map((tour, index) => (
                     <a
                         key={tour.tour_id}
                         href={tour.url || '#'}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() =>
+                            trackEvent('viator_click', {
+                                tour_id: tour.tour_id,
+                                site_id: tour.site_id,
+                                metadata: { position: index, variant: 'default' },
+                            })
+                        }
                         className="flex gap-3 rounded-xl border bg-white p-3 hover:shadow-md transition-shadow duration-200 group"
                     >
                         {/* Image */}

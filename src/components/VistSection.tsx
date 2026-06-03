@@ -9,6 +9,7 @@ import { Button } from './ui/button';
 import Image from 'next/image';
 import { ViatorTour } from '@/lib/viator/types';
 import ViatorTours from './ViatorTours';
+import { trackEvent } from '@/lib/analytics';
 
 // Helper to check if user is in US or CA
 // Returns false on error to be safe with restriction
@@ -74,12 +75,20 @@ export default function VisitSection({
           <div>
             <h3 className="font-headline font-bold text-[#1b1c1c] text-lg mb-4">Recommended Tours</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-              {tours.slice(0, 3).map((tour) => (
+              {tours.slice(0, 3).map((tour, index) => (
                 <a
                   key={tour.tour_id}
                   href={tour.url || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() =>
+                    trackEvent('viator_click', {
+                      tour_id: tour.tour_id,
+                      site_id: tour.site_id,
+                      country_slug,
+                      metadata: { position: index, variant: 'redesign' },
+                    })
+                  }
                   className="bg-[#ffffff] rounded-xl border border-[#c3c6d6]/20 overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   <div className="aspect-[16/10] bg-[#e8eaed]">
