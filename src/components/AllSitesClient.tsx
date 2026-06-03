@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Site } from '../types/site';
@@ -23,6 +24,11 @@ import {
 } from "./ui/select";
 import { Checkbox } from './ui/checkbox';
 import { SiteMetadata } from '../lib/sites';
+
+const Map = dynamic(() => import('./Map'), {
+    ssr: false,
+    loading: () => <div className="w-full h-full bg-slate-100 animate-pulse rounded-xl" />
+});
 
 interface AllSitesClientProps {
     initialSites: Site[];
@@ -597,6 +603,22 @@ export default function AllSitesClient({ initialSites, totalCount, metadata, cur
                                 </Button>
                             </div>
                         )}
+                    </div>
+
+                    {/* Interactive Map — driven by the same filters as the grid */}
+                    <div className="mb-6 relative w-full h-[500px] rounded-xl overflow-hidden border border-gray-200 shadow-sm bg-gray-100">
+                        <Map
+                            onSiteClick={(site) => router.push(`/sites/${site.country_slug}/${site.slug}`)}
+                            selectedSite={null}
+                            isSidebarOpen={false}
+                            filters={{
+                                countries: selectedCountries,
+                                periods: selectedPeriods,
+                                features: selectedFeatures,
+                                unesco: unescoOnly,
+                            }}
+                            persistViewKey="allSitesMapView"
+                        />
                     </div>
 
                     <div className="mb-4 text-sm text-gray-500 font-medium">

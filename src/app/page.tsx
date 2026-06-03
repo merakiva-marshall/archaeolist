@@ -3,6 +3,7 @@
 export const revalidate = 3600;
 
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import HomepageClient from '../components/HomepageClient'
 import FeaturedSites from '../components/FeaturedSites'
 import PopularCountries from '../components/PopularCountries'
@@ -26,7 +27,9 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      <HomepageClient />
+      <Suspense fallback={<div className="w-full h-[75vh] sm:h-[65vh] bg-slate-100 animate-pulse" />}>
+        <HomepageClient />
+      </Suspense>
       <FeaturedSites />
       <PopularCountries />
       <MissionSection />

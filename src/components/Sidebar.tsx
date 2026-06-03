@@ -37,24 +37,25 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className={`bg-white shadow-2xl ring-1 ring-black/5
-                  transition-all duration-300 ease-in-out z-[100]
-                  
-                  /* Mobile Styles: Relative flow, appearing below map */
-                  max-sm:relative max-sm:w-full max-sm:top-0 max-sm:left-0 max-sm:right-0 max-sm:bottom-auto
-                  max-sm:min-h-0 max-sm:rounded-none max-sm:border-t max-sm:border-gray-200
-                  ${isOpen ? 'max-sm:block' : 'max-sm:hidden'}
+      className={`absolute bg-white shadow-2xl ring-1 ring-black/5 overflow-hidden
+                  transition-all duration-300 ease-in-out z-[120]
 
-                  /* Desktop Styles: Absolute overlay */
-                  sm:absolute
-                  sm:w-[400px] sm:min-h-auto sm:max-h-[calc(100%-2rem)] sm:top-4 sm:bottom-4 sm:right-4
-                  sm:rounded-xl
+                  /* Mobile (<640): bottom sheet whose lower edge spills past the
+                     map, overlapping the filter bar below it */
+                  inset-x-2 top-[46%] -bottom-14 rounded-2xl
+                  ${isOpen ? 'translate-y-0' : 'translate-y-[150%]'}
+
+                  /* Tablet & up (>=640): right-side overlay card */
+                  sm:inset-x-auto sm:top-3 sm:bottom-3 sm:right-3 sm:h-auto sm:w-[330px] sm:max-h-[calc(100%-1.5rem)] sm:rounded-xl
                   ${isOpen
-          ? 'sm:translate-x-0'
-          : 'sm:translate-x-[calc(100%+1rem)]'
-        }`}
+          ? 'sm:translate-y-0 sm:translate-x-0'
+          : 'sm:translate-y-0 sm:translate-x-[calc(100%+1rem)]'
+        }
+
+                  /* Desktop (>=1024): a touch wider */
+                  lg:w-[380px]`}
     >
-      <div className="h-full flex flex-col p-6 max-sm:pb-12">
+      <div className="h-full min-h-0 flex flex-col p-5 sm:p-6">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -69,7 +70,7 @@ export default function Sidebar({ isOpen, onClose, site, onLearnMore, onOpen }: 
 
         <h2 className="text-2xl font-bold mb-4 pr-8">{site.name}</h2>
 
-        <div className="flex-grow overflow-y-auto px-0.5">
+        <div className="flex-grow min-h-0 overflow-y-auto px-0.5">
           {firstImage && (
             <div className="mb-4 w-full">
               <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">

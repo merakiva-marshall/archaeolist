@@ -36,6 +36,37 @@ export interface FAQData {
   faqs: FAQ[];
 }
 
+// Slim shape used to render map markers + drive client-side filtering.
+// Intentionally omits heavy columns (description, images, etc.) — the full
+// record is fetched on demand when a site is selected.
+export interface MapSite {
+  id: string;
+  name: string;
+  slug: string;
+  country: string;
+  country_slug: string;
+  location: [number, number];
+  is_unesco: boolean;
+  periods: string[];
+  features: string[];
+}
+
+// Active map filters, mirrored to/from the URL query params shared with the
+// All Sites page.
+export interface MapFilters {
+  countries: string[];
+  periods: string[];
+  features: string[];
+  unesco: boolean;
+}
+
+export const EMPTY_MAP_FILTERS: MapFilters = {
+  countries: [],
+  periods: [],
+  features: [],
+  unesco: false,
+};
+
 export interface Site {
   // Required properties
   id: string;

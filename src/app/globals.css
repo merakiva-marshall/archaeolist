@@ -94,6 +94,26 @@ body {
   }
 }
 
+/* Desktop hover tooltip for individual map points */
+.site-hover-tooltip .mapboxgl-popup-content {
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.92);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+.site-hover-tooltip .mapboxgl-popup-tip {
+  display: none;
+}
+
+.site-hover-tooltip__label {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* Custom scrollbar for sidebar */
 .sidebar-scroll::-webkit-scrollbar {
   width: 6px;
